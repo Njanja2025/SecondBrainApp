@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Author</key>
+    <string>Lloyd Kavhanda</string>
+    <key>BundledFiles</key>
+    <array>
+        <string>/Users/mac/Documents/SecondBrainApp 2025</string>
+        <string>/Users/mac/Documents/SecondBrainApp 2025/assets</string>
+        <string>/Users/mac/Documents/SecondBrainApp 2025/requirements.txt</string>
+    </array>
+    <key>Creator</key>
+    <string>Platypus-5.4</string>
+    <key>Identifier</key>
+    <string>com.secondbrain.app</string>
+    <key>Name</key>
+    <string>SecondBrainApp</string>
+    <key>Version</key>
+    <string>2025</string>
+    <key>Description</key>
+    <string>SecondBrain Assistant with Voice Integration</string>
+    <key>IconPath</key>
+    <string>/Users/mac/Documents/SecondBrainApp 2025/assets/brain_mic_icon.icns</string>
+    <key>ScriptPath</key>
+    <string>/Users/mac/Documents/SecondBrainApp 2025/start_assistant.sh</string>
+    <key>InterfaceType</key>
+    <string>Status Menu</string>
+    <key>Authentication</key>
+    <false/>
+    <key>Remain</key>
+    <true/>
+    <key>RemainAfterCompletion</key>
+    <true/>
+    <key>RunInBackground</key>
+    <true/>
+    <key>StatusItemDisplayType</key>
+    <string>Text</string>
+    <key>StatusItemIcon</key>
+    <data></data>
+    <key>StatusItemTitle</key>
+    <string>🧠</string>
+    <key>StatusItemUseSystemFont</key>
+    <true/>
+    <key>DevelopmentVersion</key>
+    <false/>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.15.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>OptimizeApplication</key>
+    <true/>
+    <key>RequiresAdminPrivileges</key>
+    <false/>
+    <key>Droppable</key>
+    <false/>
+    <key>MenuItems</key>
+    <array>
+        <dict>
+            <key>Title</key>
+            <string>Open Dashboard</string>
+            <key>Action</key>
+            <string>OpenDashboard</string>
+        </dict>
+        <dict>
+            <key>Title</key>
+            <string>Check Status</string>
+            <key>Action</key>
+            <string>CheckStatus</string>
+        </dict>
+        <dict>
+            <key>Title</key>
+            <string>-</string>
+        </dict>
+        <dict>
+            <key>Title</key>
+            <string>Quit</string>
+            <key>Action</key>
+            <string>Quit</string>
+        </dict>
+    </array>
+</dict>
+</plist> 

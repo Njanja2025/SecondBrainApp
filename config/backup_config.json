@@ -1,0 +1,33 @@
+{
+    "backup": {
+        "schedule_time": "00:00",
+        "max_backups": 7,
+        "compression_level": 9,
+        "enable_encryption": true
+    },
+    "cloud_sync": {
+        "dropbox": {
+            "enabled": true,
+            "path": "${DROPBOX_BACKUP_PATH}"
+        },
+        "gdrive": {
+            "enabled": true,
+            "path": "${GDRIVE_BACKUP_PATH}"
+        },
+        "github": {
+            "enabled": true,
+            "repo": "${GITHUB_REPO_PATH}",
+            "branch": "backups"
+        }
+    },
+    "security": {
+        "scan_before_backup": true,
+        "verify_integrity": true,
+        "threat_action": "warn"
+    },
+    "monitoring": {
+        "metrics_enabled": true,
+        "prometheus_port": 8000,
+        "datadog_enabled": true
+    }
+} 

@@ -1,0 +1,1 @@
+This file contains a readable version of the main source code in Notepad-friendly format.

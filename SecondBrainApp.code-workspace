@@ -1,0 +1,166 @@
+{
+  "folders": [
+    {
+      "path": "/Users/mac/Documents/SecondBrainApp 2025"
+    }
+  ],
+  "settings": {
+    "terminal.integrated.cwd": "/Users/mac/Documents/SecondBrainApp 2025",
+    "files.autoSave": "onFocusChange",
+    "workbench.editor.restoreViewState": true,
+    "workbench.startupEditor": "none",
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.profiles.osx": {
+      "zsh": {
+        "path": "/bin/zsh",
+        "args": ["-l"]
+      }
+    },
+    "workbench.editor.enablePreview": false,
+    "terminal.integrated.profiles.osx": {
+      "Python Environment": {
+        "path": "python3",
+        "args": ["-m", "IPython"],
+        "icon": "terminal-python"
+      }
+    },
+    "terminal.integrated.defaultProfile.osx": "Python Environment",
+    "editor.formatOnSave": true,
+    "python.defaultInterpreterPath": "python3",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.linting.enabled": true,
+    "python.formatting.provider": "black",
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "editor.rulers": [80, 100],
+    "editor.wordWrap": "on",
+    "editor.suggestSelection": "first",
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    "files.exclude": {
+      "**/__pycache__": true,
+      "**/.DS_Store": true,
+      "**/*.pyc": true,
+      ".pytest_cache": true,
+      ".coverage": true,
+      "**/.ipynb_checkpoints": true
+    },
+    "workbench.colorCustomizations": {
+      "statusBar.background": "#1e4174",
+      "statusBar.foreground": "#ffffff",
+      "editorBracketHighlight.foreground1": "#ffd700",
+      "editorBracketHighlight.foreground2": "#da70d6",
+      "editorBracketHighlight.foreground3": "#87cefa"
+    },
+    "files.associations": {
+      "*.py": "python",
+      "requirements.txt": "pip-requirements",
+      "*.ipynb": "jupyter-notebook"
+    },
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+      "*.py": "${capture}.test.py, ${capture}.spec.py, test_${capture}.py",
+      "requirements.txt": "requirements*.txt, constraints.txt",
+      "README.md": "LICENSE, CHANGELOG.md"
+    },
+    "todo-tree.highlights.customHighlight": {
+      "TODO": {
+        "foreground": "#fff",
+        "background": "#ffbd2a",
+        "iconColour": "#ffbd2a"
+      },
+      "FIXME": {
+        "foreground": "#fff",
+        "background": "#f06292",
+        "iconColour": "#f06292"
+      }
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-toolsai.jupyter",
+      "gruntfuggly.todo-tree",
+      "njpwerner.autodocstring",
+      "kevinrose.vsc-python-indent",
+      "streetsidesoftware.code-spell-checker",
+      "visualstudioexptteam.vscodeintellicode",
+      "ms-python.vscode-pylance",
+      "eamodio.gitlens",
+      "mhutchie.git-graph"
+    ]
+  },
+  "launch": {
+    "configurations": [
+      {
+        "name": "Launch Dashboard",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/launch_dashboard.py",
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Start Voice Processor",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/voice_processor.py",
+        "console": "integratedTerminal"
+      }
+    ]
+  },
+  "files.defaultFoldersToOpen": [
+    "/Users/mac/Documents/SecondBrainApp 2025"
+  ],
+  "files.defaultFilesToOpen": [
+    "/Users/mac/Documents/SecondBrainApp 2025/voice_processor.py",
+    "/Users/mac/Documents/SecondBrainApp 2025/launch_dashboard.py",
+    "/Users/mac/Documents/SecondBrainApp 2025/start_assistant.sh"
+  ],
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Install Dependencies",
+        "type": "shell",
+        "command": "pip install -r requirements.txt",
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "Run Tests",
+        "type": "shell",
+        "command": "python -m pytest",
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        },
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "Clean Python Cache",
+        "type": "shell",
+        "command": "find . -type d -name \"__pycache__\" -exec rm -r {} + && find . -type f -name \"*.pyc\" -delete",
+        "problemMatcher": []
+      }
+    ]
+  },
+  "keybindings": [
+    {
+      "key": "cmd+shift+r",
+      "command": "workbench.action.tasks.runTask",
+      "args": "Run Tests"
+    },
+    {
+      "key": "cmd+shift+i",
+      "command": "workbench.action.tasks.runTask",
+      "args": "Install Dependencies"
+    }
+  ]
+} 

@@ -1,0 +1,1 @@
+This represents the SecondBrain macOS application package.

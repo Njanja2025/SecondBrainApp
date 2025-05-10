@@ -1,0 +1,251 @@
+{
+    "versions": [
+        {
+            "name": "standard",
+            "title": "Welcome to Njanja AI Empire",
+            "subtitle": "AI-Powered Business Solutions",
+            "features": [
+                "AI-Powered Business Solutions",
+                "Automated Content Generation",
+                "Smart Analytics & Insights",
+                "24/7 Customer Support"
+            ],
+            "style": {
+                "text_color": "#ffffff",
+                "highlight_color": "#00ff00",
+                "background_color": [0, 0, 0],
+                "font": "Arial-Bold"
+            },
+            "effects": {
+                "text_animation": {
+                    "3d": true,
+                    "zoom": true,
+                    "slide": true,
+                    "fade": true,
+                    "rotate": false,
+                    "wave": true
+                },
+                "background": {
+                    "particles": true,
+                    "num_particles": 150,
+                    "gradient": true,
+                    "color_shift": false,
+                    "wave": true
+                },
+                "banner": {
+                    "zoom": true,
+                    "rotate": false,
+                    "wave": true
+                },
+                "feature_animation": {
+                    "slide": true,
+                    "bounce": true,
+                    "wave": true
+                },
+                "global": {
+                    "fade": true,
+                    "color_shift": false,
+                    "wave": true
+                }
+            },
+            "thumbnail": {
+                "enhance": true,
+                "gradient": true,
+                "gradient_colors": [[0, 0, 0, 128], [0, 0, 0, 64]],
+                "gradient_direction": "vertical",
+                "blur": true,
+                "blur_radius": 2,
+                "title_effects": {
+                    "shadow": true,
+                    "shadow_offset": 3,
+                    "glow": true,
+                    "glow_radius": 2
+                },
+                "subtitle_effects": {
+                    "shadow": true,
+                    "shadow_offset": 2
+                },
+                "logo_glow": true,
+                "border": true,
+                "border_width": 5,
+                "border_color": [255, 255, 255]
+            }
+        },
+        {
+            "name": "premium",
+            "title": "Njanja AI Empire Premium",
+            "subtitle": "Enterprise-Grade AI Solutions",
+            "features": [
+                "Advanced AI Integration",
+                "Custom Automation Workflows",
+                "Real-time Analytics Dashboard",
+                "Dedicated Support Team"
+            ],
+            "style": {
+                "text_color": "#ffffff",
+                "highlight_color": "#ffd700",
+                "background_color": [20, 20, 40],
+                "font": "Arial-Bold"
+            },
+            "effects": {
+                "text_animation": {
+                    "3d": true,
+                    "zoom": true,
+                    "slide": true,
+                    "fade": true,
+                    "rotate": true,
+                    "wave": true
+                },
+                "background": {
+                    "particles": true,
+                    "num_particles": 200,
+                    "gradient": true,
+                    "color_shift": true,
+                    "wave": true
+                },
+                "banner": {
+                    "zoom": true,
+                    "rotate": true,
+                    "wave": true
+                },
+                "feature_animation": {
+                    "slide": true,
+                    "bounce": true,
+                    "wave": true
+                },
+                "global": {
+                    "fade": true,
+                    "color_shift": true,
+                    "wave": true
+                }
+            },
+            "thumbnail": {
+                "enhance": true,
+                "gradient": true,
+                "gradient_colors": [[20, 20, 40, 128], [40, 40, 60, 64]],
+                "gradient_direction": "vertical",
+                "blur": true,
+                "blur_radius": 3,
+                "title_effects": {
+                    "shadow": true,
+                    "shadow_offset": 4,
+                    "glow": true,
+                    "glow_radius": 3
+                },
+                "subtitle_effects": {
+                    "shadow": true,
+                    "shadow_offset": 3,
+                    "glow": true,
+                    "glow_radius": 2
+                },
+                "logo_glow": true,
+                "border": true,
+                "border_width": 6,
+                "border_color": [255, 215, 0]
+            }
+        },
+        {
+            "name": "startup",
+            "title": "Njanja AI for Startups",
+            "subtitle": "Launch Your Business with AI",
+            "features": [
+                "Quick Setup & Integration",
+                "Affordable AI Solutions",
+                "Growth Analytics",
+                "Community Support"
+            ],
+            "style": {
+                "text_color": "#ffffff",
+                "highlight_color": "#00bfff",
+                "background_color": [0, 20, 40],
+                "font": "Arial-Bold"
+            },
+            "effects": {
+                "text_animation": {
+                    "3d": true,
+                    "zoom": true,
+                    "slide": true,
+                    "fade": true,
+                    "rotate": false,
+                    "wave": true
+                },
+                "background": {
+                    "particles": true,
+                    "num_particles": 100,
+                    "gradient": true,
+                    "color_shift": false,
+                    "wave": true
+                },
+                "banner": {
+                    "zoom": true,
+                    "rotate": false,
+                    "wave": true
+                },
+                "feature_animation": {
+                    "slide": true,
+                    "bounce": true,
+                    "wave": true
+                },
+                "global": {
+                    "fade": true,
+                    "color_shift": false,
+                    "wave": true
+                }
+            },
+            "thumbnail": {
+                "enhance": true,
+                "gradient": true,
+                "gradient_colors": [[0, 20, 40, 128], [0, 40, 80, 64]],
+                "gradient_direction": "vertical",
+                "blur": true,
+                "blur_radius": 2,
+                "title_effects": {
+                    "shadow": true,
+                    "shadow_offset": 3,
+                    "glow": true,
+                    "glow_radius": 2
+                },
+                "subtitle_effects": {
+                    "shadow": true,
+                    "shadow_offset": 2,
+                    "glow": true,
+                    "glow_radius": 1
+                },
+                "logo_glow": true,
+                "border": true,
+                "border_width": 5,
+                "border_color": [0, 191, 255]
+            }
+        }
+    ],
+    "rendering": {
+        "fps": 30,
+        "resolution": [1920, 1080],
+        "bitrate": "10000k",
+        "preset": "medium",
+        "threads": 4
+    },
+    "audio": {
+        "fade_in": 1.0,
+        "fade_out": 1.0,
+        "volume": 1.0
+    },
+    "effects": {
+        "text_animation": {
+            "3d": true,
+            "zoom": true,
+            "slide": true,
+            "fade": true,
+            "wave": true
+        },
+        "background": {
+            "particles": true,
+            "gradient": true,
+            "wave": true
+        },
+        "transitions": {
+            "crossfade": true,
+            "duration": 0.5
+        }
+    }
+} 

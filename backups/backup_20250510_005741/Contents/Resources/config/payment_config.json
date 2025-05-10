@@ -1,0 +1,111 @@
+{
+    "stripe_secret_key": "sk_test_your_secret_key_here",
+    "stripe_publishable_key": "pk_test_your_publishable_key_here",
+    "webhook_secret": "whsec_test_XXXXXXXXXXXXXXXX",
+    "webhook_endpoint": "https://your-domain.com/api/payment/webhook",
+    "payment_config_path": "config/payment_config.json",
+    "supported_currencies": ["usd", "eur", "gbp"],
+    "default_currency": "usd",
+    "payment_methods": ["card"],
+    "tax_rates": {
+        "usd": {
+            "standard": 0.08,
+            "reduced": 0.05
+        },
+        "eur": {
+            "standard": 0.20,
+            "reduced": 0.10
+        },
+        "gbp": {
+            "standard": 0.20,
+            "reduced": 0.05
+        }
+    },
+    "subscription_plans": {
+        "basic": {
+            "name": "Basic Plan",
+            "price_id": "price_basic",
+            "features": ["Basic features"]
+        },
+        "premium": {
+            "name": "Premium Plan",
+            "price_id": "price_premium",
+            "features": ["All basic features", "Premium features"]
+        },
+        "enterprise": {
+            "name": "Enterprise Plan",
+            "description": "Custom solutions for organizations",
+            "price_id": "price_enterprise_id",
+            "price": {
+                "usd": 49.99,
+                "eur": 44.99,
+                "gbp": 39.99
+            },
+            "interval": "month",
+            "features": [
+                "All Premium features",
+                "Custom integrations",
+                "Dedicated support",
+                "Team management",
+                "Advanced security"
+            ]
+        }
+    },
+    "webhook_server": {
+        "host": "0.0.0.0",
+        "port": 5000,
+        "debug": false
+    },
+    "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "logs/payments.log"
+    },
+    "security": {
+        "api_key_encryption": true,
+        "webhook_verification": true,
+        "log_failed_attempts": true,
+        "alert_threshold": 3
+    },
+    "urls": {
+        "success": "https://your-domain.com/payment/success",
+        "cancel": "https://your-domain.com/payment/cancel"
+    },
+    "stripe_keys": {
+        "secret": "your_stripe_secret_key",
+        "publishable": "your_stripe_publishable_key"
+    },
+    "webhook_secrets": {
+        "stripe": "your_stripe_webhook_secret"
+    },
+    "email_alerts": {
+        "sender": "youremail@example.com",
+        "receiver": "admin@njanja.net",
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587,
+        "smtp_password": "your_app_password"
+    },
+    "plans": {
+        "basic": {
+            "name": "Basic Plan",
+            "price_id": "price_basic",
+            "amount": 999,
+            "currency": "usd",
+            "interval": "month"
+        },
+        "premium": {
+            "name": "Premium Plan",
+            "price_id": "price_premium",
+            "amount": 1999,
+            "currency": "usd",
+            "interval": "month"
+        },
+        "enterprise": {
+            "name": "Enterprise Plan",
+            "price_id": "price_enterprise",
+            "amount": 4999,
+            "currency": "usd",
+            "interval": "month"
+        }
+    }
+} 

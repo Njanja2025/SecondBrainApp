@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Business Starter Pack | Njanja Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #818CF8;
+            --text-color: #1F2937;
+            --bg-color: #F9FAFB;
+            --accent-color: #10B981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .price-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .price {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .buy-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .buy-button:hover {
+            background: #0EA271;
+        }
+
+        .audio-player {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .audio-player h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        #delivery-status {
+            display: none;
+            background: #F0FDF4;
+            border: 1px solid var(--accent-color);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .price {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="container">
+            <h1>AI Business Starter Pack</h1>
+            <p>Launch your digital business with our comprehensive AI toolkit</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="audio-player">
+            <h3>🎤 Welcome Message</h3>
+            <audio controls id="welcome-audio">
+                <source src="voice_scripts/homepage_intro.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <h3>🤖 AI Automation Tool</h3>
+                <p>Streamline your workflow with our powerful AI automation tools. Save hours on repetitive tasks and focus on growing your business.</p>
+            </div>
+            <div class="feature-card">
+                <h3>📚 Editable eBook</h3>
+                <p>Comprehensive guide with customizable content to help you establish and grow your digital presence.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🎯 Marketing Templates</h3>
+                <p>Ready-to-use marketing materials designed to attract and convert customers across all platforms.</p>
+            </div>
+        </div>
+
+        <div class="price-section">
+            <div class="price">ZAR 499.00</div>
+            <p>One-time payment, instant delivery</p>
+            <button class="buy-button" onclick="payWithPaystack()">Buy Now</button>
+            <div id="delivery-status"></div>
+        </div>
+    </div>
+
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script>
+        // Auto-play welcome message with user interaction
+        document.addEventListener('DOMContentLoaded', function() {
+            const audioElement = document.getElementById('welcome-audio');
+            document.body.addEventListener('click', function() {
+                audioElement.play().catch(function(error) {
+                    console.log("Audio play failed:", error);
+                });
+            }, { once: true });
+        });
+
+        // Payment handling
+        function payWithPaystack() {
+            const handler = PaystackPop.setup({
+                key: 'pk_test_702e2471b3b9dd34fb6c',
+                email: 'buyer@njanja.net',
+                amount: 49900 * 100,
+                currency: 'ZAR',
+                callback: function(response) {
+                    handleSuccessfulPayment(response);
+                },
+                onClose: function() {
+                    const statusDiv = document.getElementById('delivery-status');
+                    statusDiv.style.display = 'block';
+                    statusDiv.style.background = '#FEF2F2';
+                    statusDiv.style.border = '1px solid #EF4444';
+                    statusDiv.innerHTML = 'Transaction cancelled. Click "Buy Now" to try again.';
+                }
+            });
+            handler.openIframe();
+        }
+
+        // Handle successful payment
+        function handleSuccessfulPayment(response) {
+            const statusDiv = document.getElementById('delivery-status');
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#F0FDF4';
+            statusDiv.style.border = '1px solid #10B981';
+            statusDiv.innerHTML = `
+                <h3>Thank you for your purchase!</h3>
+                <p>Transaction Reference: ${response.reference}</p>
+                <p>Your download link will be sent to your email shortly.</p>
+            `;
+
+            // Send purchase confirmation to backend
+            fetch('/api/process-purchase', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    reference: response.reference,
+                    email: 'buyer@njanja.net'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.downloadUrl;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                statusDiv.innerHTML += '<p>If you don\'t receive the email, please contact support@njanja.net</p>';
+            });
+        }
+    </script>
+</body>
+</html> 

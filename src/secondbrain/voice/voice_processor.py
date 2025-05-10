@@ -11,6 +11,7 @@ import tempfile
 import queue
 import threading
 from ..core.phantom_mcp import PhantomMCP
+import pyttsx3
 
 logger = logging.getLogger(__name__)
 
@@ -447,4 +448,81 @@ class VoiceProcessor:
             
         except Exception as e:
             logger.error(f"Error stopping voice processor: {str(e)}")
-            raise 
+            raise
+
+class VoiceEngine:
+    def __init__(self, voice_name: str = "Samantha"):
+        """Initialize voice engine with specified voice."""
+        self.engine = pyttsx3.init()
+        self.base_rate = 175  # Default speech rate
+        self.base_volume = 1.0
+        self.base_pitch = 1.0
+        self._configure_engine()
+        self.set_voice(voice_name)
+        
+    def _configure_engine(self):
+        """Configure initial engine properties."""
+        self.engine.setProperty('rate', self.base_rate)
+        self.engine.setProperty('volume', self.base_volume)
+        
+    def set_voice(self, name: str):
+        """Set the voice by name."""
+        voices = self.engine.getProperty('voices')
+        voice_found = False
+        
+        for voice in voices:
+            if name.lower() in voice.name.lower():
+                self.engine.setProperty('voice', voice.id)
+                voice_found = True
+                logger.info(f"Set voice to: {voice.name}")
+                break
+                
+        if not voice_found:
+            logger.warning(f"Voice '{name}' not found. Using default voice.")
+            
+    def speak(self, message: str, emotion_modifiers: Optional[Dict[str, float]] = None):
+        """
+        Speak the message with optional emotional modulation.
+        
+        Args:
+            message: Text to speak
+            emotion_modifiers: Optional dict of emotion-based modifications
+                             e.g. {"pitch": 1.1, "speed": 0.9, "volume": 1.0}
+        """
+        try:
+            # Apply emotional modulation if provided
+            if emotion_modifiers:
+                self._apply_emotion_modifiers(emotion_modifiers)
+            
+            # Speak the message
+            self.engine.say(message)
+            self.engine.runAndWait()
+            
+            # Reset to base properties after speaking
+            if emotion_modifiers:
+                self._reset_properties()
+                
+        except Exception as e:
+            logger.error(f"Failed to speak message: {str(e)}")
+            
+    def _apply_emotion_modifiers(self, modifiers: Dict[str, float]):
+        """Apply emotional modifiers to voice properties."""
+        if "speed" in modifiers:
+            self.engine.setProperty('rate', self.base_rate * modifiers["speed"])
+        if "volume" in modifiers:
+            self.engine.setProperty('volume', self.base_volume * modifiers["volume"])
+        if "pitch" in modifiers:
+            # Note: pitch modification might not be supported by all TTS engines
+            try:
+                self.engine.setProperty('pitch', self.base_pitch * modifiers["pitch"])
+            except:
+                logger.warning("Pitch modification not supported by the TTS engine")
+                
+    def _reset_properties(self):
+        """Reset voice properties to base values."""
+        self.engine.setProperty('rate', self.base_rate)
+        self.engine.setProperty('volume', self.base_volume)
+        try:
+            self.engine.setProperty('pitch', self.base_pitch)
+        except:
+            pass 

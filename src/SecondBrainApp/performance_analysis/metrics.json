@@ -1,0 +1,99 @@
+{
+    "system_metrics": {
+        "name": "system_metrics",
+        "metrics": [
+            {
+                "name": "cpu_usage",
+                "type": "cpu",
+                "category": "system",
+                "description": "CPU usage percentage",
+                "unit": "%",
+                "threshold": 80.0,
+                "weight": 1.0
+            },
+            {
+                "name": "memory_usage",
+                "type": "memory",
+                "category": "system",
+                "description": "Memory usage percentage",
+                "unit": "%",
+                "threshold": 80.0,
+                "weight": 1.0
+            },
+            {
+                "name": "disk_usage",
+                "type": "disk",
+                "category": "system",
+                "description": "Disk usage percentage",
+                "unit": "%",
+                "threshold": 85.0,
+                "weight": 0.8
+            },
+            {
+                "name": "network_io",
+                "type": "network",
+                "category": "system",
+                "description": "Network I/O in MB",
+                "unit": "MB",
+                "threshold": 1000.0,
+                "weight": 0.6
+            }
+        ],
+        "reports": [
+            {
+                "name": "system_report",
+                "format": "markdown",
+                "metrics": ["cpu_usage", "memory_usage", "disk_usage", "network_io"],
+                "interval": 3600,
+                "retention": 7
+            }
+        ],
+        "sampling_interval": 60,
+        "analysis_window": 3600,
+        "alert_threshold": 0.8
+    },
+    "application_metrics": {
+        "name": "application_metrics",
+        "metrics": [
+            {
+                "name": "response_time",
+                "type": "custom",
+                "category": "application",
+                "description": "API response time",
+                "unit": "ms",
+                "threshold": 1000.0,
+                "weight": 1.0
+            },
+            {
+                "name": "error_rate",
+                "type": "custom",
+                "category": "application",
+                "description": "Error rate percentage",
+                "unit": "%",
+                "threshold": 1.0,
+                "weight": 1.2
+            },
+            {
+                "name": "request_rate",
+                "type": "custom",
+                "category": "application",
+                "description": "Requests per second",
+                "unit": "req/s",
+                "threshold": 100.0,
+                "weight": 0.8
+            }
+        ],
+        "reports": [
+            {
+                "name": "application_report",
+                "format": "markdown",
+                "metrics": ["response_time", "error_rate", "request_rate"],
+                "interval": 1800,
+                "retention": 14
+            }
+        ],
+        "sampling_interval": 30,
+        "analysis_window": 1800,
+        "alert_threshold": 0.9
+    }
+} 

@@ -1,3 +1,7 @@
+# Environment variables
+.env
+.env.*
+
 # Python
 __pycache__/
 *.py[cod]
@@ -21,6 +25,9 @@ wheels/
 *.egg
 
 # Virtual Environment
+.env
+.venv
+env/
 venv/
 ENV/
 
@@ -29,23 +36,70 @@ ENV/
 .vscode/
 *.swp
 *.swo
+.DS_Store
 
 # Logs
-*.log
 logs/
-Library/Logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.db
+*.sqlite3
+data/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+coverage.xml
+*.cover
+
+# Distribution
+dist/
+build/
+*.spec
+
+# Security
+*.key
+*.pem
+*.cert
+config/encryption_key.key
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Google Drive credentials
+*credentials*.json
 
 # Environment variables and secrets
-.env
 .aws/
 *.pem
 *.key
 
 # macOS
-.DS_Store
 .AppleDouble
 .LSOverride
 
 # SecondBrain specific
 .secondbrain/
-*.enc 
+*.enc
+
+# Project specific
+*.sqlite
+*.db
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Distribution
+*.dmg
+*.app 

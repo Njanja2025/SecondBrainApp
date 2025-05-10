@@ -1,0 +1,58 @@
+Report Metadata
+Generated At,{{ timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+Version,1.0
+Format,CSV
+Analysis Window Start,{{ data.overview.date_range.start }}
+Analysis Window End,{{ data.overview.date_range.end }}
+
+Overview Metrics
+Metric,Value
+Total Emails,{{ data.overview.total_emails }}
+Response Rate,{{ "%.1f"|format(data.metrics.response_rate) }}
+Average Response Time (hours),{{ "%.1f"|format(data.metrics.avg_response_time/3600) }}
+Overall Score,{{ "%.1f"|format(data.overview.overall_score) }}
+
+System Metrics
+Metric,Value
+Inbox Volume,{{ data.metrics.inbox_volume }}
+Response Time (seconds),{{ data.metrics.response_time }}
+Attachment Count,{{ data.metrics.attachment_count }}
+
+Application Metrics
+Category,Count,Percentage
+{% for category, count in data.metrics.categories.items() %}
+{{ category }},{{ count }},{{ "%.1f"|format(count/data.metrics.inbox_volume*100) }}
+{% endfor %}
+
+Anomalies
+{% if data.anomalies %}
+Metric,Value,Z-Score,Timestamp,Severity
+{% for anomaly in data.anomalies %}
+{{ anomaly.metric }},{{ "%.2f"|format(anomaly.value) }},{{ "%.2f"|format(anomaly.z_score) }},{{ anomaly.timestamp }},{{ anomaly.severity }}
+{% endfor %}
+{% else %}
+No anomalies detected during the analysis period.
+{% endif %}
+
+Recommendations
+{% if data.recommendations %}
+Priority,Category,Text
+{% for recommendation in data.recommendations %}
+{{ recommendation.priority if recommendation.priority else "medium" }},{{ recommendation.category if recommendation.category else "general" }},{{ recommendation }}
+{% endfor %}
+{% else %}
+No recommendations available at this time.
+{% endif %}
+
+Trends Analysis
+Metric,Change,Direction
+Volume,{{ "%.1f"|format(data.trends.volume_change) }},{{ "increasing" if data.trends.volume_change > 0 else "decreasing" }}
+Response Time,{{ "%.1f"|format(data.trends.response_time_change) }},{{ "increasing" if data.trends.response_time_change > 0 else "decreasing" }}
+Sentiment,{{ "%.1f"|format(data.trends.sentiment_change) }},{{ "improving" if data.trends.sentiment_change > 0 else "declining" }}
+
+Additional Information
+Metric,Value
+Analysis Method,{{ data.additional_info.analysis_method }}
+Data Points,{{ data.additional_info.data_points }}
+Sampling Interval,{{ data.additional_info.sampling_interval }}
+Confidence Level,{{ "%.1f"|format(data.additional_info.confidence_level) }} 

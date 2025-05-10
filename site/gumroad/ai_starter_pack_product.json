@@ -1,0 +1,55 @@
+{
+    "name": "AI Business Starter Pack",
+    "description": "Your fast-track toolkit to launch and scale your digital empire.\n\nIncludes:\n- AI automation tool\n- Editable eBook\n- Marketing templates\n\nInstant download after payment.",
+    "price": 499,
+    "currency": "USD",
+    "file": "NjanjaStorefront_Package.zip",
+    "cover_image": "cover_mockup.jpg",
+    "call_to_action": "Buy Now",
+    "tags": [
+        "ai",
+        "business",
+        "automation",
+        "digital",
+        "marketing"
+    ],
+    "categories": [
+        "Business",
+        "Technology",
+        "Marketing"
+    ],
+    "custom_fields": {
+        "version": "1.0.0",
+        "last_updated": "2024-05-08",
+        "file_size": "250MB",
+        "format": "ZIP"
+    },
+    "preview": {
+        "enabled": true,
+        "type": "video",
+        "url": "https://njanja.net/preview/ai_starter_pack.mp4"
+    },
+    "sales_page": {
+        "headline": "Launch Your Digital Empire with AI",
+        "subheadline": "The complete toolkit for building a high-performance digital business",
+        "features": [
+            "AI-powered automation tools",
+            "Professional marketing templates",
+            "Step-by-step business guide",
+            "24/7 customer support",
+            "Regular updates and improvements"
+        ],
+        "testimonials": [
+            {
+                "name": "Sarah K.",
+                "role": "Digital Entrepreneur",
+                "quote": "This toolkit transformed my business. The AI automation alone saved me hours every week."
+            },
+            {
+                "name": "Michael T.",
+                "role": "Startup Founder",
+                "quote": "The marketing templates are gold. I've seen a 3x increase in my conversion rates."
+            }
+        ]
+    }
+} 

@@ -1,0 +1,57 @@
+{
+    "app": {
+        "name": "SecondBrain",
+        "version": "0.1.0",
+        "environment": "development",
+        "debug": false
+    },
+    "gui": {
+        "enabled": true,
+        "theme": "dark",
+        "window_size": [800, 600],
+        "fullscreen": false
+    },
+    "voice": {
+        "enabled": true,
+        "input_device": "default",
+        "output_device": "default",
+        "language": "en-US"
+    },
+    "memory": {
+        "max_size_mb": 1024,
+        "backup_interval_minutes": 60,
+        "compression_enabled": true
+    },
+    "security": {
+        "encryption_enabled": true,
+        "key_rotation_days": 30,
+        "ssl_verify": true
+    },
+    "notifications": {
+        "email_enabled": false,
+        "slack_enabled": false,
+        "alert_threshold": 0.8
+    },
+    "logging": {
+        "level": "INFO",
+        "file_enabled": true,
+        "console_enabled": true,
+        "max_size_mb": 10,
+        "backup_count": 5
+    },
+    "health": {
+        "enabled": true,
+        "check_interval_minutes": 5,
+        "alert_threshold": 0.8
+    },
+    "web": {
+        "host": "localhost",
+        "port": 8000,
+        "ssl_enabled": false
+    },
+    "cloud": {
+        "dropbox_enabled": false,
+        "google_drive_enabled": false,
+        "aws_enabled": false
+    }
+} 

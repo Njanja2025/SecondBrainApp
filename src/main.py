@@ -13,14 +13,18 @@ from datetime import datetime
 from typing import Dict, Any
 from secondbrain.ai_agent import AIAgent
 from secondbrain.phantom.phantom_core import PhantomCore
+from pathlib import Path
+import argparse
+from secondbrain.cloud.test_runner import run_tests
+from secondbrain.cloud.scheduler import BackupScheduler
 
 # Initialize logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('phantom_logs/secondbrain.log'),
-        logging.StreamHandler(sys.stdout)
+        logging.FileHandler("logs/secondbrain.log"),
+        logging.StreamHandler()
     ]
 )
 
@@ -210,36 +214,39 @@ class SecondBrainApp:
 
 async def main():
     """Main application entry point."""
-    app = SecondBrainApp()
+    parser = argparse.ArgumentParser(description="SecondBrain AI Assistant")
+    parser.add_argument("--test", action="store_true", help="Run integration tests")
+    args = parser.parse_args()
     
     try:
-        # Handle graceful shutdown
-        loop = asyncio.get_event_loop()
-        for signal in ('SIGINT', 'SIGTERM'):
-            loop.add_signal_handler(
-                getattr(signal, signal),
-                lambda: asyncio.create_task(app.shutdown())
-            )
+        # Create necessary directories
+        Path("logs").mkdir(exist_ok=True)
+        Path("data/memory").mkdir(parents=True, exist_ok=True)
         
-        # Start the application
-        await app.startup()
+        # Run tests if requested
+        if args.test:
+            logger.info("Running integration tests...")
+            success = await run_tests()
+            if not success:
+                logger.error("Integration tests failed")
+                return
         
-        # Start system monitoring
-        monitor_task = asyncio.create_task(app.monitor_system())
+        # Initialize and start scheduler
+        scheduler = BackupScheduler()
+        await scheduler.start()
         
-        # Keep running until interrupted
+        # Keep the application running
         while True:
-            await asyncio.sleep(1)
+            await asyncio.sleep(60)
             
     except KeyboardInterrupt:
-        await app.shutdown()
+        logger.info("Shutting down...")
+        if 'scheduler' in locals():
+            await scheduler.stop()
     except Exception as e:
-        logger.error(f"Application error: {str(e)}")
-        await app.shutdown()
-        sys.exit(1)
-    finally:
-        if 'monitor_task' in locals():
-            monitor_task.cancel()
+        logger.error(f"Application error: {e}")
+        if 'scheduler' in locals():
+            await scheduler.stop()
 
 if __name__ == "__main__":
     # Ensure phantom_logs directory exists

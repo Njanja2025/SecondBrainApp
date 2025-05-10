@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .platform-card {
+            transition: transform 0.2s;
+        }
+        .platform-card:hover {
+            transform: translateY(-5px);
+        }
+        .audio-player {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .audio-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">Social Media Dashboard</span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Platform Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card platform-card">
+                    <div class="card-body">
+                        <h5 class="card-title">LinkedIn</h5>
+                        <p class="card-text">
+                            Posts: <span id="linkedin-posts">0</span><br>
+                            Engagement: <span id="linkedin-engagement">0%</span><br>
+                            Reach: <span id="linkedin-reach">0</span>
+                        </p>
+                        <div id="linkedin-audio" class="audio-content"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card platform-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Twitter</h5>
+                        <p class="card-text">
+                            Posts: <span id="twitter-posts">0</span><br>
+                            Engagement: <span id="twitter-engagement">0%</span><br>
+                            Reach: <span id="twitter-reach">0</span>
+                        </p>
+                        <div id="twitter-audio" class="audio-content"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card platform-card">
+                    <div class="card-body">
+                        <h5 class="card-title">TikTok</h5>
+                        <p class="card-text">
+                            Posts: <span id="tiktok-posts">0</span><br>
+                            Engagement: <span id="tiktok-engagement">0%</span><br>
+                            Reach: <span id="tiktok-reach">0</span>
+                        </p>
+                        <div id="tiktok-audio" class="audio-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Engagement Rate</h5>
+                        <div id="engagement-chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Reach</h5>
+                        <div id="reach-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scheduled Posts -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Scheduled Posts</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Platform</th>
+                                        <th>Content</th>
+                                        <th>Scheduled Time</th>
+                                        <th>Audio</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scheduled-posts">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audio Generation Form -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Generate Audio Content</h5>
+                        <form id="audio-form">
+                            <div class="mb-3">
+                                <label for="platform" class="form-label">Platform</label>
+                                <select class="form-select" id="platform" required>
+                                    <option value="linkedin">LinkedIn</option>
+                                    <option value="twitter">Twitter</option>
+                                    <option value="tiktok">TikTok</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Content</label>
+                                <textarea class="form-control" id="content" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Generate Audio</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update platform statistics
+        function updateStats() {
+            fetch('/api/stats')
+                .then(response => response.json())
+                .then(data => {
+                    for (const [platform, stats] of Object.entries(data)) {
+                        document.getElementById(`${platform}-posts`).textContent = stats.total_posts;
+                        document.getElementById(`${platform}-engagement`).textContent = 
+                            `${(stats.engagement_rate * 100).toFixed(2)}%`;
+                        document.getElementById(`${platform}-reach`).textContent = stats.reach;
+                        
+                        // Update audio content
+                        const audioContainer = document.getElementById(`${platform}-audio`);
+                        audioContainer.innerHTML = '';
+                        stats.audio_content.forEach(audio => {
+                            const audioElement = document.createElement('div');
+                            audioElement.className = 'audio-player';
+                            audioElement.innerHTML = `
+                                <audio controls>
+                                    <source src="/api/audio/${audio.name}" type="audio/mpeg">
+                                    Your browser does not support the audio element.
+                                </audio>
+                                <div class="audio-controls">
+                                    <button class="btn btn-sm btn-outline-primary" 
+                                            onclick="downloadAudio('${audio.name}')">
+                                        Download
+                                    </button>
+                                </div>
+                            `;
+                            audioContainer.appendChild(audioElement);
+                        });
+                    }
+                });
+        }
+
+        // Update charts
+        function updateCharts() {
+            fetch('/api/charts/engagement')
+                .then(response => response.json())
+                .then(data => {
+                    Plotly.newPlot('engagement-chart', JSON.parse(data));
+                });
+
+            fetch('/api/charts/reach')
+                .then(response => response.json())
+                .then(data => {
+                    Plotly.newPlot('reach-chart', JSON.parse(data));
+                });
+        }
+
+        // Update scheduled posts
+        function updateScheduledPosts() {
+            fetch('/api/scheduled')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('scheduled-posts');
+                    tbody.innerHTML = '';
+                    data.forEach(post => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${post.platform}</td>
+                            <td>${post.content}</td>
+                            <td>${new Date(post.scheduled_time).toLocaleString()}</td>
+                            <td>${post.has_audio ? '✓' : '✗'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" 
+                                        onclick="generateAudio('${post.platform}', '${post.content}')">
+                                    Generate Audio
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        // Generate audio content
+        function generateAudio(platform, content) {
+            fetch('/api/audio/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ platform, content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Audio generated successfully!');
+                    updateStats();
+                } else {
+                    alert('Error generating audio: ' + data.error);
+                }
+            });
+        }
+
+        // Download audio file
+        function downloadAudio(filename) {
+            window.location.href = `/api/audio/${filename}`;
+        }
+
+        // Handle audio generation form submission
+        document.getElementById('audio-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const platform = document.getElementById('platform').value;
+            const content = document.getElementById('content').value;
+            generateAudio(platform, content);
+        });
+
+        // Initial update
+        updateStats();
+        updateCharts();
+        updateScheduledPosts();
+
+        // Update every 30 seconds
+        setInterval(() => {
+            updateStats();
+            updateCharts();
+            updateScheduledPosts();
+        }, 30000);
+    </script>
+</body>
+</html> 

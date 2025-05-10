@@ -1,157 +1,140 @@
 #!/bin/bash
 
-# Color definitions
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
 # Configuration
-APP_NAME="SecondBrainApp"
+APP_NAME="SecondBrain"
 VERSION="2025"
-APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DIST_DIR="$APP_DIR/dist"
-BUILD_DIR="$APP_DIR/build"
+BUILD_DIR="build"
+APP_BUNDLE="$BUILD_DIR/$APP_NAME.app"
+APP_CONTENTS="$APP_BUNDLE/Contents"
+APP_MACOS="$APP_CONTENTS/MacOS"
+APP_RESOURCES="$APP_CONTENTS/Resources"
+APP_FRAMEWORKS="$APP_CONTENTS/Frameworks"
+APP_PLUGINS="$APP_CONTENTS/PlugIns"
+APP_SHARED_SUPPORT="$APP_CONTENTS/SharedSupport"
 
-# Function to print status
-print_status() {
-    echo -e "${2}$(date '+%Y-%m-%d %H:%M:%S') - $1${NC}"
+# Logging function
+log() {
+    local level=$1
+    local message=$2
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$level] $message"
 }
 
-# Function to check command existence
-check_command() {
-    if ! command -v "$1" &> /dev/null; then
-        print_status "❌ Error: $1 is required but not installed." "$RED"
-        case "$1" in
-            "platypus")
-                print_status "To install Platypus, you can use Homebrew:" "$BLUE"
-                print_status "  brew install platypus" "$YELLOW"
-                print_status "Then link the command-line tool:" "$BLUE"
-                print_status "  sudo ln -sf /Applications/Platypus.app/Contents/Resources/platypus_clt /usr/local/bin/platypus" "$YELLOW"
-                ;;
-            "zip")
-                print_status "To install zip:" "$BLUE"
-                print_status "  brew install zip" "$YELLOW"
-                ;;
-        esac
-        return 1
-    fi
-    return 0
+# Create app bundle structure
+create_app_bundle() {
+    log "INFO" "Creating app bundle structure..."
+    
+    # Create directory structure
+    mkdir -p "$APP_MACOS"
+    mkdir -p "$APP_RESOURCES"
+    mkdir -p "$APP_FRAMEWORKS"
+    mkdir -p "$APP_PLUGINS"
+    mkdir -p "$APP_SHARED_SUPPORT"
+    
+    # Create Info.plist
+    cat > "$APP_CONTENTS/Info.plist" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleExecutable</key>
+    <string>$APP_NAME</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.secondbrain.app</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>$APP_NAME</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>$VERSION</string>
+    <key>CFBundleVersion</key>
+    <string>$VERSION</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.15</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+</dict>
+</plist>
+EOF
+    
+    # Create launcher script
+    cat > "$APP_MACOS/$APP_NAME" << EOF
+#!/bin/bash
+cd "\$(dirname "\$0")/../Resources"
+exec python3.11 launcher/main.py "\$@"
+EOF
+    chmod +x "$APP_MACOS/$APP_NAME"
+    
+    # Copy resources
+    cp -r "resources" "$APP_RESOURCES/"
+    cp -r "launcher" "$APP_RESOURCES/"
+    cp -r "config" "$APP_RESOURCES/"
+    cp -r "models" "$APP_RESOURCES/"
+    cp -r "voices" "$APP_RESOURCES/"
+    
+    # Copy frameworks
+    cp -r "venv/lib/python3.11/site-packages" "$APP_FRAMEWORKS/"
+    
+    # Create PkgInfo
+    echo "APPL????" > "$APP_CONTENTS/PkgInfo"
 }
 
-# Function to verify directory existence
-verify_directory() {
-    if [ ! -d "$1" ]; then
-        print_status "Creating directory: $1" "$YELLOW"
-        mkdir -p "$1" || {
-            print_status "❌ Failed to create directory: $1" "$RED"
-            exit 1
-        }
-    fi
+# Create DMG
+create_dmg() {
+    log "INFO" "Creating DMG..."
+    local dmg_path="$BUILD_DIR/$APP_NAME-$VERSION.dmg"
+    
+    # Create temporary directory for DMG
+    local temp_dir="$BUILD_DIR/dmg_temp"
+    mkdir -p "$temp_dir"
+    
+    # Copy app bundle
+    cp -r "$APP_BUNDLE" "$temp_dir/"
+    
+    # Create DMG
+    hdiutil create -volname "$APP_NAME" -srcfolder "$temp_dir" -ov -format UDZO "$dmg_path"
+    
+    # Cleanup
+    rm -rf "$temp_dir"
 }
 
-# Function to verify file existence
-verify_file() {
-    if [ ! -f "$1" ]; then
-        print_status "❌ Required file not found: $1" "$RED"
-        return 1
-    fi
-    return 0
+# Create zip archive
+create_zip() {
+    log "INFO" "Creating zip archive..."
+    local zip_path="$BUILD_DIR/$APP_NAME-$VERSION.zip"
+    
+    # Create zip
+    cd "$BUILD_DIR"
+    zip -r "$zip_path" "$APP_NAME.app"
+    cd - > /dev/null
 }
 
-# Check required tools
-print_status "🔍 Checking required tools..." "$YELLOW"
-TOOLS_MISSING=0
-for tool in "platypus" "zip"; do
-    if ! check_command "$tool"; then
-        TOOLS_MISSING=1
-    fi
-done
-
-if [ $TOOLS_MISSING -eq 1 ]; then
-    print_status "Please install missing tools and try again" "$RED"
-    exit 1
-fi
-
-# Verify required directories and files
-print_status "🔍 Verifying project structure..." "$YELLOW"
-verify_directory "$APP_DIR"
-verify_directory "$APP_DIR/assets"
-verify_directory "$APP_DIR/logs"
-
-REQUIRED_FILES=(
-    "$APP_DIR/SecondBrainApp.code-workspace"
-    "$APP_DIR/start_assistant.sh"
-    "$APP_DIR/requirements.txt"
-    "$APP_DIR/SecondBrainApp.platypus"
-)
-
-FILES_MISSING=0
-for file in "${REQUIRED_FILES[@]}"; do
-    if ! verify_file "$file"; then
-        FILES_MISSING=1
-    fi
-done
-
-if [ $FILES_MISSING -eq 1 ]; then
-    print_status "Please ensure all required files are present and try again" "$RED"
-    exit 1
-fi
-
-# Create distribution directories
-verify_directory "$DIST_DIR"
-verify_directory "$BUILD_DIR"
-
-# Clean previous builds
-print_status "🧹 Cleaning previous builds..." "$YELLOW"
-rm -rf "$DIST_DIR"/* "$BUILD_DIR"/*
-
-# Build macOS app using Platypus
-print_status "🔨 Building macOS app..." "$YELLOW"
-platypus -P "$APP_DIR/SecondBrainApp.platypus" "$BUILD_DIR/$APP_NAME.app" || {
-    print_status "❌ Failed to build macOS app" "$RED"
-    print_status "Check Platypus configuration and try again" "$YELLOW"
-    exit 1
+# Main packaging process
+main() {
+    log "INFO" "Starting packaging process for $APP_NAME v$VERSION"
+    
+    # Create build directory if it doesn't exist
+    mkdir -p "$BUILD_DIR"
+    
+    # Create app bundle
+    create_app_bundle
+    
+    # Create distribution
+    create_dmg
+    create_zip
+    
+    log "INFO" "Packaging complete!"
+    echo "Distribution files are available in: $BUILD_DIR"
+    echo "- $APP_NAME-$VERSION.dmg"
+    echo "- $APP_NAME-$VERSION.zip"
 }
 
-# Create ZIP archive
-print_status "📦 Creating ZIP archive..." "$YELLOW"
-zip -r "$DIST_DIR/${APP_NAME}_${VERSION}.zip" \
-    "$BUILD_DIR/$APP_NAME.app" \
-    "$APP_DIR/SecondBrainApp.code-workspace" \
-    "$APP_DIR/README.md" \
-    "$APP_DIR/start_assistant.sh" \
-    "$APP_DIR/requirements.txt" \
-    "$APP_DIR/assets" || {
-    print_status "❌ Failed to create ZIP archive" "$RED"
-    exit 1
-}
-
-# Create desktop shortcut
-print_status "🔗 Creating desktop shortcut..." "$YELLOW"
-if cp "$APP_DIR/Launch_SecondBrainApp.command" "$HOME/Desktop/"; then
-    chmod +x "$HOME/Desktop/Launch_SecondBrainApp.command"
-    print_status "✅ Desktop shortcut created" "$GREEN"
-else
-    print_status "❌ Failed to create desktop shortcut" "$RED"
-fi
-
-# Final status report
-print_status "\n📋 Build Summary:" "$BLUE"
-print_status "✨ Package creation complete!" "$GREEN"
-print_status "📍 Distribution files: $DIST_DIR" "$GREEN"
-if [ -f "$HOME/Desktop/Launch_SecondBrainApp.command" ]; then
-    print_status "🚀 Desktop shortcut: $HOME/Desktop/Launch_SecondBrainApp.command" "$GREEN"
-fi
-
-print_status "\n📦 Distribution package includes:" "$BLUE"
-print_status "- macOS App Bundle" "$YELLOW"
-print_status "- Workspace configuration" "$YELLOW"
-print_status "- Documentation" "$YELLOW"
-print_status "- Launch scripts" "$YELLOW"
-print_status "- Assets and resources" "$YELLOW"
-
-print_status "\n📝 Next steps:" "$BLUE"
-print_status "1. Install the app from: $BUILD_DIR/$APP_NAME.app" "$YELLOW"
-print_status "2. Test the desktop shortcut" "$YELLOW" 
+# Run main function
+main 

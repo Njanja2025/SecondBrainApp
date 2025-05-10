@@ -1,0 +1,30 @@
+{
+    "linkedin": [
+        {
+            "content": "🚀 Excited to announce the launch of our AI Business Starter Pack! Transform your business operations with our comprehensive toolkit featuring:\n\n✨ 50+ AI Integration Templates\n🤖 30+ Automation Scripts\n📊 Custom Dashboard Templates\n🎯 Marketing & Sales Tools\n\nPerfect for entrepreneurs and businesses looking to leverage AI for growth.\n\nSpecial launch price: $499 (Regular $997)\n\nLearn more: [GUMROAD_LINK]\n\n#AIBusiness #DigitalTransformation #BusinessAutomation",
+            "media": ["cover_mockup.jpg", "product_demo.gif"],
+            "tags": ["#AIBusiness", "#DigitalTransformation", "#BusinessAutomation", "#Entrepreneurship", "#SmallBusiness"]
+        }
+    ],
+    "twitter": [
+        {
+            "content": "🚀 Just launched: AI Business Starter Pack!\n\nTransform your business with:\n✨ 50+ AI Templates\n🤖 30+ Automation Scripts\n📊 Custom Dashboards\n\nSpecial launch price: $499\n\nGet it here: [GUMROAD_LINK]\n\n#AIBusiness #BusinessAutomation",
+            "media": ["cover_mockup.jpg"],
+            "tags": ["#AIBusiness", "#BusinessAutomation", "#Entrepreneurship"]
+        }
+    ],
+    "tiktok": [
+        {
+            "script": "Transform your business with AI! 🚀\n\nOur new AI Business Starter Pack includes:\n✨ 50+ AI Templates\n🤖 30+ Automation Scripts\n📊 Custom Dashboards\n\nSpecial launch price: $499\n\nGet it now: [GUMROAD_LINK]\n\n#AIBusiness #BusinessAutomation",
+            "hashtags": ["#AIBusiness", "#BusinessAutomation", "#Entrepreneurship", "#SmallBusiness", "#DigitalTransformation"],
+            "music": "trending_business_beat",
+            "effects": ["text_reveal", "glitch_transition"]
+        }
+    ],
+    "youtube": {
+        "title": "Transform Your Business with AI - Complete Starter Pack Review",
+        "description": "In this video, I'll show you how to transform your business operations with our new AI Business Starter Pack. Learn about the powerful features and how to implement them in your business.\n\n✨ What's Included:\n- 50+ AI Integration Templates\n- 30+ Automation Scripts\n- Custom Dashboard Templates\n- Marketing & Sales Tools\n\n🎁 Special Launch Price: $499 (Regular $997)\n\nGet it here: [GUMROAD_LINK]\n\nTimestamps:\n00:00 - Introduction\n02:15 - Key Features\n05:30 - Live Demo\n12:45 - Implementation Guide\n18:20 - Success Stories\n22:00 - Pricing & Bonuses\n25:15 - Q&A\n\n#AIBusiness #BusinessAutomation #DigitalTransformation",
+        "tags": ["AIBusiness", "BusinessAutomation", "DigitalTransformation", "Entrepreneurship", "SmallBusiness", "MarketingAutomation"],
+        "thumbnail": "video_thumbnail.jpg"
+    }
+} 

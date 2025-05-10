@@ -1,0 +1,63 @@
+{
+    "example_api": {
+        "base_url": "https://api.example.com",
+        "endpoints": {
+            "users": {
+                "path": "/users",
+                "methods": ["GET", "POST"],
+                "params": {
+                    "limit": "integer",
+                    "offset": "integer",
+                    "sort": "string"
+                },
+                "auth_required": true,
+                "rate_limit": 100
+            },
+            "user": {
+                "path": "/users/{id}",
+                "methods": ["GET", "PUT", "DELETE"],
+                "params": {
+                    "id": "string"
+                },
+                "auth_required": true,
+                "rate_limit": 100
+            },
+            "auth": {
+                "path": "/auth/token",
+                "methods": ["POST"],
+                "params": {
+                    "username": "string",
+                    "password": "string"
+                },
+                "auth_required": false,
+                "rate_limit": 10
+            }
+        }
+    },
+    "weather_api": {
+        "base_url": "https://api.weather.com",
+        "endpoints": {
+            "current": {
+                "path": "/current",
+                "methods": ["GET"],
+                "params": {
+                    "city": "string",
+                    "units": "string"
+                },
+                "auth_required": true,
+                "rate_limit": 60
+            },
+            "forecast": {
+                "path": "/forecast",
+                "methods": ["GET"],
+                "params": {
+                    "city": "string",
+                    "days": "integer",
+                    "units": "string"
+                },
+                "auth_required": true,
+                "rate_limit": 60
+            }
+        }
+    }
+} 

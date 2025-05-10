@@ -1,0 +1,117 @@
+{
+    "landing_page": {
+        "variations": [
+            {
+                "id": "control",
+                "name": "Original",
+                "elements": {
+                    "headline": "Transform Your Business with AI",
+                    "subheadline": "The Complete AI Business Starter Pack",
+                    "cta": "Get Started Now",
+                    "price": "$499",
+                    "original_price": "$997"
+                }
+            },
+            {
+                "id": "benefit_focused",
+                "name": "Benefit-Focused",
+                "elements": {
+                    "headline": "Save 15 Hours Weekly with AI Automation",
+                    "subheadline": "The AI Business Starter Pack - Your Time-Saving Solution",
+                    "cta": "Save Time Now",
+                    "price": "$499",
+                    "original_price": "$997"
+                }
+            },
+            {
+                "id": "social_proof",
+                "name": "Social Proof",
+                "elements": {
+                    "headline": "Join 1000+ Businesses Using AI Successfully",
+                    "subheadline": "The AI Business Starter Pack - Trusted by Entrepreneurs",
+                    "cta": "Join Success Stories",
+                    "price": "$499",
+                    "original_price": "$997"
+                }
+            }
+        ]
+    },
+    "email_subject": {
+        "variations": [
+            {
+                "id": "control",
+                "subject": "Welcome to AI Business Starter Pack! 🚀"
+            },
+            {
+                "id": "curiosity",
+                "subject": "Your AI Transformation Begins Now..."
+            },
+            {
+                "id": "urgency",
+                "subject": "Limited Time: Start Your AI Journey Today"
+            }
+        ]
+    },
+    "social_posts": {
+        "variations": [
+            {
+                "id": "control",
+                "platform": "linkedin",
+                "content": "🚀 Excited to announce the launch of our AI Business Starter Pack! Transform your business operations with our comprehensive toolkit featuring:\n\n✨ 50+ AI Integration Templates\n🤖 30+ Automation Scripts\n📊 Custom Dashboard Templates\n🎯 Marketing & Sales Tools"
+            },
+            {
+                "id": "case_study",
+                "platform": "linkedin",
+                "content": "📈 Case Study: How Sarah's Digital Solutions increased lead generation by 40% using our AI Business Starter Pack. Read the full story and learn how you can achieve similar results.\n\n✨ 50+ AI Integration Templates\n🤖 30+ Automation Scripts\n📊 Custom Dashboard Templates"
+            },
+            {
+                "id": "testimonial",
+                "platform": "linkedin",
+                "content": "💬 'The automation tools alone saved us countless hours. We've been able to scale our operations without hiring additional staff.' - Michael T., Digital Agency CEO\n\nTransform your business with our AI Business Starter Pack:"
+            }
+        ]
+    },
+    "pricing": {
+        "variations": [
+            {
+                "id": "control",
+                "price": "$499",
+                "original_price": "$997",
+                "discount": "50%"
+            },
+            {
+                "id": "premium",
+                "price": "$997",
+                "original_price": "$1997",
+                "discount": "50%",
+                "bonus": "Free 1:1 Consultation"
+            },
+            {
+                "id": "starter",
+                "price": "$299",
+                "original_price": "$597",
+                "discount": "50%",
+                "limitation": "Basic Features Only"
+            }
+        ]
+    },
+    "cta": {
+        "variations": [
+            {
+                "id": "control",
+                "text": "Get Started Now",
+                "color": "#4CAF50"
+            },
+            {
+                "id": "action",
+                "text": "Transform Your Business",
+                "color": "#2196F3"
+            },
+            {
+                "id": "urgency",
+                "text": "Limited Time Offer",
+                "color": "#F44336"
+            }
+        ]
+    }
+} 

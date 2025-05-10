@@ -1,0 +1,53 @@
+{
+    "stripe_secret_key": "sk_test_51NxXXXXXXXXXXXXX",
+    "stripe_publishable_key": "pk_test_51NxXXXXXXXXXXXXX",
+    "webhook_secret": "whsec_test_XXXXXXXXXXXXX",
+    "webhook_endpoint": "http://localhost:5000/api/payment/webhook",
+    "payment_config_path": "config/test_payment_config.json",
+    "supported_currencies": ["usd"],
+    "default_currency": "usd",
+    "subscription_plans": {
+        "basic": {
+            "price_id": "price_test_basic",
+            "name": "Test Basic Plan",
+            "price": {
+                "usd": 9.99
+            },
+            "interval": "month",
+            "features": [
+                "Basic journaling",
+                "Emotional tracking",
+                "Basic memory management"
+            ]
+        },
+        "premium": {
+            "price_id": "price_test_premium",
+            "name": "Test Premium Plan",
+            "price": {
+                "usd": 19.99
+            },
+            "interval": "month",
+            "features": [
+                "Advanced journaling",
+                "Emotional analytics",
+                "Advanced memory management",
+                "AI-powered insights",
+                "Priority support"
+            ]
+        }
+    },
+    "urls": {
+        "success": "http://localhost:5000/success",
+        "cancel": "http://localhost:5000/cancel"
+    },
+    "logging": {
+        "file": "logs/test_payments.log",
+        "level": "DEBUG",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    },
+    "security": {
+        "api_key_encryption": true,
+        "webhook_verification": true,
+        "log_failed_attempts": true
+    }
+} 

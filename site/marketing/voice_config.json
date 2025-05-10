@@ -1,0 +1,30 @@
+{
+    "voice": "Samantha",
+    "rate": 175,
+    "pitch": 50,
+    "volume": 1.0,
+    "background": {
+        "frequency": 440,
+        "duration": 30,
+        "gain": -30
+    },
+    "mixing": {
+        "background_gain": -20,
+        "fade_in": 1000,
+        "fade_out": 1000
+    },
+    "platforms": {
+        "linkedin": {
+            "max_duration": 60,
+            "style": "professional"
+        },
+        "twitter": {
+            "max_duration": 30,
+            "style": "casual"
+        },
+        "tiktok": {
+            "max_duration": 60,
+            "style": "energetic"
+        }
+    }
+} 

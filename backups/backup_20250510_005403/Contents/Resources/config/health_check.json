@@ -1,0 +1,91 @@
+{
+    "health_checks": {
+        "system": {
+            "enabled": true,
+            "interval_seconds": 60,
+            "checks": [
+                {
+                    "name": "cpu_usage",
+                    "warning_threshold": 75,
+                    "critical_threshold": 90
+                },
+                {
+                    "name": "memory_usage",
+                    "warning_threshold": 75,
+                    "critical_threshold": 90
+                },
+                {
+                    "name": "disk_usage",
+                    "warning_threshold": 80,
+                    "critical_threshold": 90
+                }
+            ]
+        },
+        "services": {
+            "enabled": true,
+            "interval_seconds": 120,
+            "services": [
+                {
+                    "name": "dashboard",
+                    "endpoint": "http://localhost:8000/status",
+                    "timeout_seconds": 5
+                },
+                {
+                    "name": "backup_service",
+                    "endpoint": "http://localhost:8001/status",
+                    "timeout_seconds": 5
+                },
+                {
+                    "name": "alert_service",
+                    "endpoint": "http://localhost:8002/status",
+                    "timeout_seconds": 5
+                }
+            ]
+        },
+        "database": {
+            "enabled": true,
+            "interval_seconds": 300,
+            "connection_timeout": 5,
+            "query_timeout": 10
+        },
+        "external_services": {
+            "enabled": true,
+            "interval_seconds": 300,
+            "services": [
+                {
+                    "name": "dropbox",
+                    "check_type": "api",
+                    "timeout_seconds": 10
+                },
+                {
+                    "name": "gdrive",
+                    "check_type": "api",
+                    "timeout_seconds": 10
+                }
+            ]
+        }
+    },
+    "notifications": {
+        "email": {
+            "enabled": true,
+            "recipients": ["${ALERT_TO_EMAIL}"],
+            "cooldown_minutes": 30
+        },
+        "slack": {
+            "enabled": true,
+            "webhook_url": "${SLACK_WEBHOOK_URL}",
+            "channel": "#secondbrain-monitoring",
+            "username": "SecondBrain Monitor",
+            "icon_emoji": ":brain:",
+            "notification_levels": ["critical", "warning", "info"],
+            "thread_alerts": true,
+            "daily_summary": true
+        }
+    },
+    "reporting": {
+        "enabled": true,
+        "interval_hours": 24,
+        "format": ["html", "json"],
+        "retention_days": 30
+    }
+} 

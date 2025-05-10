@@ -1,0 +1,57 @@
+{
+  "last_startup": "2025-05-06T14:28:44.772281",
+  "components": {
+    "memory": {
+      "status": "running",
+      "initialized_at": "2025-05-06T14:28:44.769042"
+    },
+    "phantom_mcp": {
+      "status": "running",
+      "initialized_at": "2025-05-06T14:28:44.769356"
+    },
+    "phantom_core": {
+      "status": "running",
+      "initialized_at": "2025-05-06T14:28:44.769680"
+    },
+    "security": {
+      "status": "running",
+      "initialized_at": "2025-05-06T14:28:44.770160"
+    },
+    "wallet": {
+      "status": "running",
+      "initialized_at": "2025-05-06T14:28:44.770252"
+    },
+    "blockchain": {
+      "status": "running",
+      "initialized_at": "2025-05-06T14:28:44.770352"
+    },
+    "voice_enhancer": {
+      "status": "running",
+      "initialized_at": "2025-05-06T14:28:44.770489"
+    },
+    "voice_processor": {
+      "status": "running",
+      "initialized_at": "2025-05-06T14:28:44.770731"
+    },
+    "recommendation_engine": {
+      "status": "running",
+      "initialized_at": "2025-05-06T14:28:44.771281"
+    },
+    "context_manager": {
+      "status": "running",
+      "initialized_at": "2025-05-06T14:28:44.771793"
+    }
+  },
+  "startup_order": [
+    "memory",
+    "phantom_mcp",
+    "phantom_core",
+    "security",
+    "wallet",
+    "blockchain",
+    "voice_enhancer",
+    "voice_processor",
+    "recommendation_engine",
+    "context_manager"
+  ]
+}

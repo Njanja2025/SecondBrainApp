@@ -1,0 +1,79 @@
+report:
+  metadata:
+    generated_at: {{ timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+    version: "1.0"
+    format: "YAML"
+    analysis_window:
+      start: {{ data.overview.date_range.start }}
+      end: {{ data.overview.date_range.end }}
+
+  overview:
+    total_emails: {{ data.overview.total_emails }}
+    response_rate: {{ "%.1f"|format(data.metrics.response_rate) }}
+    avg_response_time: {{ "%.1f"|format(data.metrics.avg_response_time/3600) }}
+    overall_score: {{ "%.1f"|format(data.overview.overall_score) }}
+
+  metrics:
+    system:
+      inbox_volume: {{ data.metrics.inbox_volume }}
+      response_time: {{ data.metrics.response_time }}
+      attachment_count: {{ data.metrics.attachment_count }}
+    application:
+      categories: {{ data.metrics.categories|tojson }}
+      thread_length: {{ data.metrics.thread_length }}
+      sentiment_score: {{ "%.2f"|format(data.metrics.sentiment_score) }}
+
+  anomalies:
+    {% if data.anomalies %}
+    detected: true
+    items:
+      {% for anomaly in data.anomalies %}
+      - metric: {{ anomaly.metric }}
+        value: {{ "%.2f"|format(anomaly.value) }}
+        z_score: {{ "%.2f"|format(anomaly.z_score) }}
+        timestamp: {{ anomaly.timestamp }}
+        severity: {{ anomaly.severity }}
+      {% endfor %}
+    {% else %}
+    detected: false
+    items: []
+    {% endif %}
+
+  recommendations:
+    {% if data.recommendations %}
+    available: true
+    items:
+      {% for recommendation in data.recommendations %}
+      - text: {{ recommendation }}
+        priority: {{ recommendation.priority if recommendation.priority else "medium" }}
+        category: {{ recommendation.category if recommendation.category else "general" }}
+      {% endfor %}
+    {% else %}
+    available: false
+    items: []
+    {% endif %}
+
+  trends:
+    volume:
+      change: {{ "%.1f"|format(data.trends.volume_change) }}
+      direction: {{ "increasing" if data.trends.volume_change > 0 else "decreasing" }}
+    response_time:
+      change: {{ "%.1f"|format(data.trends.response_time_change) }}
+      direction: {{ "increasing" if data.trends.response_time_change > 0 else "decreasing" }}
+    sentiment:
+      change: {{ "%.1f"|format(data.trends.sentiment_change) }}
+      direction: {{ "improving" if data.trends.sentiment_change > 0 else "declining" }}
+
+  charts:
+    {% for chart in charts %}
+    - title: {{ chart.title }}
+      type: {{ chart.type }}
+      path: {{ chart.path }}
+      metadata: {{ chart.metadata|tojson }}
+    {% endfor %}
+
+  additional_info:
+    analysis_method: {{ data.additional_info.analysis_method }}
+    data_points: {{ data.additional_info.data_points }}
+    sampling_interval: {{ data.additional_info.sampling_interval }}
+    confidence_level: {{ "%.1f"|format(data.additional_info.confidence_level) }} 

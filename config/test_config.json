@@ -1,0 +1,36 @@
+{
+    "app": {
+        "name": "SecondBrain",
+        "version": "0.1.0",
+        "environment": "test",
+        "debug": true
+    },
+    "gui": {
+        "enabled": true,
+        "theme": "dark",
+        "window_size": [800, 600],
+        "fullscreen": false
+    },
+    "voice": {
+        "enabled": true,
+        "input_device": null,
+        "output_device": null,
+        "language": "en-US"
+    },
+    "memory": {
+        "max_size_mb": 1024,
+        "backup_interval_minutes": 60,
+        "compression_enabled": true
+    },
+    "security": {
+        "encryption_enabled": true,
+        "key_rotation_days": 30,
+        "ssl_verify": true
+    },
+    "test_mode": {
+        "enabled": true,
+        "mock_services": true,
+        "skip_cloud_sync": true,
+        "local_only": true
+    }
+} 

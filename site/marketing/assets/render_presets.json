@@ -1,0 +1,141 @@
+{
+    "presets": {
+        "minimal": {
+            "title": "Welcome to Njanja AI Empire",
+            "background_colors": [0, 0, 0, 30, 30, 60],
+            "title_style": {
+                "fontsize": 70,
+                "color": "white",
+                "fade": true,
+                "zoom": false,
+                "rotate": false,
+                "wave": false
+            },
+            "features": [],
+            "banner_zoom": false,
+            "banner_rotate": false,
+            "global_fade": true,
+            "global_mirror": false,
+            "global_rotate": false,
+            "fps": 24,
+            "threads": 2,
+            "preset": "fast",
+            "bitrate": "4000k"
+        },
+        "standard": {
+            "title": "Welcome to Njanja AI Empire",
+            "background_colors": [0, 0, 0, 50, 50, 100],
+            "title_style": {
+                "fontsize": 80,
+                "color": "white",
+                "stroke_color": "black",
+                "stroke_width": 2,
+                "fade": true,
+                "zoom": true,
+                "rotate": true,
+                "wave": true
+            },
+            "features": [
+                ["AI-Powered Business Solutions", 5],
+                ["Automated Content Generation", 10],
+                ["Smart Analytics & Insights", 15],
+                ["24/7 Customer Support", 20]
+            ],
+            "feature_style": {
+                "fontsize": 50,
+                "color": "#00ff00",
+                "fade": true,
+                "zoom": true,
+                "wave": true
+            },
+            "banner_zoom": true,
+            "banner_rotate": true,
+            "global_fade": true,
+            "global_mirror": false,
+            "global_rotate": false,
+            "fps": 30,
+            "threads": 4,
+            "preset": "medium",
+            "bitrate": "8000k"
+        },
+        "premium": {
+            "title": "Welcome to Njanja AI Empire",
+            "background_colors": [20, 20, 40, 80, 80, 160],
+            "title_style": {
+                "fontsize": 90,
+                "color": "#ffffff",
+                "stroke_color": "#000000",
+                "stroke_width": 3,
+                "fade": true,
+                "zoom": true,
+                "rotate": true,
+                "wave": true
+            },
+            "features": [
+                ["AI-Powered Business Solutions", 5],
+                ["Automated Content Generation", 10],
+                ["Smart Analytics & Insights", 15],
+                ["24/7 Customer Support", 20],
+                ["Custom AI Solutions", 25],
+                ["Enterprise Integration", 30]
+            ],
+            "feature_style": {
+                "fontsize": 60,
+                "color": "#00ff00",
+                "stroke_color": "#000000",
+                "stroke_width": 2,
+                "fade": true,
+                "zoom": true,
+                "wave": true
+            },
+            "banner_zoom": true,
+            "banner_rotate": true,
+            "global_fade": true,
+            "global_mirror": true,
+            "global_rotate": true,
+            "fps": 60,
+            "threads": 8,
+            "preset": "slow",
+            "bitrate": "12000k"
+        },
+        "startup": {
+            "title": "Welcome to Njanja AI Empire",
+            "background_colors": [40, 40, 80, 100, 100, 200],
+            "title_style": {
+                "fontsize": 85,
+                "color": "#ffffff",
+                "stroke_color": "#000000",
+                "stroke_width": 2,
+                "fade": true,
+                "zoom": true,
+                "rotate": true,
+                "wave": true
+            },
+            "features": [
+                ["AI-Powered Business Solutions", 5],
+                ["Automated Content Generation", 10],
+                ["Smart Analytics & Insights", 15],
+                ["24/7 Customer Support", 20],
+                ["Startup Package", 25]
+            ],
+            "feature_style": {
+                "fontsize": 55,
+                "color": "#00ff00",
+                "stroke_color": "#000000",
+                "stroke_width": 1,
+                "fade": true,
+                "zoom": true,
+                "wave": true
+            },
+            "banner_zoom": true,
+            "banner_rotate": true,
+            "global_fade": true,
+            "global_mirror": false,
+            "global_rotate": false,
+            "fps": 30,
+            "threads": 4,
+            "preset": "medium",
+            "bitrate": "8000k"
+        }
+    }
+} 

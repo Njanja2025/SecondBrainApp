@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Paystack Checkout</title>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+</head>
+<body>
+  <h2>Pay with Paystack (Test Mode)</h2>
+  <button onclick="payWithPaystack()">Pay Now</button>
+
+  <script>
+    function payWithPaystack() {
+      var handler = PaystackPop.setup({
+        key: 'pk_test_702e2471b3b9dd34fb6c',
+        email: 'testuser@njanja.net',
+        amount: 500000, // ZAR 5000.00 in kobo
+        currency: 'ZAR',
+        callback: function(response) {
+          alert('Payment successful. Ref: ' + response.reference);
+        },
+        onClose: function() {
+          alert('Payment cancelled');
+        }
+      });
+      handler.openIframe();
+    }
+  </script>
+</body>
+</html> 

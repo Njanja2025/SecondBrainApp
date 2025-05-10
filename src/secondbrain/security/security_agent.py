@@ -5,7 +5,7 @@ import os
 import re
 from typing import List, Tuple, Dict, Any
 import logging
-from ..voice.voice_processor import respond_with_voice
+from ..voice.respond_with_voice import respond_with_voice
 from ..core.phantom_mcp import PhantomMCP
 from ..phantom.phantom_core import PhantomCore
 

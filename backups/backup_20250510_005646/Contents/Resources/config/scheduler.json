@@ -1,0 +1,23 @@
+{
+    "backup_schedule": {
+        "memory": {
+            "frequency": "weekly",
+            "day": "monday",
+            "time": "07:00"
+        },
+        "voice_logs": {
+            "frequency": "daily",
+            "time": "23:00"
+        },
+        "emotional_logs": {
+            "frequency": "daily",
+            "time": "23:15"
+        },
+        "gui_logs": {
+            "frequency": "daily",
+            "time": "23:30"
+        }
+    },
+    "dns_check_interval": 21600,
+    "enabled": true
+} 

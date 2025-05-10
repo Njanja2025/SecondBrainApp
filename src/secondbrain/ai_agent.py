@@ -5,7 +5,7 @@ import logging
 import asyncio
 from typing import Optional, Dict, Any
 from datetime import datetime
-from .voice import VoiceProcessor
+from .voice_processor import VoiceProcessor
 from .memory import MemoryStore
 from .core.phantom_mcp import PhantomMCP
 from .blockchain import BlockchainAgent

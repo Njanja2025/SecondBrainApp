@@ -13,22 +13,30 @@ logger = logging.getLogger(__name__)
 
 class PhantomCore:
     def __init__(self):
-        """Initialize PhantomCore with secure logging and encryption."""
-        self.logs: List[Dict[str, Any]] = []
-        self.encryption_key = self._generate_key()
-        self.fernet = Fernet(self.encryption_key)
-        self.environment_status = "secure"
-        self.last_scan = datetime.datetime.now()
+        self.status = "idle"
+        self.logs = []
+        self.fernet = Fernet(self._generate_key())
+        self.environment_status = "unknown"
         self.threat_level = 0
-        
-        # Ensure phantom logs directory exists
-        os.makedirs("phantom_logs", exist_ok=True)
-        
-        logger.info("PhantomCore initialized with secure logging")
+        self.last_scan = datetime.datetime.now()
+
+    async def initialize(self):
+        logger.info("PhantomCore initialized and ready.")
+        self.status = "ready"
+        return self.status
+
+    def transform(self, text: str) -> str:
+        """
+        Placeholder logic to transform input text.
+        Replace this with real NLP/AI logic as needed.
+        """
+        logger.debug(f"Transforming text via PhantomCore: {text}")
+        return f"<<{text.lower()}>>"
 
     def _generate_key(self) -> bytes:
         """Generate a secure encryption key."""
-        return base64.urlsafe_b64encode(os.urandom(32))
+        key = base64.urlsafe_b64encode(hashlib.sha256(os.urandom(32)).digest())
+        return key
 
     def log_event(self, action: str, result: str, severity: str = "INFO") -> None:
         """

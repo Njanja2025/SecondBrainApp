@@ -22,6 +22,27 @@ class MemoryStore:
         self.db_path = db_path
         self._initialize_db()
 
+    async def initialize(self):
+        """Initialize the memory store."""
+        logger.info("Memory store initialized")
+        return True
+
+    def store_context_snapshot(self, snapshot_type: str, data: Dict[str, Any] = None) -> bool:
+        """Store a context snapshot."""
+        try:
+            if data is None:
+                data = {}
+            return self.store(
+                memory_type="context_snapshot",
+                content={
+                    "type": snapshot_type,
+                    "data": data
+                }
+            ) > 0
+        except Exception as e:
+            logger.error(f"Failed to store context snapshot: {str(e)}")
+            return False
+
     def _initialize_db(self):
         """Create necessary database tables if they don't exist."""
         with sqlite3.connect(self.db_path) as conn:

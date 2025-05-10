@@ -1,0 +1,48 @@
+{
+    "welcome_sequence": [
+        {
+            "subject": "Welcome to AI Business Starter Pack! 🚀",
+            "delay": 0,
+            "content": {
+                "html": "<h1>Welcome to the AI Business Starter Pack!</h1><p>Thank you for taking the first step towards transforming your business with AI. We're excited to have you on board!</p><h2>What's Next?</h2><ol><li>Download your package from the link below</li><li>Review the quick-start guide</li><li>Join our community forum</li></ol><p>Your download link: [DOWNLOAD_LINK]</p><p>Need help? Our support team is just an email away!</p>",
+                "text": "Welcome to the AI Business Starter Pack!\n\nThank you for taking the first step towards transforming your business with AI. We're excited to have you on board!\n\nWhat's Next?\n1. Download your package from the link below\n2. Review the quick-start guide\n3. Join our community forum\n\nYour download link: [DOWNLOAD_LINK]\n\nNeed help? Our support team is just an email away!"
+            }
+        },
+        {
+            "subject": "Getting Started Guide: Your AI Journey Begins 📚",
+            "delay": 1,
+            "content": {
+                "html": "<h1>Your AI Journey Begins</h1><p>Ready to implement AI in your business? Here's your step-by-step guide:</p><h2>Week 1: Foundation</h2><ul><li>Set up your AI infrastructure</li><li>Configure basic automation</li><li>Review template library</li></ul><h2>Week 2: Implementation</h2><ul><li>Deploy first automation</li><li>Set up analytics</li><li>Configure marketing tools</li></ul><p>Download the complete guide: [GUIDE_LINK]</p>",
+                "text": "Your AI Journey Begins\n\nReady to implement AI in your business? Here's your step-by-step guide:\n\nWeek 1: Foundation\n- Set up your AI infrastructure\n- Configure basic automation\n- Review template library\n\nWeek 2: Implementation\n- Deploy first automation\n- Set up analytics\n- Configure marketing tools\n\nDownload the complete guide: [GUIDE_LINK]"
+            }
+        },
+        {
+            "subject": "Success Story: How Sarah Transformed Her Business with AI 💪",
+            "delay": 3,
+            "content": {
+                "html": "<h1>Success Story: Sarah's Journey</h1><p>Meet Sarah, a small business owner who transformed her operations using the AI Business Starter Pack:</p><blockquote>'Within the first month, we automated 70% of our customer service inquiries and saw a 40% increase in lead generation.'</blockquote><p>Read her full story: [SUCCESS_STORY_LINK]</p><p>Need help implementing similar strategies? Book a call with our team: [BOOKING_LINK]</p>",
+                "text": "Success Story: Sarah's Journey\n\nMeet Sarah, a small business owner who transformed her operations using the AI Business Starter Pack:\n\n'Within the first month, we automated 70% of our customer service inquiries and saw a 40% increase in lead generation.'\n\nRead her full story: [SUCCESS_STORY_LINK]\n\nNeed help implementing similar strategies? Book a call with our team: [BOOKING_LINK]"
+            }
+        }
+    ],
+    "onboarding_sequence": [
+        {
+            "subject": "Your AI Implementation Roadmap 🗺️",
+            "delay": 7,
+            "content": {
+                "html": "<h1>Your AI Implementation Roadmap</h1><p>Based on your business profile, here's your personalized implementation plan:</p><h2>Phase 1: Quick Wins (Week 1-2)</h2><ul><li>Customer service automation</li><li>Basic analytics setup</li><li>Marketing automation</li></ul><h2>Phase 2: Growth (Week 3-4)</h2><ul><li>Advanced analytics</li><li>Sales pipeline automation</li><li>Performance optimization</li></ul><p>Download your roadmap: [ROADMAP_LINK]</p>",
+                "text": "Your AI Implementation Roadmap\n\nBased on your business profile, here's your personalized implementation plan:\n\nPhase 1: Quick Wins (Week 1-2)\n- Customer service automation\n- Basic analytics setup\n- Marketing automation\n\nPhase 2: Growth (Week 3-4)\n- Advanced analytics\n- Sales pipeline automation\n- Performance optimization\n\nDownload your roadmap: [ROADMAP_LINK]"
+            }
+        }
+    ],
+    "support_sequence": [
+        {
+            "subject": "Need Help? We're Here! 🤝",
+            "delay": 14,
+            "content": {
+                "html": "<h1>Need Help? We're Here!</h1><p>How's your AI implementation going? We're here to help you succeed:</p><ul><li>Schedule a 1:1 consultation</li><li>Join our weekly Q&A session</li><li>Access our knowledge base</li></ul><p>Book your support session: [SUPPORT_LINK]</p>",
+                "text": "Need Help? We're Here!\n\nHow's your AI implementation going? We're here to help you succeed:\n\n- Schedule a 1:1 consultation\n- Join our weekly Q&A session\n- Access our knowledge base\n\nBook your support session: [SUPPORT_LINK]"
+            }
+        }
+    ]
+} 

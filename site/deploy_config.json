@@ -1,0 +1,50 @@
+{
+    "s3_bucket": "njanja-global",
+    "cloudfront_distribution": "your-distribution-id",
+    "regions": {
+        "africa": {
+            "payment": "paystack",
+            "currency": "ZAR",
+            "price": 499.00,
+            "endpoints": [
+                "https://njanja.net",
+                "https://africa.njanja.net"
+            ]
+        },
+        "global": {
+            "payment": "stripe",
+            "currency": "USD",
+            "price": 29.99,
+            "endpoints": [
+                "https://global.njanja.net",
+                "https://store.njanja.net"
+            ]
+        }
+    },
+    "backup_retention_days": 30,
+    "monitoring": {
+        "endpoints": [
+            "https://njanja.net",
+            "https://global.njanja.net",
+            "https://africa.njanja.net",
+            "https://store.njanja.net"
+        ],
+        "check_interval": 300,
+        "alert_threshold": 3,
+        "notification_email": "admin@njanja.net"
+    },
+    "voice_over": {
+        "voice": "Samantha",
+        "format": "mp3",
+        "quality": "high"
+    },
+    "security": {
+        "jwt_secret": "your-jwt-secret-key",
+        "allowed_origins": [
+            "https://njanja.net",
+            "https://global.njanja.net",
+            "https://africa.njanja.net",
+            "https://store.njanja.net"
+        ]
+    }
+} 

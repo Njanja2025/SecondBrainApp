@@ -1,0 +1,18 @@
+{
+    "app": {
+        "name": "SecondBrain",
+        "version": "2025",
+        "debug": false
+    },
+    "voice": {
+        "enabled": true,
+        "engine": "pyttsx3",
+        "rate": 150,
+        "volume": 1.0
+    },
+    "audio": {
+        "sample_rate": 44100,
+        "channels": 2,
+        "bit_depth": 16
+    }
+}

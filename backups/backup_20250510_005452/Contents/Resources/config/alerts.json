@@ -1,0 +1,47 @@
+{
+    "email_alerts": {
+        "enabled": true,
+        "smtp_settings": {
+            "server": "smtp.gmail.com",
+            "port": 587,
+            "use_tls": true,
+            "username": "${SMTP_USERNAME}",
+            "password": "${SMTP_APP_PASSWORD}"
+        },
+        "notification_settings": {
+            "from_address": "${ALERT_FROM_EMAIL}",
+            "to_addresses": ["${ALERT_TO_EMAIL}"],
+            "alert_levels": ["critical", "warning"],
+            "cooldown_minutes": 30
+        }
+    },
+    "resource_alerts": {
+        "cpu": {
+            "warning_threshold": 75,
+            "critical_threshold": 90,
+            "duration_minutes": 5
+        },
+        "memory": {
+            "warning_threshold": 75,
+            "critical_threshold": 90,
+            "duration_minutes": 5
+        },
+        "disk": {
+            "warning_threshold": 80,
+            "critical_threshold": 90,
+            "duration_minutes": 0
+        }
+    },
+    "backup_alerts": {
+        "missing_backup_hours": 24,
+        "backup_size_min_mb": 1,
+        "failed_backup_notify": true
+    },
+    "system_alerts": {
+        "service_down_notify": true,
+        "high_error_rate": {
+            "threshold": 100,
+            "window_minutes": 5
+        }
+    }
+} 

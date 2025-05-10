@@ -1,0 +1,126 @@
+{
+    "funnel_name": "AI Business Starter Pack Launch",
+    "funnel_type": "sales",
+    "pages": [
+        {
+            "name": "Landing Page",
+            "type": "landing",
+            "elements": [
+                {
+                    "type": "hero",
+                    "title": "Transform Your Business with AI",
+                    "subtitle": "The Complete AI Business Starter Pack",
+                    "cta": "Get Started Now",
+                    "price": "$499",
+                    "original_price": "$997"
+                },
+                {
+                    "type": "features",
+                    "items": [
+                        "50+ AI Integration Templates",
+                        "30+ Automation Scripts",
+                        "Custom Dashboard Templates",
+                        "Marketing & Sales Tools"
+                    ]
+                },
+                {
+                    "type": "testimonials",
+                    "items": [
+                        {
+                            "name": "Sarah J.",
+                            "role": "Small Business Owner",
+                            "text": "This pack transformed how we handle customer service and marketing. ROI within the first month!"
+                        },
+                        {
+                            "name": "Michael T.",
+                            "role": "Digital Agency CEO",
+                            "text": "The automation tools alone saved us countless hours. Worth every penny!"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Checkout Page",
+            "type": "checkout",
+            "elements": [
+                {
+                    "type": "order_summary",
+                    "product_name": "AI Business Starter Pack",
+                    "price": 499.00,
+                    "currency": "USD"
+                },
+                {
+                    "type": "guarantee",
+                    "text": "30-Day Money-Back Guarantee"
+                }
+            ]
+        },
+        {
+            "name": "Thank You Page",
+            "type": "thank_you",
+            "elements": [
+                {
+                    "type": "download_instructions",
+                    "text": "Your AI Business Starter Pack is ready for download!"
+                },
+                {
+                    "type": "next_steps",
+                    "items": [
+                        "Check your email for download link",
+                        "Join our community forum",
+                        "Schedule your onboarding call"
+                    ]
+                }
+            ]
+        }
+    ],
+    "email_sequences": [
+        {
+            "name": "Welcome Sequence",
+            "emails": [
+                {
+                    "subject": "Welcome to AI Business Starter Pack!",
+                    "delay": 0,
+                    "content": "Thank you for purchasing the AI Business Starter Pack..."
+                },
+                {
+                    "subject": "Getting Started Guide",
+                    "delay": 1,
+                    "content": "Here's your step-by-step guide to implementing AI in your business..."
+                },
+                {
+                    "subject": "Success Story: How Sarah Implemented AI",
+                    "delay": 3,
+                    "content": "Read how Sarah transformed her business using our templates..."
+                }
+            ]
+        }
+    ],
+    "integrations": [
+        {
+            "name": "Gumroad",
+            "type": "payment",
+            "settings": {
+                "product_id": "ai-business-starter-pack",
+                "webhook_url": "https://your-domain.com/webhook"
+            }
+        },
+        {
+            "name": "Mailchimp",
+            "type": "email",
+            "settings": {
+                "list_id": "your-list-id",
+                "api_key": "your-api-key"
+            }
+        }
+    ],
+    "tracking": {
+        "google_analytics": {
+            "tracking_id": "UA-XXXXXXXXX-X"
+        },
+        "facebook_pixel": {
+            "pixel_id": "XXXXXXXXXXXXXXX"
+        }
+    }
+} 

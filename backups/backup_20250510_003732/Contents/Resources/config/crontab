@@ -1,0 +1,22 @@
+# SecondBrain Crontab Configuration
+
+# Run system health check every 6 hours
+0 */6 * * * /home/ubuntu/secondbrain/scripts/monitor.sh >> /var/log/secondbrain/monitor.log 2>&1
+
+# Rotate backups daily at 2 AM
+0 2 * * * /home/ubuntu/secondbrain/scripts/rotate_backups.sh >> /var/log/secondbrain/backup.log 2>&1
+
+# Check SSL certificate renewal weekly
+0 0 * * 0 certbot renew --quiet
+
+# Clean up old logs monthly
+0 0 1 * * find /var/log/secondbrain -type f -name "*.log" -mtime +30 -delete
+
+# Update system packages weekly
+0 3 * * 0 apt-get update && apt-get upgrade -y >> /var/log/secondbrain/system-update.log 2>&1
+
+# Restart application weekly to prevent memory leaks
+0 4 * * 0 systemctl restart secondbrain
+
+# Generate status dashboard every 5 minutes
+*/5 * * * * /home/ubuntu/secondbrain/venv/bin/python /home/ubuntu/secondbrain/scripts/generate_dashboard.py >> /var/log/secondbrain/dashboard.log 2>&1 

@@ -1,0 +1,37 @@
+{
+    "github": {
+        "token": "your_github_token_here",
+        "repo": "lloydkavhanda/SecondBrain-App",
+        "branch": "main"
+    },
+    "cloud_storage": {
+        "dropbox": {
+            "path": "${HOME}/Dropbox/SecondBrain_2025_Deploy",
+            "enabled": true
+        },
+        "gdrive": {
+            "path": "${HOME}/Google Drive/SecondBrain_2025_Deploy",
+            "enabled": true
+        }
+    },
+    "website": {
+        "domain": "phantom.njanja.net",
+        "path": "/var/www/phantom.njanja.net",
+        "enabled": true
+    },
+    "email": {
+        "recipients": [
+            "lloydkavh77@gmail.com",
+            "kavhanda@gmail.com"
+        ]
+    },
+    "backup": {
+        "enabled": true,
+        "schedule": "daily",
+        "retention_days": 30,
+        "encryption": {
+            "enabled": true,
+            "key_file": "config/backup_key.pem"
+        }
+    }
+} 

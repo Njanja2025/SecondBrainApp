@@ -1,0 +1,57 @@
+{
+    "stripe": {
+        "secret_key": "sk_test_your_secret_key_here",
+        "webhook_secret": "whsec_your_webhook_secret_here",
+        "public_key": "pk_test_your_public_key_here"
+    },
+    "products": {
+        "ai_starter_pack": {
+            "name": "AI Business Starter Pack",
+            "price": 49900,
+            "currency": "usd",
+            "description": "Launch your digital business with our comprehensive AI toolkit",
+            "features": [
+                "AI-powered business automation",
+                "Custom voice-over generation",
+                "Professional landing page templates",
+                "Payment processing integration",
+                "24/7 customer support"
+            ],
+            "image_url": "https://njanja.net/images/ai_starter_pack.jpg"
+        }
+    },
+    "urls": {
+        "success": "https://njanja.net/success",
+        "cancel": "https://njanja.net/cancel",
+        "webhook": "https://njanja.net/api/webhook"
+    },
+    "email": {
+        "from": "sales@njanja.net",
+        "to": "admin@njanja.net",
+        "subject": "New Purchase: AI Business Starter Pack"
+    },
+    "shipping": {
+        "allowed_countries": [
+            "US",
+            "CA",
+            "GB",
+            "ZA",
+            "NG",
+            "KE",
+            "GH",
+            "EG"
+        ]
+    },
+    "security": {
+        "jwt_secret": "your_jwt_secret_here",
+        "allowed_origins": [
+            "https://njanja.net",
+            "https://www.njanja.net"
+        ]
+    },
+    "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "logs/stripe.log"
+    }
+} 

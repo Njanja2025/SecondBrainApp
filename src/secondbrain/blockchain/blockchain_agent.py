@@ -11,7 +11,7 @@ from .wallet_manager import WalletManager
 from .contract_manager import ContractManager
 from .network_manager import NetworkManager
 from ..memory import MemoryStore
-from ..voice import VoiceProcessor
+from ..voice_processor import VoiceProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,11 @@ class BlockchainAgent:
             "dex": "dex_template.sol",
             "marketplace": "marketplace_template.sol"
         }
+        
+    async def initialize(self):
+        """Initialize the blockchain agent."""
+        logger.info("Initializing blockchain agent...")
+        return True
         
     async def start(self):
         """Start the blockchain agent."""

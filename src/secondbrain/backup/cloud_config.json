@@ -1,0 +1,52 @@
+{
+    "use_cloud": true,
+    "provider": "dropbox",
+    "access_token": "PASTE_YOUR_DROPBOX_ACCESS_TOKEN_HERE",
+    "local_vault_path": "~/Documents/.secondbrain/backups",
+    "cloud_path": "/SecondBrain_Backups",
+    "encryption": {
+        "enabled": true,
+        "algorithm": "AES-256",
+        "key_file": "~/Documents/.secondbrain/.vault_key"
+    },
+    "sync": {
+        "auto_sync": true,
+        "sync_interval": "daily",
+        "retry_attempts": 3,
+        "retry_delay": 300
+    },
+    "notifications": {
+        "email_enabled": true,
+        "email_from": "backup@secondbrain.ai",
+        "email_to": "user@example.com",
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587,
+        "smtp_username": "YOUR_EMAIL@gmail.com",
+        "smtp_password": "YOUR_APP_SPECIFIC_PASSWORD",
+        "report_frequency": "daily",
+        "alert_on_failure": true
+    },
+    "monitoring": {
+        "health_check_interval": "daily",
+        "retention_days": 30,
+        "min_backup_size_mb": 0.1,
+        "max_backup_age_days": 7
+    },
+    "dropbox": {
+        "app_key": "YOUR_DROPBOX_APP_KEY",
+        "app_secret": "YOUR_DROPBOX_APP_SECRET",
+        "access_token": "YOUR_DROPBOX_ACCESS_TOKEN",
+        "vault_folder": "/Phantom Vault"
+    },
+    "icloud": {
+        "apple_id": "YOUR_APPLE_ID",
+        "password": "YOUR_APP_SPECIFIC_PASSWORD",
+        "vault_folder": "Njax Secure"
+    },
+    "s3": {
+        "aws_access_key_id": "YOUR_AWS_ACCESS_KEY",
+        "aws_secret_access_key": "YOUR_AWS_SECRET_KEY",
+        "region_name": "us-west-2",
+        "bucket_name": "secondbrain-vault"
+    }
+} 

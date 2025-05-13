@@ -1,0 +1,5 @@
+{
+    "voice_dir": "voices",
+    "models_dir": "models",
+    "backup_dir": "backups/voices"
+}

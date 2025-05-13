@@ -1,0 +1,11 @@
+{
+    "python.analysis.extraPaths": [
+        "/Users/mac/Documents/Cursor_SecondBrain_Release_Package/app_core",
+        "/Users/mac/Documents/Cursor_SecondBrain_Release_Package/plugins",
+        "/Users/mac/Documents/Cursor_SecondBrain_Release_Package/tests"
+    ],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": true
+}

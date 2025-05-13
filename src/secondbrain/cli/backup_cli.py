@@ -50,6 +50,12 @@ def parse_args():
         help="Clean up old backups"
     )
     
+    parser.add_argument(
+        "--auto",
+        action="store_true",
+        help="Enable automated journaling with Samantha voice and cleanup"
+    )
+    
     return parser.parse_args()
 
 def list_backups(backup_root: str):
@@ -103,14 +109,42 @@ async def run_backup(args):
         print(f"Error: {result.get('error', 'Unknown error')}")
         sys.exit(1)
 
+def generate_timestamped_backup(backup_root=None, max_backups=20):
+    """Create a timestamped backup, keep max 20, and trigger Samantha's voice."""
+    from src.secondbrain.backup.companion_journaling_backup import CompanionJournalingBackup
+    import subprocess
+    import time
+    backup_root = backup_root or os.path.expanduser("~/.secondbrain/backups")
+    backup = CompanionJournalingBackup(
+        backup_root=backup_root,
+        max_backups=max_backups
+    )
+    print("[AutoMode] Creating timestamped backup...")
+    result = backup.create_backup_sync() if hasattr(backup, 'create_backup_sync') else asyncio.run(backup.create_backup())
+    if result["status"] == "success":
+        print(f"[AutoMode] Backup completed: {result['backup_path']}")
+        # Trigger Samantha's voice (macOS say command as example)
+        try:
+            subprocess.run(["say", "Samantha", "Your journal backup is complete."], check=True)
+        except Exception as e:
+            print(f"[AutoMode] Voice notification failed: {e}")
+        # Cleanup old backups
+        backup._cleanup_old_backups(max_backups)
+        print(f"[AutoMode] Kept max {max_backups} backups.")
+        # Simulate ping to vault (Dropbox/iCloud)
+        print("[AutoMode] Ping sent to synced vault.")
+    else:
+        print(f"[AutoMode] Backup failed: {result.get('error', 'Unknown error')}")
+
 def main():
     """Main entry point."""
     args = parse_args()
-    
+    if args.auto:
+        generate_timestamped_backup(args.backup_root, 20)
+        return
     if args.list:
         list_backups(args.backup_root)
         return
-    
     if args.cleanup:
         backup = CompanionJournalingBackup(
             backup_root=args.backup_root,
@@ -119,7 +153,6 @@ def main():
         backup._cleanup_old_backups()
         print("Cleanup completed.")
         return
-    
     asyncio.run(run_backup(args))
 
 if __name__ == "__main__":

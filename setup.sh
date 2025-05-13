@@ -1,141 +1,188 @@
 #!/bin/bash
 
-echo "Setting up SecondBrain AI Agent with Phantom MCP..."
+# Setup script for SecondBrainApp
+# This script handles the initial bootstrap and launch of the system
 
-# Check for Python 3.8+
-if ! command -v python3 &> /dev/null; then
-    echo "Python 3 is required but not installed. Please install Python 3.8 or higher."
-    exit 1
-fi
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
-# Check for Homebrew (macOS)
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    if ! command -v brew &> /dev/null; then
-        echo "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    fi
-    
-    # Install ffmpeg using Homebrew
-    echo "Installing ffmpeg..."
-    brew install ffmpeg
-fi
-
-# Function to handle errors
-handle_error() {
-    echo "Error: $1"
-    exit 1
+# Function to print status messages
+print_status() {
+    echo -e "${GREEN}[+]${NC} $1"
 }
 
-# Create and activate virtual environment
-echo "Creating virtual environment..."
-python3 -m venv venv || handle_error "Failed to create virtual environment"
-source venv/bin/activate || handle_error "Failed to activate virtual environment"
+print_warning() {
+    echo -e "${YELLOW}[!]${NC} $1"
+}
 
-# Upgrade pip
-echo "Upgrading pip..."
-pip install --upgrade pip || handle_error "Failed to upgrade pip"
+print_error() {
+    echo -e "${RED}[-]${NC} $1"
+}
 
-# Install dependencies in groups
-echo "Installing core dependencies..."
-pip install flask==2.3.3 flask-sqlalchemy==3.1.1 gunicorn==21.2.0 requests==2.31.0 boto3==1.28.64 python-dotenv==1.0.0 || handle_error "Failed to install core dependencies"
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
 
-echo "Installing quantum and phantom dependencies..."
-pip install numpy==1.24.3 scipy==1.11.3 scikit-learn==1.3.0 matplotlib==3.7.2 pandas==2.1.0 || handle_error "Failed to install quantum dependencies"
+# Function to create virtual environment
+create_venv() {
+    print_status "Creating virtual environment..."
+    python3 -m venv venv
+    source venv/bin/activate
+    print_status "Virtual environment created and activated"
+}
 
-echo "Installing security and authentication dependencies..."
-pip install pyjwt==2.8.0 bcrypt==4.0.1 cryptography==41.0.3 || handle_error "Failed to install security dependencies"
+# Function to install dependencies
+install_dependencies() {
+    print_status "Installing dependencies..."
+    pip install --upgrade pip
+    pip install -r requirements.txt
+    pip install -r requirements-dev.txt
+    print_status "Dependencies installed"
+}
 
-echo "Installing database dependencies..."
-pip install sqlalchemy==2.0.20 psycopg2-binary==2.9.7 redis==4.6.0 || handle_error "Failed to install database dependencies"
+# Function to setup Git repository
+setup_git() {
+    print_status "Setting up Git repository..."
+    if [ ! -d ".git" ]; then
+        git init
+        git remote add origin https://github.com/LloydKavhanda/SecondBrainApp_2025.git
+        git fetch
+        git checkout main
+    else
+        git fetch
+        git pull origin main
+    fi
+    print_status "Git repository setup complete"
+}
 
-echo "Installing API and web dependencies..."
-pip install fastapi==0.103.1 uvicorn==0.23.2 websockets==11.0.3 || handle_error "Failed to install API dependencies"
+# Function to create necessary directories
+create_directories() {
+    print_status "Creating necessary directories..."
+    mkdir -p backups/voices
+    mkdir -p backups/njax
+    mkdir -p config
+    mkdir -p logs
+    mkdir -p temp
+    mkdir -p cache
+    print_status "Directories created"
+}
 
-echo "Installing testing and development dependencies..."
-pip install pytest==7.4.2 black==23.7.0 flake8==6.1.0 mypy==1.5.1 || handle_error "Failed to install testing dependencies"
-
-echo "Installing monitoring and logging dependencies..."
-pip install prometheus-client==0.17.1 python-json-logger==2.0.7 || handle_error "Failed to install monitoring dependencies"
-
-echo "Installing additional utilities..."
-pip install python-dateutil==2.8.2 pytz==2023.3 tqdm==4.66.1 || handle_error "Failed to install utility dependencies"
-
-# Create necessary directories
-echo "Creating system directories..."
-mkdir -p ~/.secondbrain/backups
-mkdir -p ~/.secondbrain/models
-mkdir -p ~/.secondbrain/logs
-mkdir -p SecondBrainApp/backend/guardian_alerts/{analytics,dashboards,insights} || handle_error "Failed to create guardian alerts directories"
-mkdir -p SecondBrainApp/backend/logs || handle_error "Failed to create logs directory"
-mkdir -p SecondBrainApp/backend/data || handle_error "Failed to create data directory"
-
-# Download Whisper model
-echo "Downloading Whisper model..."
-python3 -c "import whisper; whisper.load_model('base')"
-
-# Set up environment variables
-echo "Setting up environment variables..."
-if [ ! -f .env ]; then
-    echo "Creating .env file..."
-    cat > .env << EOL
-# OpenAI API Key (required for some features)
-OPENAI_API_KEY=your_api_key_here
-
-# Blockchain settings
-INFURA_API_KEY=your_infura_key_here
-PRIVATE_KEY=your_private_key_here
-
-# System settings
-LOG_LEVEL=INFO
-ENABLE_VOICE=true
-ENABLE_GUI=true
-
-# Application Settings
-FLASK_APP=SecondBrainApp/backend/app.py
-FLASK_ENV=development
-SECRET_KEY=$(openssl rand -hex 32)
-
-# Database Settings
-DATABASE_URL=sqlite:///SecondBrainApp/backend/data/app.db
-
-# AWS Settings
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_REGION=us-west-2
-
-# Quantum Settings
-QUANTUM_BACKEND=ibmq_qasm_simulator
-QUANTUM_TOKEN=your_quantum_token
-
-# Security Settings
-JWT_SECRET_KEY=$(openssl rand -hex 32)
-ENCRYPTION_KEY=$(openssl rand -hex 32)
-
-# Logging Settings
-LOG_FILE=SecondBrainApp/backend/logs/app.log
-EOL
-fi
-
-# Initialize the system
-echo "Initializing the system..."
-python3 -c "
-from src.secondbrain.core.phantom_mcp import PhantomMCP
-import asyncio
-
-async def init():
-    mcp = PhantomMCP()
-    await mcp.initialize()
+# Function to setup configuration files
+setup_config() {
+    print_status "Setting up configuration files..."
     
-asyncio.run(init())
-"
+    # Create agent config
+    cat > config/agent_config.json << EOF
+{
+    "repo_path": ".",
+    "backup_dir": "backups",
+    "modules_dir": "modules"
+}
+EOF
 
-# Initialize the database
-echo "Initializing the database..."
-python SecondBrainApp/backend/init_db.py || handle_error "Failed to initialize database"
+    # Create voice config
+    cat > config/voice_config.json << EOF
+{
+    "voice_dir": "voices",
+    "models_dir": "models",
+    "backup_dir": "backups/voices"
+}
+EOF
 
-# Run tests
-echo "Running tests..."
-pytest || handle_error "Tests failed"
+    # Create Njax config
+    cat > config/njax_config.json << EOF
+{
+    "njax_dir": "njax",
+    "components_dir": "njax/components",
+    "backup_dir": "backups/njax"
+}
+EOF
 
-echo "Setup completed successfully!"
-echo "To start the system, run: python3 main.py" 
+    print_status "Configuration files created"
+}
+
+# Function to setup Cursor configuration
+setup_cursor() {
+    print_status "Setting up Cursor configuration..."
+    mkdir -p .cursor
+    
+    # Create Cursor settings
+    cat > .cursor/settings.json << EOF
+{
+    "python.analysis.extraPaths": [
+        "${PWD}/app_core",
+        "${PWD}/plugins",
+        "${PWD}/tests"
+    ],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": true
+}
+EOF
+
+    print_status "Cursor configuration created"
+}
+
+# Function to verify installation
+verify_installation() {
+    print_status "Verifying installation..."
+    
+    # Check Python version
+    python_version=$(python3 --version)
+    print_status "Python version: $python_version"
+    
+    # Check pip packages
+    print_status "Installed packages:"
+    pip list
+    
+    # Check Git status
+    print_status "Git status:"
+    git status
+    
+    print_status "Installation verification complete"
+}
+
+# Main setup process
+main() {
+    print_status "Starting SecondBrainApp setup..."
+    
+    # Check for required commands
+    for cmd in python3 pip git; do
+        if ! command_exists $cmd; then
+            print_error "$cmd is required but not installed"
+            exit 1
+        fi
+    done
+    
+    # Create virtual environment
+    create_venv
+    
+    # Install dependencies
+    install_dependencies
+    
+    # Setup Git repository
+    setup_git
+    
+    # Create directories
+    create_directories
+    
+    # Setup configuration files
+    setup_config
+    
+    # Setup Cursor configuration
+    setup_cursor
+    
+    # Verify installation
+    verify_installation
+    
+    print_status "Setup complete! You can now run the application with:"
+    echo "python launch_secondbrain.py"
+}
+
+# Run main function
+main 

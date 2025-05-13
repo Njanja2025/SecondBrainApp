@@ -423,7 +423,7 @@ class CompanionJournalingBackup:
         except Exception as e:
             logger.error(f"Failed to sync backup to cloud: {e}")
     
-    def _cleanup_old_backups(self):
+    def _cleanup_old_backups(self, *_):
         """Clean up old backups, keeping only the specified number."""
         try:
             backups = sorted(self.backup_root.glob("journaling_backup_*.zip"))

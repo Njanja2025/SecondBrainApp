@@ -1,0 +1,10 @@
+{
+  "voice_enabled": true,
+  "voice_name": "Samantha",
+  "confirmation_message": "Backup completed and synced successfully.",
+  "error_message": "There was an error during the backup process.",
+  "play_audio": true,
+  "audio_file": "src/secondbrain/voice/NjanjaIntro.aiff",
+  "intro_enabled": true,
+  "intro_message": "Starting SecondBrain backup process."
+} 

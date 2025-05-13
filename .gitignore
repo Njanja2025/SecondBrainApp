@@ -25,18 +25,15 @@ wheels/
 *.egg
 
 # Virtual Environment
-.env
-.venv
-env/
 venv/
 ENV/
+env/
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-.DS_Store
 
 # Logs
 logs/
@@ -84,12 +81,26 @@ config/encryption_key.key
 *.key
 
 # macOS
+.DS_Store
 .AppleDouble
 .LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
 
 # SecondBrain specific
-.secondbrain/
-*.enc
+*.log
+/tmp/secondbrain_*
+~/Documents/.secondbrain/
+*.zip
+*.sha256
+backup_health.db
 
 # Project specific
 *.sqlite

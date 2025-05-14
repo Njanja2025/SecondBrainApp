@@ -15,7 +15,17 @@
 """Handle typing imports based on system compatibility."""
 
 import sys
-from typing import Any, Callable, List, Literal, Type, TypeVar, Union, get_args, get_origin
+from typing import (
+    Any,
+    Callable,
+    List,
+    Literal,
+    Type,
+    TypeVar,
+    Union,
+    get_args,
+    get_origin,
+)
 
 
 UNION_TYPES: List[Any] = [Union]
@@ -50,7 +60,10 @@ def is_jsonable(obj: Any) -> bool:
         if isinstance(obj, (list, tuple)):
             return all(is_jsonable(item) for item in obj)
         if isinstance(obj, dict):
-            return all(isinstance(key, _JSON_SERIALIZABLE_TYPES) and is_jsonable(value) for key, value in obj.items())
+            return all(
+                isinstance(key, _JSON_SERIALIZABLE_TYPES) and is_jsonable(value)
+                for key, value in obj.items()
+            )
         if hasattr(obj, "__json__"):
             return True
         return False

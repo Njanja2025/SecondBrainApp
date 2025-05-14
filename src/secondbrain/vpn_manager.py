@@ -5,26 +5,27 @@ from .resilience import CircuitBreaker, CircuitState, with_circuit_breaker
 
 logger = logging.getLogger(__name__)
 
+
 class VPNManager:
     """Manages VPN connection with automatic failover."""
-    
+
     def __init__(
         self,
         connect_vpn_func: Callable,
         disconnect_vpn_func: Callable,
         failure_threshold: int = 3,
-        recovery_timeout: int = 30
+        recovery_timeout: int = 30,
     ):
         self.connect_vpn = connect_vpn_func
         self.disconnect_vpn = disconnect_vpn_func
         self.vpn_active = False
         self._lock = asyncio.Lock()
-        
+
         # Circuit breaker for monitoring regular connection
         self.circuit_breaker = CircuitBreaker(
             failure_threshold=failure_threshold,
             recovery_timeout=recovery_timeout,
-            exception_types=(ConnectionError, TimeoutError)
+            exception_types=(ConnectionError, TimeoutError),
         )
 
     async def execute_with_vpn_failover(self, func: Callable, *args, **kwargs):
@@ -64,10 +65,14 @@ class VPNManager:
                     logger.error(f"Failed to disconnect VPN: {e}")
                     raise
 
+
 def with_vpn_failover(vpn_manager: VPNManager):
     """Decorator to wrap function with VPN failover capability."""
+
     def decorator(func):
         async def wrapper(*args, **kwargs):
             return await vpn_manager.execute_with_vpn_failover(func, *args, **kwargs)
+
         return wrapper
-    return decorator 
+
+    return decorator

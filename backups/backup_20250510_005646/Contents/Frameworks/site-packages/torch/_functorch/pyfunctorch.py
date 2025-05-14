@@ -123,7 +123,9 @@ class GradInterpreter(FuncTorchInterpreter):
         self._cptr = CGradInterpreterPtr(cdata)
 
     def lift(self, args, kwargs):
-        args, kwargs = pytree.tree_map_only(torch.Tensor, self._cptr.lift, [args, kwargs])
+        args, kwargs = pytree.tree_map_only(
+            torch.Tensor, self._cptr.lift, [args, kwargs]
+        )
         return args, kwargs
 
     def process(self, op, args, kwargs):
@@ -152,7 +154,9 @@ class JvpInterpreter(FuncTorchInterpreter):
         self._cptr = CJvpInterpreterPtr(cdata)
 
     def lift(self, args, kwargs):
-        args, kwargs = pytree.tree_map_only(torch.Tensor, self._cptr.lift, [args, kwargs])
+        args, kwargs = pytree.tree_map_only(
+            torch.Tensor, self._cptr.lift, [args, kwargs]
+        )
         return args, kwargs
 
     def process(self, op, args, kwargs):
@@ -214,5 +218,6 @@ def dispatch_functorch(op, args, kwargs):
     # transforms, so we manually unwrap the dead tensors here.
     # This logic won't need to exist when we have mode-only functorch.
     args, kwargs = pytree.tree_map_only(
-        torch.Tensor, torch._C._functorch.unwrap_if_dead, (args, kwargs))
+        torch.Tensor, torch._C._functorch.unwrap_if_dead, (args, kwargs)
+    )
     return interpreter.process(op, args, kwargs)

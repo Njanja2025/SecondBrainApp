@@ -1,6 +1,7 @@
 """
 Memory storage and retrieval system for the AI Agent.
 """
+
 import time
 from typing import Dict, List, Optional, Any
 import sqlite3
@@ -10,15 +11,16 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+
 class MemoryStore:
     def __init__(self, db_path: Optional[str] = None):
         """Initialize the memory store with optional custom database path."""
         if db_path is None:
-            db_path = str(Path.home() / '.secondbrain' / 'memory.db')
-        
+            db_path = str(Path.home() / ".secondbrain" / "memory.db")
+
         # Ensure directory exists
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
-        
+
         self.db_path = db_path
         self._initialize_db()
 
@@ -27,18 +29,20 @@ class MemoryStore:
         logger.info("Memory store initialized")
         return True
 
-    def store_context_snapshot(self, snapshot_type: str, data: Dict[str, Any] = None) -> bool:
+    def store_context_snapshot(
+        self, snapshot_type: str, data: Dict[str, Any] = None
+    ) -> bool:
         """Store a context snapshot."""
         try:
             if data is None:
                 data = {}
-            return self.store(
-                memory_type="context_snapshot",
-                content={
-                    "type": snapshot_type,
-                    "data": data
-                }
-            ) > 0
+            return (
+                self.store(
+                    memory_type="context_snapshot",
+                    content={"type": snapshot_type, "data": data},
+                )
+                > 0
+            )
         except Exception as e:
             logger.error(f"Failed to store context snapshot: {str(e)}")
             return False
@@ -46,7 +50,8 @@ class MemoryStore:
     def _initialize_db(self):
         """Create necessary database tables if they don't exist."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS memories (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     type TEXT NOT NULL,
@@ -55,21 +60,28 @@ class MemoryStore:
                     metadata TEXT,
                     importance REAL DEFAULT 1.0
                 )
-            """)
-            conn.execute("""
+            """
+            )
+            conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_memories_type 
                 ON memories(type)
-            """)
-            conn.execute("""
+            """
+            )
+            conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_memories_timestamp 
                 ON memories(timestamp)
-            """)
+            """
+            )
 
-    def store(self, 
-              memory_type: str, 
-              content: Any, 
-              metadata: Optional[Dict] = None, 
-              importance: float = 1.0) -> int:
+    def store(
+        self,
+        memory_type: str,
+        content: Any,
+        metadata: Optional[Dict] = None,
+        importance: float = 1.0,
+    ) -> int:
         """
         Store a new memory.
         Returns the ID of the stored memory.
@@ -87,19 +99,21 @@ class MemoryStore:
                         json.dumps(content),
                         time.time(),
                         json.dumps(metadata) if metadata else None,
-                        importance
-                    )
+                        importance,
+                    ),
                 )
                 return cursor.lastrowid
         except Exception as e:
             logger.error(f"Failed to store memory: {str(e)}")
             return -1
 
-    def retrieve(self, 
-                memory_type: Optional[str] = None, 
-                limit: int = 10, 
-                since: Optional[float] = None,
-                min_importance: float = 0.0) -> List[Dict[str, Any]]:
+    def retrieve(
+        self,
+        memory_type: Optional[str] = None,
+        limit: int = 10,
+        since: Optional[float] = None,
+        min_importance: float = 0.0,
+    ) -> List[Dict[str, Any]]:
         """
         Retrieve memories matching the given criteria.
         Returns a list of memory dictionaries.
@@ -107,33 +121,33 @@ class MemoryStore:
         try:
             query = "SELECT * FROM memories WHERE importance >= ?"
             params = [min_importance]
-            
+
             if memory_type:
                 query += " AND type = ?"
                 params.append(memory_type)
-            
+
             if since:
                 query += " AND timestamp >= ?"
                 params.append(since)
-            
+
             query += " ORDER BY timestamp DESC LIMIT ?"
             params.append(limit)
-            
+
             with sqlite3.connect(self.db_path) as conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
                 cursor.execute(query, params)
-                
+
                 memories = []
                 for row in cursor:
                     memory = dict(row)
-                    memory['content'] = json.loads(memory['content'])
-                    if memory['metadata']:
-                        memory['metadata'] = json.loads(memory['metadata'])
+                    memory["content"] = json.loads(memory["content"])
+                    if memory["metadata"]:
+                        memory["metadata"] = json.loads(memory["metadata"])
                     memories.append(memory)
-                
+
                 return memories
-                
+
         except Exception as e:
             logger.error(f"Failed to retrieve memories: {str(e)}")
             return []
@@ -144,7 +158,7 @@ class MemoryStore:
             with sqlite3.connect(self.db_path) as conn:
                 conn.execute(
                     "UPDATE memories SET importance = ? WHERE id = ?",
-                    (importance, memory_id)
+                    (importance, memory_id),
                 )
                 return True
         except Exception as e:
@@ -162,4 +176,4 @@ class MemoryStore:
                 return True
         except Exception as e:
             logger.error(f"Failed to clear memories: {str(e)}")
-            return False 
+            return False

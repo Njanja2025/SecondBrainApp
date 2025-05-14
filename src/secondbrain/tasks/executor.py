@@ -1,11 +1,13 @@
 """
 Task execution module for the AI Agent system.
 """
+
 from typing import Dict, Any
 import logging
 from ..voice_processor import VoiceProcessor
 
 logger = logging.getLogger(__name__)
+
 
 class TaskExecutor:
     def __init__(self):
@@ -43,4 +45,4 @@ class TaskExecutor:
 
     async def _say_hello(self, task: Dict[str, Any]):
         """Simple greeting task."""
-        await self.voice_processor.speak("Hello, I am your AI Agent.") 
+        await self.voice_processor.speak("Hello, I am your AI Agent.")

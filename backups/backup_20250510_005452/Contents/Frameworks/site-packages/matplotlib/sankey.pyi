@@ -43,7 +43,7 @@ class Sankey:
         head_angle: float = ...,
         margin: float = ...,
         tolerance: float = ...,
-        **kwargs
+        **kwargs,
     ) -> None: ...
     def add(
         self,
@@ -56,6 +56,6 @@ class Sankey:
         prior: int | None = ...,
         connect: tuple[int, int] = ...,
         rotation: float = ...,
-        **kwargs
+        **kwargs,
     ) -> Self: ...
     def finish(self) -> list[Any]: ...

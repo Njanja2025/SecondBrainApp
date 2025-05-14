@@ -1,6 +1,7 @@
 """
 Secure environment variable loader and validator.
 """
+
 import os
 from pathlib import Path
 from typing import Dict, Optional
@@ -9,29 +10,26 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class EnvironmentLoader:
     """Manages secure loading and validation of environment variables."""
-    
+
     REQUIRED_VARS = {
-        'cloud': [
-            'DROPBOX_ACCESS_TOKEN',
-            'GOOGLE_DRIVE_CREDENTIALS',
-            'GOOGLE_DRIVE_FOLDER_ID',
-            'AWS_ACCESS_KEY',
-            'AWS_SECRET_KEY',
-            'AWS_BUCKET_NAME',
-            'AWS_REGION'
+        "cloud": [
+            "DROPBOX_ACCESS_TOKEN",
+            "GOOGLE_DRIVE_CREDENTIALS",
+            "GOOGLE_DRIVE_FOLDER_ID",
+            "AWS_ACCESS_KEY",
+            "AWS_SECRET_KEY",
+            "AWS_BUCKET_NAME",
+            "AWS_REGION",
         ],
-        'dns': [
-            'NAMECHEAP_API_USER',
-            'NAMECHEAP_API_KEY',
-            'SERVER_IP'
-        ]
+        "dns": ["NAMECHEAP_API_USER", "NAMECHEAP_API_KEY", "SERVER_IP"],
     }
 
     def __init__(self, env_path: Optional[str] = None):
         """Initialize environment loader.
-        
+
         Args:
             env_path: Optional path to .env file. If not provided,
                      will look in project root.
@@ -43,11 +41,11 @@ class EnvironmentLoader:
         """Find .env file in project root."""
         current_dir = Path.cwd()
         while current_dir.parent != current_dir:
-            env_path = current_dir / '.env'
+            env_path = current_dir / ".env"
             if env_path.exists():
                 return str(env_path)
             current_dir = current_dir.parent
-        return '.env'  # Default to current directory
+        return ".env"  # Default to current directory
 
     def _load_env(self):
         """Load environment variables from .env file."""
@@ -56,11 +54,11 @@ class EnvironmentLoader:
 
     def validate_cloud_vars(self) -> Dict[str, str]:
         """Validate and return cloud-related environment variables."""
-        return self._validate_vars('cloud')
+        return self._validate_vars("cloud")
 
     def validate_dns_vars(self) -> Dict[str, str]:
         """Validate and return DNS-related environment variables."""
-        return self._validate_vars('dns')
+        return self._validate_vars("dns")
 
     def _validate_vars(self, category: str) -> Dict[str, str]:
         """Validate required environment variables for a category."""
@@ -84,13 +82,10 @@ class EnvironmentLoader:
 
     def get_all_vars(self) -> Dict[str, Dict[str, str]]:
         """Get all validated environment variables."""
-        return {
-            'cloud': self.validate_cloud_vars(),
-            'dns': self.validate_dns_vars()
-        }
+        return {"cloud": self.validate_cloud_vars(), "dns": self.validate_dns_vars()}
 
     @staticmethod
-    def generate_template(output_path: str = '.env.template'):
+    def generate_template(output_path: str = ".env.template"):
         """Generate a template .env file."""
         template = """# Cloud Storage Credentials
 DROPBOX_ACCESS_TOKEN=your_dropbox_token_here
@@ -108,6 +103,6 @@ NAMECHEAP_API_USER=your_api_user
 NAMECHEAP_API_KEY=your_api_key
 SERVER_IP=your_server_ip
 """
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             f.write(template)
-        logger.info(f"Generated environment template at {output_path}") 
+        logger.info(f"Generated environment template at {output_path}")

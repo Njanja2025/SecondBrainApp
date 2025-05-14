@@ -1,4 +1,5 @@
 """Voice processor module for SecondBrain"""
+
 from typing import Any, Optional, Callable, Dict
 import speech_recognition as sr
 import json
@@ -7,6 +8,7 @@ import logging
 import asyncio
 
 logger = logging.getLogger(__name__)
+
 
 class VoiceProcessor:
     def __init__(self, on_text: Optional[Callable[[str], None]] = None):
@@ -58,8 +60,4 @@ class VoiceProcessor:
 
     def get_status(self) -> Dict[str, Any]:
         """Get processor status."""
-        return {
-            "running": self._running,
-            "type": "basic",
-            "mode": "simulation"
-        } 
+        return {"running": self._running, "type": "basic", "mode": "simulation"}

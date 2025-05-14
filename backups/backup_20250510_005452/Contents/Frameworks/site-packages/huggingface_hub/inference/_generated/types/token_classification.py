@@ -8,7 +8,9 @@ from typing import List, Literal, Optional
 from .base import BaseInferenceType, dataclass_with_extra
 
 
-TokenClassificationAggregationStrategy = Literal["none", "simple", "first", "average", "max"]
+TokenClassificationAggregationStrategy = Literal[
+    "none", "simple", "first", "average", "max"
+]
 
 
 @dataclass_with_extra

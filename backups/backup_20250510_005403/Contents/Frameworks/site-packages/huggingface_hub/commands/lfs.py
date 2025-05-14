@@ -57,9 +57,12 @@ class LfsCommands(BaseHuggingfaceCLICommand):
     @staticmethod
     def register_subcommand(parser: _SubParsersAction):
         enable_parser = parser.add_parser(
-            "lfs-enable-largefiles", help="Configure your repository to enable upload of files > 5GB."
+            "lfs-enable-largefiles",
+            help="Configure your repository to enable upload of files > 5GB.",
         )
-        enable_parser.add_argument("path", type=str, help="Local path to repository you want to configure.")
+        enable_parser.add_argument(
+            "path", type=str, help="Local path to repository you want to configure."
+        )
         enable_parser.set_defaults(func=lambda args: LfsEnableCommand(args))
 
         # Command will get called by git-lfs, do not call it directly.
@@ -120,7 +123,9 @@ class LfsUploadCommand:
         # sends initiation data to the process over stdin.
         # This tells the process useful information about the configuration.
         init_msg = json.loads(sys.stdin.readline().strip())
-        if not (init_msg.get("event") == "init" and init_msg.get("operation") == "upload"):
+        if not (
+            init_msg.get("event") == "init" and init_msg.get("operation") == "upload"
+        ):
             write_msg({"error": {"code": 32, "message": "Wrong lfs init operation"}})
             sys.exit(1)
 

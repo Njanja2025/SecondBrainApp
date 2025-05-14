@@ -59,7 +59,9 @@ def parse_datetime(date_string: str) -> datetime:
                 # fraction[:6] takes first 6 digits and :0<6 pads with zeros if less than 6 digits
                 date_string = f"{base}.{fraction[:6]:0<6}Z"
 
-        return datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
+        return datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
+            tzinfo=timezone.utc
+        )
     except ValueError as e:
         raise ValueError(
             f"Cannot parse '{date_string}' as a datetime. Date string is expected to"

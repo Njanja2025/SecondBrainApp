@@ -422,7 +422,9 @@ class HFCacheInfo:
         """
         hashes_to_delete: Set[str] = set(revisions)
 
-        repos_with_revisions: Dict[CachedRepoInfo, Set[CachedRevisionInfo]] = defaultdict(set)
+        repos_with_revisions: Dict[CachedRepoInfo, Set[CachedRevisionInfo]] = (
+            defaultdict(set)
+        )
 
         for repo in self.repos:
             for revision in repo.revisions:
@@ -431,7 +433,9 @@ class HFCacheInfo:
                     hashes_to_delete.remove(revision.commit_hash)
 
         if len(hashes_to_delete) > 0:
-            logger.warning(f"Revision(s) not found - cannot delete them: {', '.join(hashes_to_delete)}")
+            logger.warning(
+                f"Revision(s) not found - cannot delete them: {', '.join(hashes_to_delete)}"
+            )
 
         delete_strategy_blobs: Set[Path] = set()
         delete_strategy_refs: Set[Path] = set()
@@ -565,7 +569,9 @@ class HFCacheInfo:
                         str(revision.snapshot_path),
                     ]
                     for repo in sorted(self.repos, key=lambda repo: repo.repo_path)
-                    for revision in sorted(repo.revisions, key=lambda revision: revision.commit_hash)
+                    for revision in sorted(
+                        repo.revisions, key=lambda revision: revision.commit_hash
+                    )
                 ],
                 headers=[
                     "REPO ID",
@@ -707,7 +713,9 @@ def _scan_cached_repo(repo_path: Path) -> CachedRepoInfo:
         raise CorruptedCacheException(f"Repo path is not a directory: {repo_path}")
 
     if "--" not in repo_path.name:
-        raise CorruptedCacheException(f"Repo path is not a valid HuggingFace cache directory: {repo_path}")
+        raise CorruptedCacheException(
+            f"Repo path is not a valid HuggingFace cache directory: {repo_path}"
+        )
 
     repo_type, repo_id = repo_path.name.split("--", maxsplit=1)
     repo_type = repo_type[:-1]  # "models" -> "model"
@@ -724,7 +732,9 @@ def _scan_cached_repo(repo_path: Path) -> CachedRepoInfo:
     refs_path = repo_path / "refs"
 
     if not snapshots_path.exists() or not snapshots_path.is_dir():
-        raise CorruptedCacheException(f"Snapshots dir doesn't exist in cached repo: {snapshots_path}")
+        raise CorruptedCacheException(
+            f"Snapshots dir doesn't exist in cached repo: {snapshots_path}"
+        )
 
     # Scan over `refs` directory
 
@@ -738,7 +748,9 @@ def _scan_cached_repo(repo_path: Path) -> CachedRepoInfo:
         #         └── pr
         #             └── 1
         if refs_path.is_file():
-            raise CorruptedCacheException(f"Refs directory cannot be a file: {refs_path}")
+            raise CorruptedCacheException(
+                f"Refs directory cannot be a file: {refs_path}"
+            )
 
         for ref_path in refs_path.glob("**/*"):
             # glob("**/*") iterates over all files and directories -> skip directories
@@ -758,7 +770,9 @@ def _scan_cached_repo(repo_path: Path) -> CachedRepoInfo:
         if revision_path.name in FILES_TO_IGNORE:
             continue
         if revision_path.is_file():
-            raise CorruptedCacheException(f"Snapshots folder corrupted. Found a file: {revision_path}")
+            raise CorruptedCacheException(
+                f"Snapshots folder corrupted. Found a file: {revision_path}"
+            )
 
         cached_files = set()
         for file_path in revision_path.glob("**/*"):
@@ -768,7 +782,9 @@ def _scan_cached_repo(repo_path: Path) -> CachedRepoInfo:
 
             blob_path = Path(file_path).resolve()
             if not blob_path.exists():
-                raise CorruptedCacheException(f"Blob missing (broken symlink): {blob_path}")
+                raise CorruptedCacheException(
+                    f"Blob missing (broken symlink): {blob_path}"
+                )
 
             if blob_path not in blob_stats:
                 blob_stats[blob_path] = blob_path.stat()
@@ -787,7 +803,9 @@ def _scan_cached_repo(repo_path: Path) -> CachedRepoInfo:
         # Last modified is either the last modified blob file or the revision folder
         # itself if it is empty
         if len(cached_files) > 0:
-            revision_last_modified = max(blob_stats[file.blob_path].st_mtime for file in cached_files)
+            revision_last_modified = max(
+                blob_stats[file.blob_path].st_mtime for file in cached_files
+            )
         else:
             revision_last_modified = revision_path.stat().st_mtime
 
@@ -797,7 +815,8 @@ def _scan_cached_repo(repo_path: Path) -> CachedRepoInfo:
                 files=frozenset(cached_files),
                 refs=frozenset(refs_by_hash.pop(revision_path.name, set())),
                 size_on_disk=sum(
-                    blob_stats[blob_path].st_size for blob_path in set(file.blob_path for file in cached_files)
+                    blob_stats[blob_path].st_size
+                    for blob_path in set(file.blob_path for file in cached_files)
                 ),
                 snapshot_path=revision_path,
                 last_modified=revision_last_modified,
@@ -891,6 +910,10 @@ def _try_delete_path(path: Path, path_type: str) -> None:
         else:
             shutil.rmtree(path)
     except FileNotFoundError:
-        logger.warning(f"Couldn't delete {path_type}: file not found ({path})", exc_info=True)
+        logger.warning(
+            f"Couldn't delete {path_type}: file not found ({path})", exc_info=True
+        )
     except PermissionError:
-        logger.warning(f"Couldn't delete {path_type}: permission denied ({path})", exc_info=True)
+        logger.warning(
+            f"Couldn't delete {path_type}: permission denied ({path})", exc_info=True
+        )

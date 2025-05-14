@@ -4,7 +4,7 @@ from typing import cast, Callable, Generic, List, Optional, Type, TypeVar, Union
 
 import torch
 
-__all__ = ['Future', 'collect_all', 'wait_all']
+__all__ = ["Future", "collect_all", "wait_all"]
 
 T = TypeVar("T")
 S = TypeVar("S")
@@ -23,7 +23,9 @@ class Future(torch._C.Future, Generic[T], metaclass=_PyFutureMeta):
     .. warning:: GPU support is a beta feature, subject to changes.
     """
 
-    def __init__(self, *, devices: Optional[List[Union[int, str, torch.device]]] = None):
+    def __init__(
+        self, *, devices: Optional[List[Union[int, str, torch.device]]] = None
+    ):
         r"""
         Create an empty unset ``Future``. If the future is intended to hold
         values containing CUDA tensors, (a superset of) their CUDA devices must
@@ -262,7 +264,9 @@ class Future(torch._C.Future, Generic[T], metaclass=_PyFutureMeta):
             ...
             ValueError: foo
         """
-        assert isinstance(result, Exception), f"{result} is of type {type(result)}, not an Exception."
+        assert isinstance(
+            result, Exception
+        ), f"{result} is of type {type(result)}, not an Exception."
 
         def raise_error(fut_result):
             raise fut_result
@@ -297,7 +301,10 @@ def collect_all(futures: List[Future]) -> Future[List[Future]]:
         >>> print(f"fut1 result = {fut_list[1].wait()}")
         fut1 result = 1
     """
-    return cast(Future[List[Future]], torch._C._collect_all(cast(List[torch._C.Future], futures)))
+    return cast(
+        Future[List[Future]],
+        torch._C._collect_all(cast(List[torch._C.Future], futures)),
+    )
 
 
 def wait_all(futures: List[Future]) -> List:
@@ -315,4 +322,7 @@ def wait_all(futures: List[Future]) -> List:
         method will throw an error if ``wait`` on any
         :class:`~torch.futures.Future` throws.
     """
-    return [fut.wait() for fut in torch._C._collect_all(cast(List[torch._C.Future], futures)).wait()]
+    return [
+        fut.wait()
+        for fut in torch._C._collect_all(cast(List[torch._C.Future], futures)).wait()
+    ]

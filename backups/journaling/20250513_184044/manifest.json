@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-05-13T18:40:44.684317",
+  "backup_id": "20250513_184044",
+  "components": {
+    "journal_entries": {
+      "total_entries": 0,
+      "total_size": 0,
+      "entry_types": {},
+      "success": true,
+      "error": null
+    },
+    "emotional_logs": {
+      "total_entries": 0,
+      "total_size": 0,
+      "entry_types": {},
+      "success": true,
+      "error": null
+    },
+    "memory_entries": {
+      "total_entries": 0,
+      "total_size": 0,
+      "entry_types": {},
+      "success": true,
+      "error": null
+    },
+    "interaction_patterns": {
+      "total_entries": 0,
+      "total_size": 0,
+      "entry_types": {},
+      "success": true,
+      "error": null
+    }
+  },
+  "total_size": 0,
+  "total_entries": 0
+}

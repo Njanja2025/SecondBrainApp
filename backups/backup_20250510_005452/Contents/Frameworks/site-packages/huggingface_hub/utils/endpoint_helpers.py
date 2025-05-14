@@ -25,7 +25,9 @@ if TYPE_CHECKING:
     from ..hf_api import ModelInfo
 
 
-def _is_emission_within_threshold(model_info: "ModelInfo", minimum_threshold: float, maximum_threshold: float) -> bool:
+def _is_emission_within_threshold(
+    model_info: "ModelInfo", minimum_threshold: float, maximum_threshold: float
+) -> bool:
     """Checks if a model's emission is within a given threshold.
 
     Args:
@@ -40,7 +42,9 @@ def _is_emission_within_threshold(model_info: "ModelInfo", minimum_threshold: fl
         `bool`: Whether the model's emission is within the given threshold.
     """
     if minimum_threshold is None and maximum_threshold is None:
-        raise ValueError("Both `minimum_threshold` and `maximum_threshold` cannot both be `None`")
+        raise ValueError(
+            "Both `minimum_threshold` and `maximum_threshold` cannot both be `None`"
+        )
     if minimum_threshold is None:
         minimum_threshold = -1
     if maximum_threshold is None:

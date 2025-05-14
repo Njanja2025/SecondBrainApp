@@ -133,22 +133,31 @@ def read_dduf_file(dduf_path: Union[os.PathLike, str]) -> Dict[str, DDUFEntry]:
         for info in zf.infolist():
             logger.debug(f"Reading entry {info.filename}")
             if info.compress_type != zipfile.ZIP_STORED:
-                raise DDUFCorruptedFileError("Data must not be compressed in DDUF file.")
+                raise DDUFCorruptedFileError(
+                    "Data must not be compressed in DDUF file."
+                )
 
             try:
                 _validate_dduf_entry_name(info.filename)
             except DDUFInvalidEntryNameError as e:
-                raise DDUFCorruptedFileError(f"Invalid entry name in DDUF file: {info.filename}") from e
+                raise DDUFCorruptedFileError(
+                    f"Invalid entry name in DDUF file: {info.filename}"
+                ) from e
 
             offset = _get_data_offset(zf, info)
 
             entries[info.filename] = DDUFEntry(
-                filename=info.filename, offset=offset, length=info.file_size, dduf_path=dduf_path
+                filename=info.filename,
+                offset=offset,
+                length=info.file_size,
+                dduf_path=dduf_path,
             )
 
     # Consistency checks on the DDUF file
     if "model_index.json" not in entries:
-        raise DDUFCorruptedFileError("Missing required 'model_index.json' entry in DDUF file.")
+        raise DDUFCorruptedFileError(
+            "Missing required 'model_index.json' entry in DDUF file."
+        )
     index = json.loads(entries["model_index.json"].read_text())
     _validate_dduf_structure(index, entries.keys())
 
@@ -157,7 +166,8 @@ def read_dduf_file(dduf_path: Union[os.PathLike, str]) -> Dict[str, DDUFEntry]:
 
 
 def export_entries_as_dduf(
-    dduf_path: Union[str, os.PathLike], entries: Iterable[Tuple[str, Union[str, Path, bytes]]]
+    dduf_path: Union[str, os.PathLike],
+    entries: Iterable[Tuple[str, Union[str, Path, bytes]]],
 ) -> None:
     """Write a DDUF file from an iterable of entries.
 
@@ -247,7 +257,9 @@ def export_entries_as_dduf(
     logger.info(f"Done writing DDUF file {dduf_path}")
 
 
-def export_folder_as_dduf(dduf_path: Union[str, os.PathLike], folder_path: Union[str, os.PathLike]) -> None:
+def export_folder_as_dduf(
+    dduf_path: Union[str, os.PathLike], folder_path: Union[str, os.PathLike]
+) -> None:
     """
     Export a folder as a DDUF file.
 
@@ -283,7 +295,9 @@ def export_folder_as_dduf(dduf_path: Union[str, os.PathLike], folder_path: Union
     export_entries_as_dduf(dduf_path, _iterate_over_folder())
 
 
-def _dump_content_in_archive(archive: zipfile.ZipFile, filename: str, content: Union[str, os.PathLike, bytes]) -> None:
+def _dump_content_in_archive(
+    archive: zipfile.ZipFile, filename: str, content: Union[str, os.PathLike, bytes]
+) -> None:
     with archive.open(filename, "w", force_zip64=True) as archive_fh:
         if isinstance(content, (str, Path)):
             content_path = Path(content)
@@ -292,7 +306,9 @@ def _dump_content_in_archive(archive: zipfile.ZipFile, filename: str, content: U
         elif isinstance(content, bytes):
             archive_fh.write(content)
         else:
-            raise DDUFExportError(f"Invalid content type for {filename}. Must be str, Path or bytes.")
+            raise DDUFExportError(
+                f"Invalid content type for {filename}. Must be str, Path or bytes."
+            )
 
 
 def _load_content(content: Union[str, Path, bytes]) -> bytes:
@@ -305,17 +321,23 @@ def _load_content(content: Union[str, Path, bytes]) -> bytes:
     elif isinstance(content, bytes):
         return content
     else:
-        raise DDUFExportError(f"Invalid content type. Must be str, Path or bytes. Got {type(content)}.")
+        raise DDUFExportError(
+            f"Invalid content type. Must be str, Path or bytes. Got {type(content)}."
+        )
 
 
 def _validate_dduf_entry_name(entry_name: str) -> str:
     if "." + entry_name.split(".")[-1] not in DDUF_ALLOWED_ENTRIES:
         raise DDUFInvalidEntryNameError(f"File type not allowed: {entry_name}")
     if "\\" in entry_name:
-        raise DDUFInvalidEntryNameError(f"Entry names must use UNIX separators ('/'). Got {entry_name}.")
+        raise DDUFInvalidEntryNameError(
+            f"Entry names must use UNIX separators ('/'). Got {entry_name}."
+        )
     entry_name = entry_name.strip("/")
     if entry_name.count("/") > 1:
-        raise DDUFInvalidEntryNameError(f"DDUF only supports 1 level of directory. Got {entry_name}.")
+        raise DDUFInvalidEntryNameError(
+            f"DDUF only supports 1 level of directory. Got {entry_name}."
+        )
     return entry_name
 
 
@@ -338,13 +360,20 @@ def _validate_dduf_structure(index: Any, entry_names: Iterable[str]) -> None:
         - [`DDUFCorruptedFileError`]: If the DDUF file is corrupted (i.e. doesn't follow the DDUF format).
     """
     if not isinstance(index, dict):
-        raise DDUFCorruptedFileError(f"Invalid 'model_index.json' content. Must be a dictionary. Got {type(index)}.")
+        raise DDUFCorruptedFileError(
+            f"Invalid 'model_index.json' content. Must be a dictionary. Got {type(index)}."
+        )
 
     dduf_folders = {entry.split("/")[0] for entry in entry_names if "/" in entry}
     for folder in dduf_folders:
         if folder not in index:
-            raise DDUFCorruptedFileError(f"Missing required entry '{folder}' in 'model_index.json'.")
-        if not any(f"{folder}/{required_entry}" in entry_names for required_entry in DDUF_FOLDER_REQUIRED_ENTRIES):
+            raise DDUFCorruptedFileError(
+                f"Missing required entry '{folder}' in 'model_index.json'."
+            )
+        if not any(
+            f"{folder}/{required_entry}" in entry_names
+            for required_entry in DDUF_FOLDER_REQUIRED_ENTRIES
+        ):
             raise DDUFCorruptedFileError(
                 f"Missing required file in folder '{folder}'. Must contains at least one of {DDUF_FOLDER_REQUIRED_ENTRIES}."
             )

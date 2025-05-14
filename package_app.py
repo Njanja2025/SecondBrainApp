@@ -15,42 +15,48 @@ from email.message import EmailMessage
 import requests
 
 # --- CONFIGURATION ---
-CODE_SIGN_IDENTITY = os.environ.get('CODE_SIGN_IDENTITY')  # e.g., 'Developer ID Application: ...'
-APPLE_ID = os.environ.get('APPLE_ID')
-APPLE_TEAM_ID = os.environ.get('APPLE_TEAM_ID')
-APPLE_APP_SPECIFIC_PASSWORD = os.environ.get('APPLE_APP_SPECIFIC_PASSWORD')
-NOTARIZE = bool(os.environ.get('NOTARIZE', '0') == '1')
-DEPLOY_TARGET = os.environ.get('DEPLOY_TARGET')  # e.g., 's3://bucket/path' or 'scp:user@host:path'
-FTP_TARGET = os.environ.get('FTP_TARGET')  # e.g., 'ftp://user:pass@host/path/'
-GDRIVE_FOLDER_ID = os.environ.get('GDRIVE_FOLDER_ID')  # Google Drive folder ID
-DASHBOARD_USER = os.environ.get('DASHBOARD_USER')
-DASHBOARD_PASS = os.environ.get('DASHBOARD_PASS')
-EMAIL_NOTIFY = os.environ.get('EMAIL_NOTIFY')  # recipient email
-SMTP_SERVER = os.environ.get('SMTP_SERVER')
-SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
-SMTP_USER = os.environ.get('SMTP_USER')
-SMTP_PASS = os.environ.get('SMTP_PASS')
-WEBHOOK_URL = os.environ.get('WEBHOOK_URL')
-TWILIO_SID = os.environ.get('TWILIO_SID')
-TWILIO_TOKEN = os.environ.get('TWILIO_TOKEN')
-TWILIO_FROM = os.environ.get('TWILIO_FROM')
-TWILIO_TO = os.environ.get('TWILIO_TO')
-TEAMS_WEBHOOK_URL = os.environ.get('TEAMS_WEBHOOK_URL')
-ARTIFACT_RETENTION = int(os.environ.get('ARTIFACT_RETENTION', '5'))  # Keep latest N builds
-CDN_MIRROR_CMD = os.environ.get('CDN_MIRROR_CMD')  # e.g., 'aws s3 cp ... && aws cloudfront create-invalidation ...'
-ENCRYPT_ARTIFACTS = bool(os.environ.get('ENCRYPT_ARTIFACTS', '0') == '1')
-ENCRYPTION_PASSWORD = os.environ.get('ENCRYPTION_PASSWORD')
+CODE_SIGN_IDENTITY = os.environ.get(
+    "CODE_SIGN_IDENTITY"
+)  # e.g., 'Developer ID Application: ...'
+APPLE_ID = os.environ.get("APPLE_ID")
+APPLE_TEAM_ID = os.environ.get("APPLE_TEAM_ID")
+APPLE_APP_SPECIFIC_PASSWORD = os.environ.get("APPLE_APP_SPECIFIC_PASSWORD")
+NOTARIZE = bool(os.environ.get("NOTARIZE", "0") == "1")
+DEPLOY_TARGET = os.environ.get(
+    "DEPLOY_TARGET"
+)  # e.g., 's3://bucket/path' or 'scp:user@host:path'
+FTP_TARGET = os.environ.get("FTP_TARGET")  # e.g., 'ftp://user:pass@host/path/'
+GDRIVE_FOLDER_ID = os.environ.get("GDRIVE_FOLDER_ID")  # Google Drive folder ID
+DASHBOARD_USER = os.environ.get("DASHBOARD_USER")
+DASHBOARD_PASS = os.environ.get("DASHBOARD_PASS")
+EMAIL_NOTIFY = os.environ.get("EMAIL_NOTIFY")  # recipient email
+SMTP_SERVER = os.environ.get("SMTP_SERVER")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+SMTP_USER = os.environ.get("SMTP_USER")
+SMTP_PASS = os.environ.get("SMTP_PASS")
+WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
+TWILIO_SID = os.environ.get("TWILIO_SID")
+TWILIO_TOKEN = os.environ.get("TWILIO_TOKEN")
+TWILIO_FROM = os.environ.get("TWILIO_FROM")
+TWILIO_TO = os.environ.get("TWILIO_TO")
+TEAMS_WEBHOOK_URL = os.environ.get("TEAMS_WEBHOOK_URL")
+ARTIFACT_RETENTION = int(
+    os.environ.get("ARTIFACT_RETENTION", "5")
+)  # Keep latest N builds
+CDN_MIRROR_CMD = os.environ.get(
+    "CDN_MIRROR_CMD"
+)  # e.g., 'aws s3 cp ... && aws cloudfront create-invalidation ...'
+ENCRYPT_ARTIFACTS = bool(os.environ.get("ENCRYPT_ARTIFACTS", "0") == "1")
+ENCRYPTION_PASSWORD = os.environ.get("ENCRYPTION_PASSWORD")
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('package.log'),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("package.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
+
 
 class AppPackager:
     def __init__(self):
@@ -61,12 +67,12 @@ class AppPackager:
         self.resources_dir = Path("resources")
         self.backup_dir = Path("backups")
         self.dist_dir = self.build_dir / "dist"
-        
+
         # Create required directories
         self.build_dir.mkdir(exist_ok=True)
         self.backup_dir.mkdir(exist_ok=True)
         self.dist_dir.mkdir(exist_ok=True)
-        
+
         # Initialize manifest
         self.manifest = {
             "app_name": self.app_name,
@@ -78,7 +84,7 @@ class AppPackager:
             "notarized": False,
             "tested": False,
             "deployed": False,
-            "files": []
+            "files": [],
         }
 
     def create_backup(self):
@@ -98,14 +104,16 @@ class AppPackager:
             for file in files:
                 file_path = Path(root) / file
                 if file_path.is_file():
-                    with open(file_path, 'rb') as f:
+                    with open(file_path, "rb") as f:
                         checksum = hashlib.sha256(f.read()).hexdigest()
                         rel_path = file_path.relative_to(self.app_bundle)
-                        self.manifest["files"].append({
-                            "path": str(rel_path),
-                            "checksum": checksum,
-                            "size": file_path.stat().st_size
-                        })
+                        self.manifest["files"].append(
+                            {
+                                "path": str(rel_path),
+                                "checksum": checksum,
+                                "size": file_path.stat().st_size,
+                            }
+                        )
 
     def code_sign(self):
         if not CODE_SIGN_IDENTITY:
@@ -113,11 +121,20 @@ class AppPackager:
             return False
         logger.info(f"Code signing .app with identity: {CODE_SIGN_IDENTITY}")
         try:
-            subprocess.run([
-                'codesign', '--deep', '--force', '--verify', '--verbose',
-                '--sign', CODE_SIGN_IDENTITY,
-                str(self.app_bundle)
-            ], check=True, capture_output=True)
+            subprocess.run(
+                [
+                    "codesign",
+                    "--deep",
+                    "--force",
+                    "--verify",
+                    "--verbose",
+                    "--sign",
+                    CODE_SIGN_IDENTITY,
+                    str(self.app_bundle),
+                ],
+                check=True,
+                capture_output=True,
+            )
             self.manifest["code_signed"] = True
             logger.info("Code signing successful.")
             return True
@@ -130,13 +147,22 @@ class AppPackager:
         logger.info("Creating DMG...")
         dmg_path = self.dist_dir / f"{self.app_name}-{self.version}.dmg"
         try:
-            subprocess.run([
-                'hdiutil', 'create',
-                '-volname', f"{self.app_name}-{self.version}",
-                '-srcfolder', str(self.app_bundle),
-                '-ov', '-format', 'UDZO',
-                str(dmg_path)
-            ], check=True, capture_output=True)
+            subprocess.run(
+                [
+                    "hdiutil",
+                    "create",
+                    "-volname",
+                    f"{self.app_name}-{self.version}",
+                    "-srcfolder",
+                    str(self.app_bundle),
+                    "-ov",
+                    "-format",
+                    "UDZO",
+                    str(dmg_path),
+                ],
+                check=True,
+                capture_output=True,
+            )
             logger.info(f"Created DMG at {dmg_path}")
             return dmg_path
         except subprocess.CalledProcessError as e:
@@ -149,11 +175,19 @@ class AppPackager:
             return False
         logger.info(f"Code signing DMG with identity: {CODE_SIGN_IDENTITY}")
         try:
-            subprocess.run([
-                'codesign', '--force', '--verify', '--verbose',
-                '--sign', CODE_SIGN_IDENTITY,
-                str(dmg_path)
-            ], check=True, capture_output=True)
+            subprocess.run(
+                [
+                    "codesign",
+                    "--force",
+                    "--verify",
+                    "--verbose",
+                    "--sign",
+                    CODE_SIGN_IDENTITY,
+                    str(dmg_path),
+                ],
+                check=True,
+                capture_output=True,
+            )
             logger.info("DMG code signing successful.")
             return True
         except subprocess.CalledProcessError as e:
@@ -167,14 +201,25 @@ class AppPackager:
         logger.info("Submitting DMG for notarization...")
         try:
             # Submit for notarization
-            submit = subprocess.run([
-                'xcrun', 'altool', '--notarize-app',
-                '--primary-bundle-id', f"com.secondbrain.app.{self.version}",
-                '--username', APPLE_ID,
-                '--password', APPLE_APP_SPECIFIC_PASSWORD,
-                '--team-id', APPLE_TEAM_ID,
-                '--file', str(dmg_path)
-            ], check=True, capture_output=True)
+            submit = subprocess.run(
+                [
+                    "xcrun",
+                    "altool",
+                    "--notarize-app",
+                    "--primary-bundle-id",
+                    f"com.secondbrain.app.{self.version}",
+                    "--username",
+                    APPLE_ID,
+                    "--password",
+                    APPLE_APP_SPECIFIC_PASSWORD,
+                    "--team-id",
+                    APPLE_TEAM_ID,
+                    "--file",
+                    str(dmg_path),
+                ],
+                check=True,
+                capture_output=True,
+            )
             logger.info(f"Notarization submitted: {submit.stdout.decode()}")
             self.manifest["notarized"] = True
             return True
@@ -188,10 +233,10 @@ class AppPackager:
         zip_path = self.dist_dir / f"{self.app_name}-{self.version}.zip"
         try:
             shutil.make_archive(
-                str(zip_path.with_suffix('')),
-                'zip',
+                str(zip_path.with_suffix("")),
+                "zip",
                 root_dir=self.build_dir,
-                base_dir=f"{self.app_name}.app"
+                base_dir=f"{self.app_name}.app",
             )
             logger.info(f"Created ZIP archive at {zip_path}")
             return zip_path
@@ -202,23 +247,23 @@ class AppPackager:
     def verify_package(self, package_path):
         """Verify package integrity"""
         logger.info(f"Verifying package: {package_path}")
-        if package_path.suffix == '.dmg':
+        if package_path.suffix == ".dmg":
             try:
-                subprocess.run([
-                    'hdiutil', 'verify',
-                    str(package_path)
-                ], check=True, capture_output=True)
+                subprocess.run(
+                    ["hdiutil", "verify", str(package_path)],
+                    check=True,
+                    capture_output=True,
+                )
                 logger.info("DMG verification successful")
                 return True
             except subprocess.CalledProcessError as e:
                 logger.error(f"DMG verification failed: {e.stderr.decode()}")
                 return False
-        elif package_path.suffix == '.zip':
+        elif package_path.suffix == ".zip":
             try:
-                subprocess.run([
-                    'unzip', '-t',
-                    str(package_path)
-                ], check=True, capture_output=True)
+                subprocess.run(
+                    ["unzip", "-t", str(package_path)], check=True, capture_output=True
+                )
                 logger.info("ZIP verification successful")
                 return True
             except subprocess.CalledProcessError as e:
@@ -230,9 +275,7 @@ class AppPackager:
         logger.info("Testing packaged app...")
         try:
             # Try to launch the app in headless mode (simulate)
-            result = subprocess.run([
-                'open', '-W', str(self.app_bundle)
-            ], timeout=10)
+            result = subprocess.run(["open", "-W", str(self.app_bundle)], timeout=10)
             if result.returncode == 0:
                 self.manifest["tested"] = True
                 logger.info("App launch test successful.")
@@ -247,15 +290,17 @@ class AppPackager:
     def gui_test(self):
         logger.info("Running GUI test (AppleScript)...")
         try:
-            script = f'''tell application "{self.app_name}"
+            script = f"""tell application "{self.app_name}"
 activate
 delay 2
 quit
-end tell'''
-            with tempfile.NamedTemporaryFile('w', delete=False, suffix='.applescript') as f:
+end tell"""
+            with tempfile.NamedTemporaryFile(
+                "w", delete=False, suffix=".applescript"
+            ) as f:
                 f.write(script)
                 script_path = f.name
-            result = subprocess.run(['osascript', script_path], timeout=10)
+            result = subprocess.run(["osascript", script_path], timeout=10)
             os.unlink(script_path)
             if result.returncode == 0:
                 logger.info("GUI test successful.")
@@ -278,14 +323,16 @@ end tell'''
 
     def advanced_integration_test(self):
         logger.info("Running advanced integration test...")
-        test_script = Path('tests/integration_test.py')
+        test_script = Path("tests/integration_test.py")
         if test_script.exists():
             try:
-                result = subprocess.run(['python3', str(test_script)], capture_output=True, timeout=60)
+                result = subprocess.run(
+                    ["python3", str(test_script)], capture_output=True, timeout=60
+                )
                 self.manifest["advanced_integration_test"] = {
                     "returncode": result.returncode,
-                    "stdout": result.stdout.decode(errors='ignore'),
-                    "stderr": result.stderr.decode(errors='ignore')
+                    "stdout": result.stdout.decode(errors="ignore"),
+                    "stderr": result.stderr.decode(errors="ignore"),
                 }
                 if result.returncode == 0:
                     logger.info("Advanced integration test passed.")
@@ -307,15 +354,18 @@ end tell'''
             return
         logger.info("Adding HTTP basic auth to dashboard...")
         import crypt
-        htpasswd_path = self.dist_dir / '.htpasswd'
-        htaccess_path = self.dist_dir / '.htaccess'
+
+        htpasswd_path = self.dist_dir / ".htpasswd"
+        htaccess_path = self.dist_dir / ".htaccess"
         # Create .htpasswd
         hashed = crypt.crypt(DASHBOARD_PASS, crypt.mksalt(crypt.METHOD_SHA512))
-        with open(htpasswd_path, 'w') as f:
+        with open(htpasswd_path, "w") as f:
             f.write(f"{DASHBOARD_USER}:{hashed}\n")
         # Create .htaccess
-        with open(htaccess_path, 'w') as f:
-            f.write(f"""AuthType Basic\nAuthName \"Restricted\"\nAuthUserFile {htpasswd_path.resolve()}\nRequire valid-user\n""")
+        with open(htaccess_path, "w") as f:
+            f.write(
+                f"""AuthType Basic\nAuthName \"Restricted\"\nAuthUserFile {htpasswd_path.resolve()}\nRequire valid-user\n"""
+            )
         logger.info("Dashboard authentication files created.")
 
     def send_email_notification(self, success):
@@ -323,10 +373,14 @@ end tell'''
             return
         logger.info(f"Sending build status email to {EMAIL_NOTIFY}...")
         msg = EmailMessage()
-        msg['Subject'] = f"Build {'Success' if success else 'Failure'}: {self.app_name} v{self.version}"
-        msg['From'] = SMTP_USER
-        msg['To'] = EMAIL_NOTIFY
-        msg.set_content(f"Build {'succeeded' if success else 'failed'} for {self.app_name} v{self.version}.\nSee dashboard for details.")
+        msg["Subject"] = (
+            f"Build {'Success' if success else 'Failure'}: {self.app_name} v{self.version}"
+        )
+        msg["From"] = SMTP_USER
+        msg["To"] = EMAIL_NOTIFY
+        msg.set_content(
+            f"Build {'succeeded' if success else 'failed'} for {self.app_name} v{self.version}.\nSee dashboard for details."
+        )
         try:
             with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
                 server.starttls()
@@ -345,7 +399,7 @@ end tell'''
             "version": self.version,
             "status": "success" if success else "failure",
             "timestamp": datetime.now().isoformat(),
-            "dashboard_url": f"dashboard.html"
+            "dashboard_url": f"dashboard.html",
         }
         try:
             requests.post(WEBHOOK_URL, json=payload, timeout=10)
@@ -362,13 +416,15 @@ end tell'''
                 # Find the latest entry (assume markdown or text format)
                 entry = []
                 for line in lines:
-                    if line.strip().startswith('#') or line.strip().lower().startswith('version'):
+                    if line.strip().startswith("#") or line.strip().lower().startswith(
+                        "version"
+                    ):
                         if entry:
                             break
                         entry = [line.strip()]
                     elif entry is not None:
                         entry.append(line.strip())
-                return '\n'.join(entry)
+                return "\n".join(entry)
         return None
 
     def generate_dashboard(self):
@@ -379,7 +435,7 @@ end tell'''
         zip_path = self.dist_dir / f"{self.app_name}-{self.version}.zip"
         changelog = self.get_changelog_entry()
         encrypted = ENCRYPT_ARTIFACTS and ENCRYPTION_PASSWORD
-        enc_note = ''
+        enc_note = ""
         if encrypted:
             enc_note = f"""
             <div style='border:1px solid #c00;padding:1em;margin:1em 0;background:#fee;'>
@@ -417,7 +473,7 @@ end tell'''
         <footer><small>Generated: {datetime.now().isoformat()}</small></footer>
         </body></html>
         """
-        with open(dashboard_path, 'w') as f:
+        with open(dashboard_path, "w") as f:
             f.write(html)
         logger.info(f"Dashboard generated at {dashboard_path}")
         self.add_dashboard_auth()
@@ -428,14 +484,18 @@ end tell'''
             return False
         logger.info(f"Deploying to {DEPLOY_TARGET} ...")
         try:
-            if DEPLOY_TARGET.startswith('s3://'):
-                subprocess.run(['aws', 's3', 'cp', str(dmg_path), DEPLOY_TARGET], check=True)
-                subprocess.run(['aws', 's3', 'cp', str(zip_path), DEPLOY_TARGET], check=True)
-            elif DEPLOY_TARGET.startswith('scp:'):
+            if DEPLOY_TARGET.startswith("s3://"):
+                subprocess.run(
+                    ["aws", "s3", "cp", str(dmg_path), DEPLOY_TARGET], check=True
+                )
+                subprocess.run(
+                    ["aws", "s3", "cp", str(zip_path), DEPLOY_TARGET], check=True
+                )
+            elif DEPLOY_TARGET.startswith("scp:"):
                 # Format: scp:user@host:/path
                 scp_target = DEPLOY_TARGET[4:]
-                subprocess.run(['scp', str(dmg_path), scp_target], check=True)
-                subprocess.run(['scp', str(zip_path), scp_target], check=True)
+                subprocess.run(["scp", str(dmg_path), scp_target], check=True)
+                subprocess.run(["scp", str(zip_path), scp_target], check=True)
             else:
                 logger.warning("Unknown deployment target format.")
                 return False
@@ -452,9 +512,9 @@ end tell'''
         logger.info(f"Deploying to FTP: {FTP_TARGET}")
         try:
             for artifact in [dmg_path, zip_path]:
-                subprocess.run([
-                    'lftp', '-e', f'put {artifact}; bye', FTP_TARGET
-                ], check=True)
+                subprocess.run(
+                    ["lftp", "-e", f"put {artifact}; bye", FTP_TARGET], check=True
+                )
             self.manifest["deployed_ftp"] = True
             logger.info("FTP deployment successful.")
             return True
@@ -469,9 +529,10 @@ end tell'''
         logger.info(f"Deploying to Google Drive folder: {GDRIVE_FOLDER_ID}")
         try:
             for artifact in [dmg_path, zip_path]:
-                subprocess.run([
-                    'gdrive', 'upload', '--parent', GDRIVE_FOLDER_ID, str(artifact)
-                ], check=True)
+                subprocess.run(
+                    ["gdrive", "upload", "--parent", GDRIVE_FOLDER_ID, str(artifact)],
+                    check=True,
+                )
             self.manifest["deployed_gdrive"] = True
             logger.info("Google Drive deployment successful.")
             return True
@@ -487,7 +548,7 @@ end tell'''
         manifest_json = json.dumps(self.manifest, indent=2)
         manifest_hash = hashlib.sha256(manifest_json.encode()).hexdigest()
         self.manifest["manifest_hash"] = manifest_hash
-        with open(manifest_path, 'w') as f:
+        with open(manifest_path, "w") as f:
             f.write(manifest_json)
         logger.info(f"Saved manifest to {manifest_path}")
 
@@ -498,14 +559,10 @@ end tell'''
         body = f"Build {'succeeded' if success else 'failed'} for {self.app_name} v{self.version}."
         try:
             resp = requests.post(
-                f'https://api.twilio.com/2010-04-01/Accounts/{TWILIO_SID}/Messages.json',
-                data={
-                    'From': TWILIO_FROM,
-                    'To': TWILIO_TO,
-                    'Body': body
-                },
+                f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_SID}/Messages.json",
+                data={"From": TWILIO_FROM, "To": TWILIO_TO, "Body": body},
                 auth=(TWILIO_SID, TWILIO_TOKEN),
-                timeout=10
+                timeout=10,
             )
             if resp.status_code == 201:
                 logger.info("SMS notification sent.")
@@ -524,7 +581,7 @@ end tell'''
             "summary": f"Build {'Success' if success else 'Failure'}: {self.app_name}",
             "themeColor": "0076D7" if success else "FF0000",
             "title": f"Build {'Success' if success else 'Failure'}: {self.app_name} v{self.version}",
-            "text": f"Build {'succeeded' if success else 'failed'} for {self.app_name} v{self.version}."
+            "text": f"Build {'succeeded' if success else 'failed'} for {self.app_name} v{self.version}.",
         }
         try:
             requests.post(TEAMS_WEBHOOK_URL, json=payload, timeout=10)
@@ -533,15 +590,25 @@ end tell'''
             logger.error(f"Failed to send Teams notification: {e}")
 
     def cleanup_old_artifacts(self):
-        logger.info(f"Applying artifact retention policy: keep last {ARTIFACT_RETENTION} builds.")
-        builds = sorted(self.dist_dir.glob(f"{self.app_name}-*.dmg"), key=os.path.getmtime, reverse=True)
+        logger.info(
+            f"Applying artifact retention policy: keep last {ARTIFACT_RETENTION} builds."
+        )
+        builds = sorted(
+            self.dist_dir.glob(f"{self.app_name}-*.dmg"),
+            key=os.path.getmtime,
+            reverse=True,
+        )
         for old in builds[ARTIFACT_RETENTION:]:
             try:
                 logger.info(f"Removing old artifact: {old}")
                 old.unlink()
                 # Remove associated zip and manifest
-                for ext in ['.zip', '-manifest.json']:
-                    related = old.with_suffix(ext) if ext != '-manifest.json' else old.with_name(old.name.replace('.dmg', '-manifest.json'))
+                for ext in [".zip", "-manifest.json"]:
+                    related = (
+                        old.with_suffix(ext)
+                        if ext != "-manifest.json"
+                        else old.with_name(old.name.replace(".dmg", "-manifest.json"))
+                    )
                     if related.exists():
                         related.unlink()
             except Exception as e:
@@ -551,11 +618,18 @@ end tell'''
         if not ENCRYPT_ARTIFACTS or not ENCRYPTION_PASSWORD:
             return path
         logger.info(f"Encrypting artifact: {path}")
-        encrypted_path = path.with_suffix(path.suffix + '.enc')
+        encrypted_path = path.with_suffix(path.suffix + ".enc")
         # Use openssl for encryption
         cmd = [
-            'openssl', 'aes-256-cbc', '-salt', '-in', str(path), '-out', str(encrypted_path),
-            '-k', ENCRYPTION_PASSWORD
+            "openssl",
+            "aes-256-cbc",
+            "-salt",
+            "-in",
+            str(path),
+            "-out",
+            str(encrypted_path),
+            "-k",
+            ENCRYPTION_PASSWORD,
         ]
         try:
             subprocess.run(cmd, check=True)
@@ -571,7 +645,7 @@ end tell'''
         logger.info(f"Mirroring artifact to CDN: {artifact_path}")
         try:
             # Replace placeholder in command
-            cmd = CDN_MIRROR_CMD.replace('{artifact}', str(artifact_path))
+            cmd = CDN_MIRROR_CMD.replace("{artifact}", str(artifact_path))
             subprocess.run(cmd, shell=True, check=True)
             logger.info("CDN mirroring command executed.")
         except Exception as e:
@@ -582,80 +656,77 @@ end tell'''
         try:
             # Create backup
             backup_path = self.create_backup()
-            
+
             # Calculate checksums
             self.calculate_checksums()
-            
+
             # Create distribution packages
             dmg_path = self.create_dmg()
             zip_path = self.create_zip()
-            
+
             # Encrypt artifacts if enabled
             dmg_path = self.encrypt_artifact(dmg_path)
             zip_path = self.encrypt_artifact(zip_path)
-            
+
             # Verify packages
-            if not all([
-                self.verify_package(dmg_path),
-                self.verify_package(zip_path)
-            ]):
+            if not all([self.verify_package(dmg_path), self.verify_package(zip_path)]):
                 raise Exception("Package verification failed")
-            
+
             # Save manifest
             self.save_manifest()
-            
+
             # Code sign
             if self.code_sign():
                 logger.info("App code signed.")
-            
+
             # Code sign DMG
             self.code_sign_dmg(dmg_path)
-            
+
             # Notarize
             if NOTARIZE:
                 self.notarize(dmg_path)
-            
+
             # Test app
             self.test_app()
-            
+
             # GUI test
             self.gui_test()
-            
+
             # Integration test
             self.integration_test()
-            
+
             # Advanced integration test
             self.advanced_integration_test()
-            
+
             # Deploy
             self.deploy(dmg_path, zip_path)
-            
+
             # Deploy to FTP
             self.deploy_ftp(dmg_path, zip_path)
-            
+
             # Deploy to Google Drive
             self.deploy_gdrive(dmg_path, zip_path)
-            
+
             # Generate dashboard
             self.generate_dashboard()
-            
+
             # Cleanup old artifacts
             self.cleanup_old_artifacts()
-            
+
             # Mirror to CDN
             self.mirror_to_cdn(dmg_path)
             self.mirror_to_cdn(zip_path)
-            
+
             logger.info("Packaging completed successfully")
             logger.info(f"Distribution files available in {self.dist_dir}")
-            
+
             self.send_email_notification(True)
             self.send_webhook_notification(True)
             self.send_sms_notification(True)
             self.send_teams_notification(True)
-            
+
             return True
-            
+
         except Exception as e:
             logger.error(f"Packaging failed: {e}")
             if backup_path:
@@ -669,10 +740,12 @@ end tell'''
             self.send_teams_notification(False)
             return False
 
+
 def main():
     packager = AppPackager()
     success = packager.package()
     sys.exit(0 if success else 1)
 
+
 if __name__ == "__main__":
-    main() 
+    main()

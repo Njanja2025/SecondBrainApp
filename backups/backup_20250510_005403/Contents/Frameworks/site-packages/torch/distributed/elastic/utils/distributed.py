@@ -52,7 +52,11 @@ def create_c10d_store(
             "  world_size  : %s\n"
             "  is_server   : %s\n"
             "  timeout(sec): %s\n",
-            server_addr, port, world_size, is_server, timeout
+            server_addr,
+            port,
+            world_size,
+            is_server,
+            timeout,
         )
 
         try:
@@ -78,7 +82,10 @@ def create_c10d_store(
             if str(e) == _ADDRESS_IN_USE:  # this will only happen on the server
                 if attempt < retries:
                     log.warning(
-                        "port: %s already in use, attempt: [%s/%s]", port, attempt, retries
+                        "port: %s already in use, attempt: [%s/%s]",
+                        port,
+                        attempt,
+                        retries,
                     )
                     attempt += 1
                 else:

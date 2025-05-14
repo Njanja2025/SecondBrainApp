@@ -3,7 +3,13 @@ from typing import Any, Dict, List, Optional, Union
 
 from . import constants
 from .hf_api import HfApi
-from .utils import build_hf_headers, get_session, is_pillow_available, logging, validate_hf_hub_args
+from .utils import (
+    build_hf_headers,
+    get_session,
+    is_pillow_available,
+    logging,
+    validate_hf_hub_args,
+)
 from .utils._deprecation import _deprecate_method
 
 
@@ -187,7 +193,9 @@ class InferenceApi:
             payload["parameters"] = params
 
         # Make API call
-        response = get_session().post(self.api_url, headers=self.headers, json=payload, data=data)
+        response = get_session().post(
+            self.api_url, headers=self.headers, json=payload, data=data
+        )
 
         # Let the user handle the response
         if raw_response:

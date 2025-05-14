@@ -4,4 +4,4 @@ with open("requirements.txt", "r") as file:
 with open("requirements.txt", "w") as file:
     for line in lines:
         if "secondbrain" not in line:
-            file.write(line) 
+            file.write(line)

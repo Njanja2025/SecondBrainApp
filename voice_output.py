@@ -11,22 +11,23 @@ import json
 CONFIG_FILE = "voice_config.json"
 LOG_FILE = "phantom_logs/voice_output.log"
 
+
 class VoiceSystem:
     def __init__(self):
         self.load_config()
         self.setup_gui()
-    
+
     def load_config(self):
         """Load or create default configuration."""
         default_config = {
             "muted": False,
             "voice_rate": 175,
-            "selected_voice": "Alex"  # Default macOS voice
+            "selected_voice": "Alex",  # Default macOS voice
         }
-        
+
         try:
             if os.path.exists(CONFIG_FILE):
-                with open(CONFIG_FILE, 'r') as f:
+                with open(CONFIG_FILE, "r") as f:
                     loaded_config = json.load(f)
                     # Ensure all default keys exist
                     self.config = default_config.copy()
@@ -40,7 +41,7 @@ class VoiceSystem:
 
     def save_config(self):
         """Save current configuration."""
-        with open(CONFIG_FILE, 'w') as f:
+        with open(CONFIG_FILE, "w") as f:
             json.dump(self.config, f, indent=4)
 
     def log_voice(self, text, status):
@@ -53,9 +54,9 @@ class VoiceSystem:
     def get_available_voices(self):
         """Get list of available macOS voices."""
         try:
-            result = subprocess.run(['say', '-v', '?'], capture_output=True, text=True)
+            result = subprocess.run(["say", "-v", "?"], capture_output=True, text=True)
             voices = []
-            for line in result.stdout.split('\n'):
+            for line in result.stdout.split("\n"):
                 if line.strip():
                     voice_name = line.split()[0]
                     voices.append(voice_name)
@@ -71,17 +72,19 @@ class VoiceSystem:
 
         if platform.system() != "Darwin":
             self.log_voice(text, "error: not macOS")
-            messagebox.showwarning("Voice Output Failed", "This system only works on macOS")
+            messagebox.showwarning(
+                "Voice Output Failed", "This system only works on macOS"
+            )
             return
 
         try:
-            cmd = ['say']
+            cmd = ["say"]
             if self.config["selected_voice"]:
-                cmd.extend(['-v', self.config["selected_voice"]])
+                cmd.extend(["-v", self.config["selected_voice"]])
             if self.config["voice_rate"]:
-                cmd.extend(['-r', str(self.config["voice_rate"])])
+                cmd.extend(["-r", str(self.config["voice_rate"])])
             cmd.append(text)
-            
+
             result = subprocess.run(cmd, capture_output=True)
             if result.returncode == 0:
                 self.log_voice(text, f"macOS say ({self.config['selected_voice']})")
@@ -91,7 +94,7 @@ class VoiceSystem:
 
         # Fallback: beep and alert box
         try:
-            print('\a')  # System beep
+            print("\a")  # System beep
             messagebox.showwarning("Voice Output Failed", f"Assistant says: {text}")
             self.log_voice(text, "popup alert")
         except Exception as e:
@@ -103,14 +106,14 @@ class VoiceSystem:
         self.window = tk.Tk()
         self.window.title("Voice Control Panel")
         self.window.geometry("300x500")
-        
+
         # Mute toggle
         self.mute_var = tk.BooleanVar(value=self.config["muted"])
         ttk.Checkbutton(
-            self.window, 
-            text="Mute Voice Output", 
+            self.window,
+            text="Mute Voice Output",
             variable=self.mute_var,
-            command=self.toggle_mute
+            command=self.toggle_mute,
         ).pack(pady=10)
 
         # Voice selection
@@ -121,10 +124,10 @@ class VoiceSystem:
             self.window,
             textvariable=self.voice_var,
             values=self.voices,
-            state="readonly"
+            state="readonly",
         )
         voice_combo.pack(pady=5)
-        voice_combo.bind('<<ComboboxSelected>>', lambda e: self.update_voice())
+        voice_combo.bind("<<ComboboxSelected>>", lambda e: self.update_voice())
 
         # Voice rate slider
         ttk.Label(self.window, text="Voice Speed").pack(pady=5)
@@ -134,22 +137,20 @@ class VoiceSystem:
             from_=100,
             to=250,
             variable=self.rate_var,
-            command=self.update_rate
+            command=self.update_rate,
         ).pack(pady=5)
 
         # Test voice button
         ttk.Button(
             self.window,
             text="Test Voice",
-            command=lambda: self.speak("Voice system test successful")
+            command=lambda: self.speak("Voice system test successful"),
         ).pack(pady=10)
 
         # Save settings button
-        ttk.Button(
-            self.window,
-            text="Save Settings",
-            command=self.save_settings
-        ).pack(pady=10)
+        ttk.Button(self.window, text="Save Settings", command=self.save_settings).pack(
+            pady=10
+        )
 
         # Status display
         self.status_text = tk.Text(self.window, height=5, width=35)
@@ -189,18 +190,21 @@ class VoiceSystem:
         status += f"Voice Speed: {self.config['voice_rate']}"
         self.status_text.insert(tk.END, status)
 
+
 def get_voice_system():
     """Get or create the voice system instance."""
     if not hasattr(get_voice_system, "instance"):
         get_voice_system.instance = VoiceSystem()
     return get_voice_system.instance
 
+
 # Global speak function for backwards compatibility
 def speak(text):
     get_voice_system().speak(text)
+
 
 # Test block
 if __name__ == "__main__":
     voice_system = get_voice_system()
     voice_system.speak("Second Brain voice system is fully active.")
-    voice_system.window.mainloop() 
+    voice_system.window.mainloop()

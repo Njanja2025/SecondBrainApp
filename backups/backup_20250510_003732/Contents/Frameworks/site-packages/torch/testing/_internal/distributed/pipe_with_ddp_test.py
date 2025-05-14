@@ -15,6 +15,7 @@ from torch.testing._internal.common_distributed import (
 )
 from torch.distributed.pipeline.sync import Pipe
 
+
 class PipeWithDDPTest(RpcAgentTestFixture):
     @property
     def world_size(self) -> int:
@@ -76,7 +77,9 @@ class PipeWithDDPTest(RpcAgentTestFixture):
     def test_basic_gloo_ckpt_except_last(self):
         self._run_basic_test("gloo", "except_last", static_graph=True)
 
-    def _run_basic_test(self, backend, checkpoint, find_unused_parameters=False, static_graph=False):
+    def _run_basic_test(
+        self, backend, checkpoint, find_unused_parameters=False, static_graph=False
+    ):
         dist.init_process_group(
             backend=backend,
             init_method=INIT_METHOD_TEMPLATE.format(file_name=self.file_name),
@@ -101,10 +104,7 @@ class PipeWithDDPTest(RpcAgentTestFixture):
                     return self.fc3(self.fc2(inp))
 
         layer2 = MyModule(2 * self.rank + 1)
-        model = nn.Sequential(
-            fc1,
-            layer2
-        )
+        model = nn.Sequential(fc1, layer2)
         model = Pipe(model, chunks=2, checkpoint=checkpoint)
         model = DistributedDataParallel(
             model,
@@ -122,7 +122,9 @@ class PipeWithDDPTest(RpcAgentTestFixture):
         if find_unused_parameters:
             # Ensure inputs are different across ranks to verify that gradient
             # sync indeed occurs.
-            unused_param_input = torch.rand(16, 16).cuda(2 * self.rank) * (self.rank + 1)
+            unused_param_input = torch.rand(16, 16).cuda(2 * self.rank) * (
+                self.rank + 1
+            )
             model(unused_param_input).local_value().sum().backward()
 
         # Run a few more iterations of fwd + bwd to ensure gradient synchronization
@@ -137,11 +139,17 @@ class PipeWithDDPTest(RpcAgentTestFixture):
         dist.all_gather(output, fc1.weight.grad)
         self.assertEqual(output[0], output[1])
 
-        output = [torch.empty_like(layer2.fc2.weight.grad), torch.empty_like(layer2.fc2.weight.grad)]
+        output = [
+            torch.empty_like(layer2.fc2.weight.grad),
+            torch.empty_like(layer2.fc2.weight.grad),
+        ]
         dist.all_gather(output, layer2.fc2.weight.grad)
         self.assertEqual(output[0], output[1])
 
         if not find_unused_parameters:
-            output = [torch.empty_like(layer2.fc3.weight.grad), torch.empty_like(layer2.fc3.weight.grad)]
+            output = [
+                torch.empty_like(layer2.fc3.weight.grad),
+                torch.empty_like(layer2.fc3.weight.grad),
+            ]
             dist.all_gather(output, layer2.fc3.weight.grad)
             self.assertEqual(output[0], output[1])

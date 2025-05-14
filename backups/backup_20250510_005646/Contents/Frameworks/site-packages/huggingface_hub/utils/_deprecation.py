@@ -123,9 +123,7 @@ def _deprecate_method(*, version: str, message: Optional[str] = None):
 
         @wraps(f)
         def inner_f(*args, **kwargs):
-            warning_message = (
-                f"'{name}' (from '{f.__module__}') is deprecated and will be removed from version '{version}'."
-            )
+            warning_message = f"'{name}' (from '{f.__module__}') is deprecated and will be removed from version '{version}'."
             if message is not None:
                 warning_message += " " + message
             warnings.warn(warning_message, FutureWarning)

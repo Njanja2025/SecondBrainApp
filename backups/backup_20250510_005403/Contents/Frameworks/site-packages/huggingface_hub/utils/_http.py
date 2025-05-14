@@ -80,7 +80,9 @@ class UniqueRequestIdAdapter(HTTPAdapter):
 
         # Add random request ID => easier for server-side debug
         if X_AMZN_TRACE_ID not in request.headers:
-            request.headers[X_AMZN_TRACE_ID] = request.headers.get(X_REQUEST_ID) or str(uuid.uuid4())
+            request.headers[X_AMZN_TRACE_ID] = request.headers.get(X_REQUEST_ID) or str(
+                uuid.uuid4()
+            )
 
         # Add debug log
         has_token = len(str(request.headers.get("authorization", ""))) > 0
@@ -124,7 +126,9 @@ BACKEND_FACTORY_T = Callable[[], requests.Session]
 _GLOBAL_BACKEND_FACTORY: BACKEND_FACTORY_T = _default_backend_factory
 
 
-def configure_http_backend(backend_factory: BACKEND_FACTORY_T = _default_backend_factory) -> None:
+def configure_http_backend(
+    backend_factory: BACKEND_FACTORY_T = _default_backend_factory,
+) -> None:
     """
     Configure the HTTP backend by providing a `backend_factory`. Any HTTP calls made by `huggingface_hub` will use a
     Session object instantiated by this factory. This can be useful if you are running your scripts in a specific
@@ -189,7 +193,9 @@ def get_session() -> requests.Session:
     session = get_session()
     ```
     """
-    return _get_session_from_cache(process_id=os.getpid(), thread_id=threading.get_ident())
+    return _get_session_from_cache(
+        process_id=os.getpid(), thread_id=threading.get_ident()
+    )
 
 
 def reset_sessions() -> None:
@@ -312,7 +318,9 @@ def http_backoff(
                 return response
 
             # Wrong status code returned (HTTP 503 for instance)
-            logger.warning(f"HTTP Error {response.status_code} thrown while requesting {method} {url}")
+            logger.warning(
+                f"HTTP Error {response.status_code} thrown while requesting {method} {url}"
+            )
             if nb_tries > max_retries:
                 response.raise_for_status()  # Will raise uncaught exception
                 # We return response to avoid infinite loop in the corner case where the
@@ -343,13 +351,18 @@ def fix_hf_endpoint_in_url(url: str, endpoint: Optional[str]) -> str:
     """
     endpoint = endpoint.rstrip("/") if endpoint else constants.ENDPOINT
     # check if a proxy has been set => if yes, update the returned URL to use the proxy
-    if endpoint not in (constants._HF_DEFAULT_ENDPOINT, constants._HF_DEFAULT_STAGING_ENDPOINT):
+    if endpoint not in (
+        constants._HF_DEFAULT_ENDPOINT,
+        constants._HF_DEFAULT_STAGING_ENDPOINT,
+    ):
         url = url.replace(constants._HF_DEFAULT_ENDPOINT, endpoint)
         url = url.replace(constants._HF_DEFAULT_STAGING_ENDPOINT, endpoint)
     return url
 
 
-def hf_raise_for_status(response: Response, endpoint_name: Optional[str] = None) -> None:
+def hf_raise_for_status(
+    response: Response, endpoint_name: Optional[str] = None
+) -> None:
     """
     Internal version of `response.raise_for_status()` that will refine a
     potential HTTPError. Raised exception will be an instance of `HfHubHTTPError`.
@@ -412,16 +425,26 @@ def hf_raise_for_status(response: Response, endpoint_name: Optional[str] = None)
         error_message = response.headers.get("X-Error-Message")
 
         if error_code == "RevisionNotFound":
-            message = f"{response.status_code} Client Error." + "\n\n" + f"Revision Not Found for url: {response.url}."
+            message = (
+                f"{response.status_code} Client Error."
+                + "\n\n"
+                + f"Revision Not Found for url: {response.url}."
+            )
             raise _format(RevisionNotFoundError, message, response) from e
 
         elif error_code == "EntryNotFound":
-            message = f"{response.status_code} Client Error." + "\n\n" + f"Entry Not Found for url: {response.url}."
+            message = (
+                f"{response.status_code} Client Error."
+                + "\n\n"
+                + f"Entry Not Found for url: {response.url}."
+            )
             raise _format(EntryNotFoundError, message, response) from e
 
         elif error_code == "GatedRepo":
             message = (
-                f"{response.status_code} Client Error." + "\n\n" + f"Cannot access gated repo for url {response.url}."
+                f"{response.status_code} Client Error."
+                + "\n\n"
+                + f"Cannot access gated repo for url {response.url}."
             )
             raise _format(GatedRepoError, message, response) from e
 
@@ -460,7 +483,9 @@ def hf_raise_for_status(response: Response, endpoint_name: Optional[str] = None)
 
         elif response.status_code == 400:
             message = (
-                f"\n\nBad request for {endpoint_name} endpoint:" if endpoint_name is not None else "\n\nBad request:"
+                f"\n\nBad request for {endpoint_name} endpoint:"
+                if endpoint_name is not None
+                else "\n\nBad request:"
             )
             raise _format(BadRequestError, message, response) from e
 
@@ -482,7 +507,9 @@ def hf_raise_for_status(response: Response, endpoint_name: Optional[str] = None)
         raise _format(HfHubHTTPError, str(e), response) from e
 
 
-def _format(error_type: Type[HfHubHTTPError], custom_message: str, response: Response) -> HfHubHTTPError:
+def _format(
+    error_type: Type[HfHubHTTPError], custom_message: str, response: Response
+) -> HfHubHTTPError:
     server_errors = []
 
     # Retrieve server error from header
@@ -547,13 +574,19 @@ def _format(error_type: Type[HfHubHTTPError], custom_message: str, response: Res
         if "\n" in final_error_message:
             newline_index = final_error_message.index("\n")
             final_error_message = (
-                final_error_message[:newline_index] + request_id_message + final_error_message[newline_index:]
+                final_error_message[:newline_index]
+                + request_id_message
+                + final_error_message[newline_index:]
             )
         else:
             final_error_message += request_id_message
 
     # Return
-    return error_type(final_error_message.strip(), response=response, server_message=server_message or None)
+    return error_type(
+        final_error_message.strip(),
+        response=response,
+        server_message=server_message or None,
+    )
 
 
 def _curlify(request: requests.PreparedRequest) -> str:
@@ -600,7 +633,9 @@ def _curlify(request: requests.PreparedRequest) -> str:
 RANGE_REGEX = re.compile(r"^\s*bytes\s*=\s*(\d*)\s*-\s*(\d*)\s*$", re.IGNORECASE)
 
 
-def _adjust_range_header(original_range: Optional[str], resume_size: int) -> Optional[str]:
+def _adjust_range_header(
+    original_range: Optional[str], resume_size: int
+) -> Optional[str]:
     """
     Adjust HTTP Range header to account for resume position.
     """
@@ -608,7 +643,9 @@ def _adjust_range_header(original_range: Optional[str], resume_size: int) -> Opt
         return f"bytes={resume_size}-"
 
     if "," in original_range:
-        raise ValueError(f"Multiple ranges detected - {original_range!r}, not supported yet.")
+        raise ValueError(
+            f"Multiple ranges detected - {original_range!r}, not supported yet."
+        )
 
     match = RANGE_REGEX.match(original_range)
     if not match:

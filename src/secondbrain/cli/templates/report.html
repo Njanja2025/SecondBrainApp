@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Metrics Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .status-ok {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-critical {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>System Metrics Report</h1>
+        <p>Generated on: {{ datetime.now().strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">CPU Metrics</div>
+        <table>
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <td>CPU Usage</td>
+                <td>{{ metrics.cpu.percent }}%</td>
+                <td>
+                    {% if metrics.cpu.percent < 80 %}
+                    <span class="status status-ok">OK</span>
+                    {% elif metrics.cpu.percent < 90 %}
+                    <span class="status status-warning">Warning</span>
+                    {% else %}
+                    <span class="status status-critical">Critical</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>CPU Count</td>
+                <td>{{ metrics.cpu.count }}</td>
+                <td><span class="status status-ok">OK</span></td>
+            </tr>
+            <tr>
+                <td>CPU Frequency</td>
+                <td>{{ metrics.cpu.frequency }} MHz</td>
+                <td><span class="status status-ok">OK</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Memory Metrics</div>
+        <table>
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <td>Memory Usage</td>
+                <td>{{ metrics.memory.percent }}%</td>
+                <td>
+                    {% if metrics.memory.percent < 80 %}
+                    <span class="status status-ok">OK</span>
+                    {% elif metrics.memory.percent < 90 %}
+                    <span class="status status-warning">Warning</span>
+                    {% else %}
+                    <span class="status status-critical">Critical</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Total Memory</td>
+                <td>{{ (metrics.memory.total / (1024**3))|round(2) }} GB</td>
+                <td><span class="status status-ok">OK</span></td>
+            </tr>
+            <tr>
+                <td>Available Memory</td>
+                <td>{{ (metrics.memory.available / (1024**3))|round(2) }} GB</td>
+                <td><span class="status status-ok">OK</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Disk Metrics</div>
+        <table>
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <td>Disk Usage</td>
+                <td>{{ metrics.disk.percent }}%</td>
+                <td>
+                    {% if metrics.disk.percent < 80 %}
+                    <span class="status status-ok">OK</span>
+                    {% elif metrics.disk.percent < 90 %}
+                    <span class="status status-warning">Warning</span>
+                    {% else %}
+                    <span class="status status-critical">Critical</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Total Space</td>
+                <td>{{ (metrics.disk.total / (1024**3))|round(2) }} GB</td>
+                <td><span class="status status-ok">OK</span></td>
+            </tr>
+            <tr>
+                <td>Free Space</td>
+                <td>{{ (metrics.disk.free / (1024**3))|round(2) }} GB</td>
+                <td><span class="status status-ok">OK</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Network Metrics</div>
+        <table>
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <td>Bytes Sent</td>
+                <td>{{ (metrics.network.bytes_sent / (1024**2))|round(2) }} MB</td>
+                <td><span class="status status-ok">OK</span></td>
+            </tr>
+            <tr>
+                <td>Bytes Received</td>
+                <td>{{ (metrics.network.bytes_recv / (1024**2))|round(2) }} MB</td>
+                <td><span class="status status-ok">OK</span></td>
+            </tr>
+            <tr>
+                <td>Active Connections</td>
+                <td>{{ metrics.network.active_connections }}</td>
+                <td><span class="status status-ok">OK</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">System Information</div>
+        <table>
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Platform</td>
+                <td>{{ metrics.system.platform }}</td>
+            </tr>
+            <tr>
+                <td>Platform Version</td>
+                <td>{{ metrics.system.platform_version }}</td>
+            </tr>
+            <tr>
+                <td>Machine</td>
+                <td>{{ metrics.system.machine }}</td>
+            </tr>
+            <tr>
+                <td>Processor</td>
+                <td>{{ metrics.system.processor }}</td>
+            </tr>
+            <tr>
+                <td>Boot Time</td>
+                <td>{{ metrics.system.boot_time }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        <p>Report generated by SecondBrain Monitoring System</p>
+        <p>© {{ datetime.now().year }} SecondBrain. All rights reserved.</p>
+    </div>
+</body>
+</html> 

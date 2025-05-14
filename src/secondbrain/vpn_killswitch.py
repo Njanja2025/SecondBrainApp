@@ -6,9 +6,10 @@ import platform
 
 logger = logging.getLogger(__name__)
 
+
 class KillSwitch:
     """VPN kill switch implementation."""
-    
+
     def __init__(self):
         self.system = platform.system().lower()
         self._original_rules: List[str] = []
@@ -18,7 +19,7 @@ class KillSwitch:
     async def enable(self, vpn_interface: str, allowed_ips: Optional[List[str]] = None):
         """
         Enable kill switch to prevent traffic leaks.
-        
+
         Args:
             vpn_interface: Name of the VPN interface (tun0, tap0, etc.)
             allowed_ips: List of IPs to allow (VPN servers, DNS, etc.)
@@ -33,11 +34,13 @@ class KillSwitch:
                 elif self.system == "linux":
                     await self._enable_linux(vpn_interface, allowed_ips)
                 else:
-                    raise NotImplementedError(f"Kill switch not implemented for {self.system}")
-                
+                    raise NotImplementedError(
+                        f"Kill switch not implemented for {self.system}"
+                    )
+
                 self._enabled = True
                 logger.info("Kill switch enabled")
-                
+
             except Exception as e:
                 logger.error(f"Failed to enable kill switch: {e}")
                 await self.disable()  # Cleanup on failure
@@ -54,20 +57,21 @@ class KillSwitch:
                     await self._disable_macos()
                 elif self.system == "linux":
                     await self._disable_linux()
-                
+
                 self._enabled = False
                 logger.info("Kill switch disabled")
-                
+
             except Exception as e:
                 logger.error(f"Failed to disable kill switch: {e}")
                 raise
 
-    async def _enable_macos(self, vpn_interface: str, allowed_ips: Optional[List[str]] = None):
+    async def _enable_macos(
+        self, vpn_interface: str, allowed_ips: Optional[List[str]] = None
+    ):
         """Enable kill switch on macOS using pf firewall."""
         # Backup current rules
         proc = await asyncio.create_subprocess_exec(
-            "sudo", "pfctl", "-sr",
-            stdout=asyncio.subprocess.PIPE
+            "sudo", "pfctl", "-sr", stdout=asyncio.subprocess.PIPE
         )
         stdout, _ = await proc.communicate()
         self._original_rules = stdout.decode().splitlines()
@@ -76,7 +80,7 @@ class KillSwitch:
         rules = [
             "block all",
             f"pass on {vpn_interface}",
-            "pass on lo0"  # Allow loopback
+            "pass on lo0",  # Allow loopback
         ]
 
         if allowed_ips:
@@ -85,23 +89,29 @@ class KillSwitch:
 
         # Write rules to temporary file
         import tempfile
-        with tempfile.NamedTemporaryFile(mode='w') as f:
+
+        with tempfile.NamedTemporaryFile(mode="w") as f:
             f.write("\n".join(rules))
             f.flush()
 
             # Load new rules
             proc = await asyncio.create_subprocess_exec(
-                "sudo", "pfctl", "-f", f.name,
+                "sudo",
+                "pfctl",
+                "-f",
+                f.name,
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
             )
             await proc.communicate()
 
         # Enable firewall
         proc = await asyncio.create_subprocess_exec(
-            "sudo", "pfctl", "-e",
+            "sudo",
+            "pfctl",
+            "-e",
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            stderr=asyncio.subprocess.PIPE,
         )
         await proc.communicate()
 
@@ -109,31 +119,37 @@ class KillSwitch:
         """Disable kill switch on macOS."""
         if self._original_rules:
             # Restore original rules
-            with tempfile.NamedTemporaryFile(mode='w') as f:
+            with tempfile.NamedTemporaryFile(mode="w") as f:
                 f.write("\n".join(self._original_rules))
                 f.flush()
 
                 proc = await asyncio.create_subprocess_exec(
-                    "sudo", "pfctl", "-f", f.name,
+                    "sudo",
+                    "pfctl",
+                    "-f",
+                    f.name,
                     stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE
+                    stderr=asyncio.subprocess.PIPE,
                 )
                 await proc.communicate()
 
         # Disable firewall
         proc = await asyncio.create_subprocess_exec(
-            "sudo", "pfctl", "-d",
+            "sudo",
+            "pfctl",
+            "-d",
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            stderr=asyncio.subprocess.PIPE,
         )
         await proc.communicate()
 
-    async def _enable_linux(self, vpn_interface: str, allowed_ips: Optional[List[str]] = None):
+    async def _enable_linux(
+        self, vpn_interface: str, allowed_ips: Optional[List[str]] = None
+    ):
         """Enable kill switch on Linux using iptables."""
         # Backup current rules
         proc = await asyncio.create_subprocess_exec(
-            "sudo", "iptables-save",
-            stdout=asyncio.subprocess.PIPE
+            "sudo", "iptables-save", stdout=asyncio.subprocess.PIPE
         )
         stdout, _ = await proc.communicate()
         self._original_rules = stdout.decode().splitlines()
@@ -162,23 +178,26 @@ class KillSwitch:
         """Disable kill switch on Linux."""
         if self._original_rules:
             # Restore original rules
-            with tempfile.NamedTemporaryFile(mode='w') as f:
+            with tempfile.NamedTemporaryFile(mode="w") as f:
                 f.write("\n".join(self._original_rules))
                 f.flush()
 
                 proc = await asyncio.create_subprocess_exec(
-                    "sudo", "iptables-restore",
+                    "sudo",
+                    "iptables-restore",
                     stdin=open(f.name),
                     stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE
+                    stderr=asyncio.subprocess.PIPE,
                 )
                 await proc.communicate()
 
     async def _run_iptables(self, args: List[str]):
         """Run iptables command."""
         proc = await asyncio.create_subprocess_exec(
-            "sudo", "iptables", *args,
+            "sudo",
+            "iptables",
+            *args,
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            stderr=asyncio.subprocess.PIPE,
         )
-        await proc.communicate() 
+        await proc.communicate()

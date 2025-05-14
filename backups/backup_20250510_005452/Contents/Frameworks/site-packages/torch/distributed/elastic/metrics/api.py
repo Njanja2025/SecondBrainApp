@@ -13,9 +13,21 @@ from collections import namedtuple
 from functools import wraps
 from typing import Dict, Optional
 
-__all__ = ['MetricsConfig', 'MetricHandler', 'ConsoleMetricHandler', 'NullMetricHandler', 'MetricStream',
-           'configure', 'getStream', 'prof', 'profile', 'put_metric', 'publish_metric', 'get_elapsed_time_ms',
-           'MetricData']
+__all__ = [
+    "MetricsConfig",
+    "MetricHandler",
+    "ConsoleMetricHandler",
+    "NullMetricHandler",
+    "MetricStream",
+    "configure",
+    "getStream",
+    "prof",
+    "profile",
+    "put_metric",
+    "publish_metric",
+    "get_elapsed_time_ms",
+    "MetricData",
+]
 
 MetricData = namedtuple("MetricData", ["timestamp", "group_name", "name", "value"])
 

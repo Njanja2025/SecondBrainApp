@@ -131,7 +131,9 @@ def disable_progress_bars(name: Optional[str] = None) -> None:
         progress_bar_states.clear()
         progress_bar_states["_global"] = False
     else:
-        keys_to_remove = [key for key in progress_bar_states if key.startswith(f"{name}.")]
+        keys_to_remove = [
+            key for key in progress_bar_states if key.startswith(f"{name}.")
+        ]
         for key in keys_to_remove:
             del progress_bar_states[key]
         progress_bar_states[name] = False
@@ -163,7 +165,9 @@ def enable_progress_bars(name: Optional[str] = None) -> None:
         progress_bar_states.clear()
         progress_bar_states["_global"] = True
     else:
-        keys_to_remove = [key for key in progress_bar_states if key.startswith(f"{name}.")]
+        keys_to_remove = [
+            key for key in progress_bar_states if key.startswith(f"{name}.")
+        ]
         for key in keys_to_remove:
             del progress_bar_states[key]
         progress_bar_states[name] = True

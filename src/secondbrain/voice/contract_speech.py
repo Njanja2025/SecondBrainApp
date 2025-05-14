@@ -1,2 +1,2 @@
 def speak(text):
-    print(f"[Voice Output]: {text}") 
+    print(f"[Voice Output]: {text}")

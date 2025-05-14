@@ -57,7 +57,9 @@ def SoftTemporaryDirectory(
 
     See https://www.scivision.dev/python-tempfile-permission-error-windows/.
     """
-    tmpdir = tempfile.TemporaryDirectory(prefix=prefix, suffix=suffix, dir=dir, **kwargs)
+    tmpdir = tempfile.TemporaryDirectory(
+        prefix=prefix, suffix=suffix, dir=dir, **kwargs
+    )
     yield Path(tmpdir.name).resolve()
 
     try:
@@ -106,7 +108,13 @@ def WeakFileLock(
             raise Timeout(str(lock_file))
 
         try:
-            lock.acquire(timeout=min(log_interval, timeout - elapsed_time) if timeout else log_interval)
+            lock.acquire(
+                timeout=(
+                    min(log_interval, timeout - elapsed_time)
+                    if timeout
+                    else log_interval
+                )
+            )
         except Timeout:
             logger.info(
                 f"Still waiting to acquire lock on {lock_file} (elapsed: {time.time() - start_time:.1f} seconds)"
@@ -114,7 +122,8 @@ def WeakFileLock(
         except NotImplementedError as e:
             if "use SoftFileLock instead" in str(e):
                 logger.warning(
-                    "FileSystem does not appear to support flock. Falling back to SoftFileLock for %s", lock_file
+                    "FileSystem does not appear to support flock. Falling back to SoftFileLock for %s",
+                    lock_file,
                 )
                 lock = SoftFileLock(lock_file, timeout=log_interval)
                 continue

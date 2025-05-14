@@ -15,6 +15,7 @@ weighted_op_quint8_dtype_config = DTypeConfig(
 )
 from typing import List
 
+
 def get_linear_configs():
     linear_configs = []
     observation_type = ObservationType.OUTPUT_USE_DIFFERENT_OBSERVER_AS_INPUT
@@ -69,6 +70,7 @@ def get_linear_configs():
     )
     return linear_configs
 
+
 def get_conv_configs():
     conv_configs = []
     observation_type = ObservationType.OUTPUT_USE_DIFFERENT_OBSERVER_AS_INPUT
@@ -80,19 +82,24 @@ def get_conv_configs():
         ._set_input_type_to_index({"weight": 1, "bias": 2})
     )
     conv_configs.append(
-        BackendPatternConfig((torch.ops.aten.convolution.default, torch.ops.aten.relu.default))
+        BackendPatternConfig(
+            (torch.ops.aten.convolution.default, torch.ops.aten.relu.default)
+        )
         .set_observation_type(observation_type)  # noqa: E131
         .set_dtype_configs(dtype_configs)
         ._set_input_type_to_index({"weight": 1, "bias": 2})
     )
     # TODO: remove when functionalization is supported in PT2 mode
     conv_configs.append(
-        BackendPatternConfig((torch.ops.aten.convolution.default, torch.ops.aten.relu_.default))
+        BackendPatternConfig(
+            (torch.ops.aten.convolution.default, torch.ops.aten.relu_.default)
+        )
         .set_observation_type(observation_type)  # noqa: E131
         .set_dtype_configs(dtype_configs)
         ._set_input_type_to_index({"weight": 1, "bias": 2})
     )
     return conv_configs
+
 
 def get_pooling_configs():
     backend_pattern_configs = []
@@ -105,13 +112,16 @@ def get_pooling_configs():
 
     backend_pattern_configs.append(
         BackendPatternConfig()
-        ._set_pattern_complex_format((operator.getitem, torch.ops.aten.max_pool2d_with_indices.default, 0))
+        ._set_pattern_complex_format(
+            (operator.getitem, torch.ops.aten.max_pool2d_with_indices.default, 0)
+        )
         .set_observation_type(observation_type)  # noqa: E131
         .set_dtype_configs(dtype_configs)
         ._set_root_node_getter(root_node_getter)
     )
 
     return backend_pattern_configs
+
 
 def get_relu_configs():
     backend_pattern_configs = []
@@ -120,8 +130,10 @@ def get_relu_configs():
     backend_pattern_configs.append(
         BackendPatternConfig(torch.ops.aten.relu.default)
         .set_observation_type(observation_type)  # noqa: E131
-        .set_dtype_configs(dtype_configs))
+        .set_dtype_configs(dtype_configs)
+    )
     return backend_pattern_configs
+
 
 def get_binary_op_configs():
     binary_op_configs: List[BackendPatternConfig] = []
@@ -134,7 +146,10 @@ def get_binary_op_configs():
         1: ObservationType.OUTPUT_SHARE_OBSERVER_WITH_INPUT,
         2: ObservationType.OUTPUT_USE_DIFFERENT_OBSERVER_AS_INPUT,
     }
-    for op_with_quantized_bop_scalar_variant in [torch.ops.aten.add.Tensor, torch.ops.aten.add_.Tensor]:
+    for op_with_quantized_bop_scalar_variant in [
+        torch.ops.aten.add.Tensor,
+        torch.ops.aten.add_.Tensor,
+    ]:
         bop_patterns = [
             (op_with_quantized_bop_scalar_variant, torch.ops.aten.relu.default),
             op_with_quantized_bop_scalar_variant,
@@ -144,10 +159,14 @@ def get_binary_op_configs():
         for bop_pattern in bop_patterns:
             binary_op_configs.append(
                 BackendPatternConfig(bop_pattern)
-                    .set_dtype_configs(dtype_configs)  # noqa: E131
-                    ._set_num_tensor_args_to_observation_type(num_tensor_args_to_observation_type_mapping))
+                .set_dtype_configs(dtype_configs)  # noqa: E131
+                ._set_num_tensor_args_to_observation_type(
+                    num_tensor_args_to_observation_type_mapping
+                )
+            )
 
     return binary_op_configs
+
 
 def get_qnnpack_pt2e_backend_config():
     return (

@@ -9,12 +9,12 @@ from .themes_styles.theme_manager import ThemeManager, ThemeConfig
 from .navigation.nav_manager import NavigationManager, NavConfig
 
 __all__ = [
-    'DashboardManager',
-    'DashboardConfig',
-    'IOManager',
-    'IOConfig',
-    'ThemeManager',
-    'ThemeConfig',
-    'NavigationManager',
-    'NavConfig'
-] 
+    "DashboardManager",
+    "DashboardConfig",
+    "IOManager",
+    "IOConfig",
+    "ThemeManager",
+    "ThemeConfig",
+    "NavigationManager",
+    "NavConfig",
+]

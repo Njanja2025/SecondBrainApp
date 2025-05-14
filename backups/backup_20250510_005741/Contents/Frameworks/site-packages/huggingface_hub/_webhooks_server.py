@@ -178,20 +178,32 @@ class WebhooksServer:
         for path, func in self.registered_webhooks.items():
             # Add secret check if required
             if self.webhook_secret is not None:
-                func = _wrap_webhook_to_check_secret(func, webhook_secret=self.webhook_secret)
+                func = _wrap_webhook_to_check_secret(
+                    func, webhook_secret=self.webhook_secret
+                )
 
             # Add route to FastAPI app
             self.fastapi_app.post(path)(func)
 
         # Print instructions and block main thread
         space_host = os.environ.get("SPACE_HOST")
-        url = "https://" + space_host if space_host is not None else (ui.share_url or ui.local_url)
+        url = (
+            "https://" + space_host
+            if space_host is not None
+            else (ui.share_url or ui.local_url)
+        )
         if url is None:
-            raise ValueError("Cannot find the URL of the app. Please provide a valid `ui` or update `gradio` version.")
+            raise ValueError(
+                "Cannot find the URL of the app. Please provide a valid `ui` or update `gradio` version."
+            )
         url = url.strip("/")
         message = "\nWebhooks are correctly setup and ready to use:"
-        message += "\n" + "\n".join(f"  - POST {url}{webhook}" for webhook in self.registered_webhooks)
-        message += "\nGo to https://huggingface.co/settings/webhooks to setup your webhooks."
+        message += "\n" + "\n".join(
+            f"  - POST {url}{webhook}" for webhook in self.registered_webhooks
+        )
+        message += (
+            "\nGo to https://huggingface.co/settings/webhooks to setup your webhooks."
+        )
         print(message)
 
         if not prevent_thread_lock:
@@ -322,7 +334,9 @@ def _get_global_app() -> WebhooksServer:
 
 def _warn_on_empty_secret(webhook_secret: Optional[str]) -> None:
     if webhook_secret is None:
-        print("Webhook secret is not defined. This means your webhook endpoints will be open to everyone.")
+        print(
+            "Webhook secret is not defined. This means your webhook endpoints will be open to everyone."
+        )
         print(
             "To add a secret, set `WEBHOOK_SECRET` as environment variable or pass it at initialization: "
             "\n\t`app = WebhooksServer(webhook_secret='my_secret', ...)`"
@@ -361,7 +375,9 @@ def _wrap_webhook_to_check_secret(func: Callable, webhook_secret: str) -> Callab
     async def _protected_func(request: Request, **kwargs):
         request_secret = request.headers.get("x-webhook-secret")
         if request_secret is None:
-            return JSONResponse({"error": "x-webhook-secret header not set."}, status_code=401)
+            return JSONResponse(
+                {"error": "x-webhook-secret header not set."}, status_code=401
+            )
         if request_secret != webhook_secret:
             return JSONResponse({"error": "Invalid webhook secret."}, status_code=403)
 
@@ -379,7 +395,11 @@ def _wrap_webhook_to_check_secret(func: Callable, webhook_secret: str) -> Callab
     if "request" not in initial_sig.parameters:
         _protected_func.__signature__ = initial_sig.replace(  # type: ignore
             parameters=(
-                inspect.Parameter(name="request", kind=inspect.Parameter.POSITIONAL_OR_KEYWORD, annotation=Request),
+                inspect.Parameter(
+                    name="request",
+                    kind=inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                    annotation=Request,
+                ),
             )
             + tuple(initial_sig.parameters.values())
         )

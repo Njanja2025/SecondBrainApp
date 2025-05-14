@@ -204,7 +204,7 @@ class DistributedOptimizer:
                 "(i.e. Distributed Model Parallel training on CPU) due to the Python's "
                 "Global Interpreter Lock (GIL). Please file an issue if you need this "
                 "optimizer in TorchScript. ",
-                optimizer_class
+                optimizer_class,
             )
             optimizer_new_func = _new_local_optimizer
 

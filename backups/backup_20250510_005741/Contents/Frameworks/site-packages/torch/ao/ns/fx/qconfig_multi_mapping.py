@@ -18,6 +18,7 @@ _QCONFIG_STYLE_TO_METHOD: Dict[str, str] = {
     "module_name_object_type_order_qconfigs": "set_module_name_object_type_order",
 }
 
+
 def _remove_duplicates_and_none(qconfig_list: List[QConfigAny]) -> None:
     to_remove = []
     for index, cur_qconfig in enumerate(qconfig_list):
@@ -30,6 +31,7 @@ def _remove_duplicates_and_none(qconfig_list: List[QConfigAny]) -> None:
                 break
     for index in to_remove[::-1]:
         qconfig_list.pop(index)
+
 
 class QConfigMultiMapping:
     """
@@ -194,10 +196,13 @@ class QConfigMultiMapping:
 
     def __repr__(self):
         return (
-            self.__class__.__name__ +
-            " [" +
-            "".join(f"\n{qconfig_mapping.__repr__()}," for qconfig_mapping in self.qconfig_mappings_list) +
-            "\n]"
+            self.__class__.__name__
+            + " ["
+            + "".join(
+                f"\n{qconfig_mapping.__repr__()},"
+                for qconfig_mapping in self.qconfig_mappings_list
+            )
+            + "\n]"
         )
 
     @classmethod

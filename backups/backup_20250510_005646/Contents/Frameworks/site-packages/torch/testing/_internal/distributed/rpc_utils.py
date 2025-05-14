@@ -28,7 +28,7 @@ from torch.testing._internal.distributed.rpc.dist_autograd_test import (
     CudaDistAutogradTest,
     FaultyAgentDistAutogradTest,
     TensorPipeAgentDistAutogradTest,
-    TensorPipeCudaDistAutogradTest
+    TensorPipeCudaDistAutogradTest,
 )
 from torch.testing._internal.distributed.rpc.dist_optimizer_test import (
     DistOptimizerTest,
@@ -52,7 +52,9 @@ from torch.testing._internal.distributed.rpc.rpc_test import (
     TensorPipeAgentRpcTest,
     TensorPipeAgentCudaRpcTest,
 )
-from torch.testing._internal.distributed.rpc.examples.parameter_server_test import ParameterServerTest
+from torch.testing._internal.distributed.rpc.examples.parameter_server_test import (
+    ParameterServerTest,
+)
 from torch.testing._internal.distributed.rpc.examples.reinforcement_learning_rpc_test import (
     ReinforcementLearningRpcTest,
 )
@@ -64,14 +66,16 @@ def _check_and_set_tcp_init():
     # different ports.
     use_tcp_init = os.environ.get("RPC_INIT_WITH_TCP", None)
     if use_tcp_init == "1":
-        os.environ["MASTER_ADDR"] = '127.0.0.1'
+        os.environ["MASTER_ADDR"] = "127.0.0.1"
         os.environ["MASTER_PORT"] = str(find_free_port())
+
 
 def _check_and_unset_tcp_init():
     use_tcp_init = os.environ.get("RPC_INIT_WITH_TCP", None)
     if use_tcp_init == "1":
         del os.environ["MASTER_ADDR"]
         del os.environ["MASTER_PORT"]
+
 
 # The tests for the RPC module need to cover multiple possible combinations:
 # - different aspects of the API, each one having its own suite of tests;
@@ -83,8 +87,10 @@ def _check_and_unset_tcp_init():
 # we call the generate_tests function of this file, passing to it a fixture for
 # the agent, which then gets mixed-in with each test suite.
 
+
 @unittest.skipIf(
-    TEST_WITH_DEV_DBG_ASAN, "Skip ASAN as torch + multiprocessing spawn have known issues"
+    TEST_WITH_DEV_DBG_ASAN,
+    "Skip ASAN as torch + multiprocessing spawn have known issues",
 )
 class SpawnHelper(MultiProcessTestCase):
     def setUp(self):
@@ -173,8 +179,10 @@ def generate_tests(
     for test_class in tests:
         if IS_SANDCASTLE and TEST_WITH_DEV_DBG_ASAN:
             print(
-                f'Skipping test {test_class} on sandcastle for the following reason: '
-                'Skip dev-asan as torch + multiprocessing spawn have known issues', file=sys.stderr)
+                f"Skipping test {test_class} on sandcastle for the following reason: "
+                "Skip dev-asan as torch + multiprocessing spawn have known issues",
+                file=sys.stderr,
+            )
             continue
 
         name = f"{prefix}{test_class.__name__}"

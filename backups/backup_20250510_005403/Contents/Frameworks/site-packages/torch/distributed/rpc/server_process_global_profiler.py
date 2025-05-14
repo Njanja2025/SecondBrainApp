@@ -13,6 +13,7 @@ from . import (
 
 __all__: List[str] = []
 
+
 class _server_process_global_profile(profile):
     """
     It has the same API as ``torch.autograd.profiler.profile`` class,
@@ -122,7 +123,8 @@ class _server_process_global_profile(profile):
             False,
             False,
             False,
-            torch.profiler._ExperimentalConfig())
+            torch.profiler._ExperimentalConfig(),
+        )
         _enable_server_process_global_profiler(profiler_config)
         return self
 
@@ -151,8 +153,10 @@ class _server_process_global_profile(profile):
         process_global_function_events = []
         for thread_local_events in process_global_events:
             # Parse from ``Event``s to ``FunctionEvent``s.
-            thread_local_function_events = torch.autograd.profiler_legacy._parse_legacy_records(
-                thread_local_events
+            thread_local_function_events = (
+                torch.autograd.profiler_legacy._parse_legacy_records(
+                    thread_local_events
+                )
             )
             thread_local_function_events.sort(
                 key=lambda function_event: [

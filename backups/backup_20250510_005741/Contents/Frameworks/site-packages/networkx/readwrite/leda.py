@@ -8,6 +8,7 @@ Format
 See http://www.algorithmic-solutions.info/leda_guide/graphs/leda_native_graph_fileformat.html
 
 """
+
 # Original author: D. Eppstein, UC Irvine, August 12, 2003.
 # The original code at http://www.ics.uci.edu/~eppstein/PADS/ is public domain.
 

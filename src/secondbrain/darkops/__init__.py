@@ -8,4 +8,4 @@ from .secure_comms import SecureComms
 from .stealth_research import StealthResearch
 from .data_encryption import DataEncryption
 
-__all__ = ['DarkOpsAgent', 'SecureComms', 'StealthResearch', 'DataEncryption'] 
+__all__ = ["DarkOpsAgent", "SecureComms", "StealthResearch", "DataEncryption"]

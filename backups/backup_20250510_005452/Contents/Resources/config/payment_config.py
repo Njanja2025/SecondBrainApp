@@ -1,6 +1,7 @@
 """
 Payment configuration module.
 """
+
 import json
 from pathlib import Path
 
@@ -20,4 +21,4 @@ TAX_RATES = config["tax_rates"]
 SUBSCRIPTION_PLANS = config["subscription_plans"]
 URLS = config["urls"]
 LOGGING = config["logging"]
-SECURITY = config["security"] 
+SECURITY = config["security"]

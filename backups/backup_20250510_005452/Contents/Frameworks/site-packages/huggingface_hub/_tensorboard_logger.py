@@ -148,7 +148,9 @@ class HFSummaryWriter(SummaryWriter):
 
         # Check logdir has been correctly initialized and fail early otherwise. In practice, SummaryWriter takes care of it.
         if not isinstance(self.logdir, str):
-            raise ValueError(f"`self.logdir` must be a string. Got '{self.logdir}' of type {type(self.logdir)}.")
+            raise ValueError(
+                f"`self.logdir` must be a string. Got '{self.logdir}' of type {type(self.logdir)}."
+            )
 
         # Append logdir name to `path_in_repo`
         if path_in_repo is None or path_in_repo == "":
@@ -178,7 +180,9 @@ class HFSummaryWriter(SummaryWriter):
 
         # Add `hf-summary-writer` tag to the model card metadata
         try:
-            card = ModelCard.load(repo_id_or_path=self.repo_id, repo_type=self.repo_type)
+            card = ModelCard.load(
+                repo_id_or_path=self.repo_id, repo_type=self.repo_type
+            )
         except EntryNotFoundError:
             card = ModelCard("")
         tags = card.data.get("tags", [])

@@ -11,16 +11,21 @@ app = FastAPI(
     version="0.1.0",
 )
 
+
 class Command(BaseModel):
     """Command model for API requests."""
+
     command: str
     parameters: Optional[dict] = None
 
+
 class Response(BaseModel):
     """Response model for API requests."""
+
     status: str
     message: str
     data: Optional[dict] = None
+
 
 @app.get("/", response_model=Response)
 async def root():
@@ -28,8 +33,9 @@ async def root():
     return Response(
         status="success",
         message="SecondBrain API is running",
-        data={"version": "0.1.0"}
+        data={"version": "0.1.0"},
     )
+
 
 @app.post("/command", response_model=Response)
 async def execute_command(command: Command):
@@ -40,11 +46,12 @@ async def execute_command(command: Command):
         return Response(
             status="success",
             message=f"Command {command.command} executed successfully",
-            data={"command": command.dict()}
+            data={"command": command.dict()},
         )
     except Exception as e:
         logger.error(f"Error executing command: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/status", response_model=Response)
 async def get_status():
@@ -54,12 +61,8 @@ async def get_status():
         return Response(
             status="success",
             message="Status retrieved successfully",
-            data={
-                "running": True,
-                "voice_enabled": True,
-                "last_command": None
-            }
+            data={"running": True, "voice_enabled": True, "last_command": None},
         )
     except Exception as e:
         logger.error(f"Error getting status: {e}")
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))

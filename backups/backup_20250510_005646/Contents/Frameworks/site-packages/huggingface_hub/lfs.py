@@ -22,7 +22,16 @@ from dataclasses import dataclass
 from math import ceil
 from os.path import getsize
 from pathlib import Path
-from typing import TYPE_CHECKING, BinaryIO, Dict, Iterable, List, Optional, Tuple, TypedDict
+from typing import (
+    TYPE_CHECKING,
+    BinaryIO,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    TypedDict,
+)
 from urllib.parse import unquote
 
 from huggingface_hub import constants
@@ -157,7 +166,9 @@ def post_lfs_batch_info(
         "hash_algo": "sha256",
     }
     if revision is not None:
-        payload["ref"] = {"name": unquote(revision)}  # revision has been previously 'quoted'
+        payload["ref"] = {
+            "name": unquote(revision)
+        }  # revision has been previously 'quoted'
 
     headers = {
         **LFS_HEADERS,
@@ -222,7 +233,9 @@ def lfs_upload(
     actions = lfs_batch_action.get("actions")
     if actions is None:
         # The file was already uploaded
-        logger.debug(f"Content of file {operation.path_in_repo} is already present upstream - skipping upload")
+        logger.debug(
+            f"Content of file {operation.path_in_repo} is already present upstream - skipping upload"
+        )
         return
 
     # 1. Validate server response (check required keys in dict)
@@ -243,7 +256,12 @@ def lfs_upload(
             raise ValueError(
                 f"Malformed response from LFS batch endpoint: `chunk_size` should be an integer. Got '{chunk_size}'."
             )
-        _upload_multi_part(operation=operation, header=header, chunk_size=chunk_size, upload_url=upload_url)
+        _upload_multi_part(
+            operation=operation,
+            header=header,
+            chunk_size=chunk_size,
+            upload_url=upload_url,
+        )
     else:
         _upload_single_part(operation=operation, upload_url=upload_url)
 
@@ -254,7 +272,10 @@ def lfs_upload(
         verify_resp = get_session().post(
             verify_url,
             headers=build_hf_headers(token=token, headers=headers),
-            json={"oid": operation.upload_info.sha256.hex(), "size": operation.upload_info.size},
+            json={
+                "oid": operation.upload_info.sha256.hex(),
+                "size": operation.upload_info.size,
+            },
         )
         hf_raise_for_status(verify_resp)
     logger.debug(f"{operation.path_in_repo}: Upload successful")
@@ -264,7 +285,10 @@ def _validate_lfs_action(lfs_action: dict):
     """validates response from the LFS batch endpoint"""
     if not (
         isinstance(lfs_action.get("href"), str)
-        and (lfs_action.get("header") is None or isinstance(lfs_action.get("header"), dict))
+        and (
+            lfs_action.get("header") is None
+            or isinstance(lfs_action.get("header"), dict)
+        )
     ):
         raise ValueError("lfs_action is improperly formatted")
     return lfs_action
@@ -272,7 +296,10 @@ def _validate_lfs_action(lfs_action: dict):
 
 def _validate_batch_actions(lfs_batch_actions: dict):
     """validates response from the LFS batch endpoint"""
-    if not (isinstance(lfs_batch_actions.get("oid"), str) and isinstance(lfs_batch_actions.get("size"), int)):
+    if not (
+        isinstance(lfs_batch_actions.get("oid"), str)
+        and isinstance(lfs_batch_actions.get("size"), int)
+    ):
         raise ValueError("lfs_batch_actions is improperly formatted")
 
     upload_action = lfs_batch_actions.get("actions", {}).get("upload")
@@ -286,7 +313,10 @@ def _validate_batch_actions(lfs_batch_actions: dict):
 
 def _validate_batch_error(lfs_batch_error: dict):
     """validates response from the LFS batch endpoint"""
-    if not (isinstance(lfs_batch_error.get("oid"), str) and isinstance(lfs_batch_error.get("size"), int)):
+    if not (
+        isinstance(lfs_batch_error.get("oid"), str)
+        and isinstance(lfs_batch_error.get("size"), int)
+    ):
         raise ValueError("lfs_batch_error is improperly formatted")
     error_info = lfs_batch_error.get("error")
     if not (
@@ -316,16 +346,22 @@ def _upload_single_part(operation: "CommitOperationAdd", upload_url: str) -> Non
     """
     with operation.as_file(with_tqdm=True) as fileobj:
         # S3 might raise a transient 500 error -> let's retry if that happens
-        response = http_backoff("PUT", upload_url, data=fileobj, retry_on_status_codes=(500, 502, 503, 504))
+        response = http_backoff(
+            "PUT", upload_url, data=fileobj, retry_on_status_codes=(500, 502, 503, 504)
+        )
         hf_raise_for_status(response)
 
 
-def _upload_multi_part(operation: "CommitOperationAdd", header: Dict, chunk_size: int, upload_url: str) -> None:
+def _upload_multi_part(
+    operation: "CommitOperationAdd", header: Dict, chunk_size: int, upload_url: str
+) -> None:
     """
     Uploads file using HF multipart LFS transfer protocol.
     """
     # 1. Get upload URLs for each part
-    sorted_parts_urls = _get_sorted_parts_urls(header=header, upload_info=operation.upload_info, chunk_size=chunk_size)
+    sorted_parts_urls = _get_sorted_parts_urls(
+        header=header, upload_info=operation.upload_info, chunk_size=chunk_size
+    )
 
     # 2. Upload parts (either with hf_transfer or in pure Python)
     use_hf_transfer = constants.HF_HUB_ENABLE_HF_TRANSFER
@@ -341,21 +377,33 @@ def _upload_multi_part(operation: "CommitOperationAdd", header: Dict, chunk_size
         use_hf_transfer = False
 
     response_headers = (
-        _upload_parts_hf_transfer(operation=operation, sorted_parts_urls=sorted_parts_urls, chunk_size=chunk_size)
+        _upload_parts_hf_transfer(
+            operation=operation,
+            sorted_parts_urls=sorted_parts_urls,
+            chunk_size=chunk_size,
+        )
         if use_hf_transfer
-        else _upload_parts_iteratively(operation=operation, sorted_parts_urls=sorted_parts_urls, chunk_size=chunk_size)
+        else _upload_parts_iteratively(
+            operation=operation,
+            sorted_parts_urls=sorted_parts_urls,
+            chunk_size=chunk_size,
+        )
     )
 
     # 3. Send completion request
     completion_res = get_session().post(
         upload_url,
-        json=_get_completion_payload(response_headers, operation.upload_info.sha256.hex()),
+        json=_get_completion_payload(
+            response_headers, operation.upload_info.sha256.hex()
+        ),
         headers=LFS_HEADERS,
     )
     hf_raise_for_status(completion_res)
 
 
-def _get_sorted_parts_urls(header: Dict, upload_info: UploadInfo, chunk_size: int) -> List[str]:
+def _get_sorted_parts_urls(
+    header: Dict, upload_info: UploadInfo, chunk_size: int
+) -> List[str]:
     sorted_part_upload_urls = [
         upload_url
         for _, upload_url in sorted(
@@ -373,12 +421,16 @@ def _get_sorted_parts_urls(header: Dict, upload_info: UploadInfo, chunk_size: in
     return sorted_part_upload_urls
 
 
-def _get_completion_payload(response_headers: List[Dict], oid: str) -> CompletionPayloadT:
+def _get_completion_payload(
+    response_headers: List[Dict], oid: str
+) -> CompletionPayloadT:
     parts: List[PayloadPartT] = []
     for part_number, header in enumerate(response_headers):
         etag = header.get("etag")
         if etag is None or etag == "":
-            raise ValueError(f"Invalid etag (`{etag}`) returned for part {part_number + 1}")
+            raise ValueError(
+                f"Invalid etag (`{etag}`) returned for part {part_number + 1}"
+            )
         parts.append(
             {
                 "partNumber": part_number + 1,
@@ -401,7 +453,10 @@ def _upload_parts_iteratively(
             ) as fileobj_slice:
                 # S3 might raise a transient 500 error -> let's retry if that happens
                 part_upload_res = http_backoff(
-                    "PUT", part_upload_url, data=fileobj_slice, retry_on_status_codes=(500, 502, 503, 504)
+                    "PUT",
+                    part_upload_url,
+                    data=fileobj_slice,
+                    retry_on_status_codes=(500, 502, 503, 504),
                 )
                 hf_raise_for_status(part_upload_res)
                 headers.append(part_upload_res.headers)

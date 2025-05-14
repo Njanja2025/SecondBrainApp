@@ -1,2 +1,2 @@
 # Main logic of SecondBrainApp
-print('Hello from SecondBrainApp')
+print("Hello from SecondBrainApp")

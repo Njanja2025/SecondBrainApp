@@ -10,27 +10,30 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class ConnectionStats:
     """VPN connection statistics."""
+
     bytes_received: int = 0
     bytes_sent: int = 0
     connected_since: Optional[datetime] = None
     current_server: Optional[str] = None
     last_error: Optional[str] = None
 
+
 class OpenVPNConnection:
     """Handles OpenVPN connection management."""
-    
+
     def __init__(
         self,
         config_path: str,
         auth_file: Optional[str] = None,
-        management_port: int = 7505
+        management_port: int = 7505,
     ):
         """
         Initialize OpenVPN connection handler.
-        
+
         Args:
             config_path: Path to OpenVPN config file (.ovpn)
             auth_file: Path to authentication file (optional)
@@ -45,7 +48,7 @@ class OpenVPNConnection:
         self._reader: Optional[asyncio.StreamReader] = None
         self._writer: Optional[asyncio.StreamWriter] = None
         self._lock = asyncio.Lock()
-        
+
     async def connect(self):
         """Establish VPN connection using OpenVPN."""
         if self.process and self.process.poll() is None:
@@ -53,10 +56,14 @@ class OpenVPNConnection:
             return
 
         cmd = [
-            "sudo", "openvpn",
-            "--config", str(self.config_path),
-            "--management", "127.0.0.1", str(self.management_port),
-            "--daemon"  # Run in background
+            "sudo",
+            "openvpn",
+            "--config",
+            str(self.config_path),
+            "--management",
+            "127.0.0.1",
+            str(self.management_port),
+            "--daemon",  # Run in background
         ]
 
         if self.auth_file:
@@ -65,29 +72,27 @@ class OpenVPNConnection:
         try:
             # Start OpenVPN process
             process = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
-            
+
             # Wait briefly to check if process started successfully
             await asyncio.sleep(2)
             if process.returncode is not None:
                 _, stderr = await process.communicate()
                 raise RuntimeError(f"Failed to start OpenVPN: {stderr.decode()}")
-            
+
             self.process = process
             logger.info("OpenVPN process started successfully")
-            
+
             # Connect to management interface
             await self._connect_management()
-            
+
             # Start monitoring
             self._monitor_task = asyncio.create_task(self._monitor_connection())
-            
+
             # Wait for connection to be established
             await self._wait_for_connection()
-            
+
         except Exception as e:
             self.stats.last_error = str(e)
             logger.error(f"Failed to establish VPN connection: {e}")
@@ -120,13 +125,13 @@ class OpenVPNConnection:
                     logger.warning("OpenVPN process didn't terminate, forcing...")
                     self.process.kill()
                     await self.process.wait()
-                
+
                 # Cleanup management interface
                 await self._cleanup_management()
-                
+
                 # Reset stats
                 self.stats = ConnectionStats()
-                
+
                 logger.info("VPN connection terminated successfully")
             except Exception as e:
                 self.stats.last_error = str(e)
@@ -139,8 +144,7 @@ class OpenVPNConnection:
         """Connect to OpenVPN management interface."""
         try:
             self._reader, self._writer = await asyncio.open_connection(
-                '127.0.0.1',
-                self.management_port
+                "127.0.0.1", self.management_port
             )
             # Read welcome message
             await self._reader.readline()
@@ -164,11 +168,11 @@ class OpenVPNConnection:
                     line = await self._reader.readline()
                     if not line:
                         break
-                    
+
                     line = line.decode().strip()
                     if line == "END":
                         break
-                        
+
                     # Parse status information
                     if line.startswith("TCP/UDP read bytes"):
                         self.stats.bytes_received = int(line.split(",")[1])
@@ -180,7 +184,7 @@ class OpenVPNConnection:
                         )
 
                 await asyncio.sleep(5)  # Update every 5 seconds
-                
+
             except asyncio.CancelledError:
                 break
             except Exception as e:
@@ -204,7 +208,7 @@ class OpenVPNConnection:
             proc = await asyncio.create_subprocess_exec(
                 "ifconfig",
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
             )
             stdout, _ = await proc.communicate()
             return b"tun0" in stdout or b"tap0" in stdout
@@ -217,9 +221,7 @@ class OpenVPNConnection:
             # Kill any remaining management interface processes
             cmd = f"sudo lsof -ti tcp:{self.management_port} | xargs -r sudo kill"
             proc = await asyncio.create_subprocess_shell(
-                cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
             await proc.communicate()
         except Exception as e:
@@ -241,21 +243,21 @@ class OpenVPNConnection:
             return None
         return (datetime.now() - self.stats.connected_since).total_seconds()
 
-def create_vpn_manager(config_path: str, auth_file: Optional[str] = None) -> 'VPNManager':
+
+def create_vpn_manager(
+    config_path: str, auth_file: Optional[str] = None
+) -> "VPNManager":
     """
     Create a VPNManager instance configured with OpenVPN.
-    
+
     Args:
         config_path: Path to OpenVPN config file (.ovpn)
         auth_file: Path to authentication file (optional)
-    
+
     Returns:
         VPNManager instance configured with OpenVPN
     """
     from .vpn_manager import VPNManager
-    
+
     vpn = OpenVPNConnection(config_path, auth_file)
-    return VPNManager(
-        connect_vpn_func=vpn.connect,
-        disconnect_vpn_func=vpn.disconnect
-    ) 
+    return VPNManager(connect_vpn_func=vpn.connect, disconnect_vpn_func=vpn.disconnect)

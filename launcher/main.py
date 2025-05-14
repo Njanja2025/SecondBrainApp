@@ -5,13 +5,12 @@ import logging
 from pathlib import Path
 
 # Suppress warnings and noise
-os.environ['PYTHONWARNINGS'] = 'ignore'
-os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+os.environ["PYTHONWARNINGS"] = "ignore"
+os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -19,6 +18,7 @@ logger = logging.getLogger(__name__)
 logging.getLogger("moviepy").setLevel(logging.ERROR)
 logging.getLogger("matplotlib").setLevel(logging.ERROR)
 logging.getLogger("PIL").setLevel(logging.ERROR)
+
 
 def main():
     try:
@@ -28,6 +28,7 @@ def main():
     except Exception as e:
         logger.error(f"Error starting application: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

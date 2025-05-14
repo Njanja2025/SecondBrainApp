@@ -8,4 +8,4 @@ from .contract_manager import ContractManager
 from .network_manager import NetworkManager
 from .blockchain_agent import BlockchainAgent
 
-__all__ = ['WalletManager', 'ContractManager', 'NetworkManager', 'BlockchainAgent'] 
+__all__ = ["WalletManager", "ContractManager", "NetworkManager", "BlockchainAgent"]

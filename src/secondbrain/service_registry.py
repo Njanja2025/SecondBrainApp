@@ -10,9 +10,11 @@ from contextlib import asynccontextmanager
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class ServiceInstance:
     """Service instance information."""
+
     id: str
     name: str
     host: str
@@ -25,23 +27,24 @@ class ServiceInstance:
     def to_dict(self) -> dict:
         """Convert to dictionary."""
         data = asdict(self)
-        data['last_heartbeat'] = data['last_heartbeat'].isoformat()
+        data["last_heartbeat"] = data["last_heartbeat"].isoformat()
         return data
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'ServiceInstance':
+    def from_dict(cls, data: dict) -> "ServiceInstance":
         """Create from dictionary."""
-        data['last_heartbeat'] = datetime.fromisoformat(data['last_heartbeat'])
+        data["last_heartbeat"] = datetime.fromisoformat(data["last_heartbeat"])
         return cls(**data)
+
 
 class ServiceRegistry:
     """Service registry for service discovery."""
-    
+
     def __init__(
         self,
         heartbeat_interval: int = 30,
         cleanup_interval: int = 60,
-        instance_timeout: int = 90
+        instance_timeout: int = 90,
     ):
         self.services: Dict[str, Dict[str, ServiceInstance]] = {}
         self.heartbeat_interval = heartbeat_interval
@@ -67,7 +70,10 @@ class ServiceRegistry:
     async def deregister(self, service_name: str, instance_id: str) -> bool:
         """Deregister a service instance."""
         async with self._lock:
-            if service_name in self.services and instance_id in self.services[service_name]:
+            if (
+                service_name in self.services
+                and instance_id in self.services[service_name]
+            ):
                 instance = self.services[service_name].pop(instance_id)
                 if not self.services[service_name]:
                     del self.services[service_name]
@@ -98,17 +104,14 @@ class ServiceRegistry:
             self.watchers[service_name].remove(queue)
 
     async def _notify_watchers(
-        self,
-        service_name: str,
-        event_type: str,
-        instance: ServiceInstance
+        self, service_name: str, event_type: str, instance: ServiceInstance
     ):
         """Notify watchers of service changes."""
         if service_name in self.watchers:
             event = {
                 "type": event_type,
                 "service": service_name,
-                "instance": instance.to_dict()
+                "instance": instance.to_dict(),
             }
             for queue in self.watchers[service_name]:
                 await queue.put(event)
@@ -116,8 +119,10 @@ class ServiceRegistry:
     async def heartbeat(self, service_name: str, instance_id: str) -> bool:
         """Update service instance heartbeat."""
         async with self._lock:
-            if (service_name in self.services and 
-                instance_id in self.services[service_name]):
+            if (
+                service_name in self.services
+                and instance_id in self.services[service_name]
+            ):
                 instance = self.services[service_name][instance_id]
                 instance.last_heartbeat = datetime.now()
                 return True
@@ -128,8 +133,7 @@ class ServiceRegistry:
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(
-                    instance.health_check_url,
-                    timeout=5
+                    instance.health_check_url, timeout=5
                 ) as response:
                     healthy = response.status == 200
                     instance.status = "healthy" if healthy else "unhealthy"
@@ -146,18 +150,20 @@ class ServiceRegistry:
             for service_name in list(self.services.keys()):
                 for instance_id in list(self.services[service_name].keys()):
                     instance = self.services[service_name][instance_id]
-                    if (now - instance.last_heartbeat).total_seconds() > self.instance_timeout:
+                    if (
+                        now - instance.last_heartbeat
+                    ).total_seconds() > self.instance_timeout:
                         await self.deregister(service_name, instance_id)
 
     async def start(self):
         """Start the service registry."""
         self._running = True
-        
+
         # Start health check task
         health_check_task = asyncio.create_task(self._health_check_loop())
         self._background_tasks.add(health_check_task)
         health_check_task.add_done_callback(self._background_tasks.discard)
-        
+
         # Start cleanup task
         cleanup_task = asyncio.create_task(self._cleanup_loop())
         self._background_tasks.add(cleanup_task)
@@ -196,9 +202,10 @@ class ServiceRegistry:
                 logger.error(f"Error in cleanup loop: {e}")
                 await asyncio.sleep(5)
 
+
 class ServiceRegistryClient:
     """Client for interacting with service registry."""
-    
+
     def __init__(self, registry: ServiceRegistry):
         self.registry = registry
         self._instance: Optional[ServiceInstance] = None
@@ -208,7 +215,7 @@ class ServiceRegistryClient:
         name: str,
         port: int,
         health_check_path: str = "/health",
-        metadata: Optional[Dict] = None
+        metadata: Optional[Dict] = None,
     ) -> ServiceInstance:
         """Register service with the registry."""
         host = socket.gethostname()
@@ -219,9 +226,9 @@ class ServiceRegistryClient:
             port=port,
             health_check_url=f"http://{host}:{port}{health_check_path}",
             metadata=metadata or {},
-            last_heartbeat=datetime.now()
+            last_heartbeat=datetime.now(),
         )
-        
+
         await self.registry.register(instance)
         self._instance = instance
         return instance
@@ -229,18 +236,12 @@ class ServiceRegistryClient:
     async def deregister_service(self):
         """Deregister service from the registry."""
         if self._instance:
-            await self.registry.deregister(
-                self._instance.name,
-                self._instance.id
-            )
+            await self.registry.deregister(self._instance.name, self._instance.id)
             self._instance = None
 
     async def start_heartbeat(self):
         """Start sending heartbeats."""
         while True:
             if self._instance:
-                await self.registry.heartbeat(
-                    self._instance.name,
-                    self._instance.id
-                )
-            await asyncio.sleep(self.registry.heartbeat_interval) 
+                await self.registry.heartbeat(self._instance.name, self._instance.id)
+            await asyncio.sleep(self.registry.heartbeat_interval)

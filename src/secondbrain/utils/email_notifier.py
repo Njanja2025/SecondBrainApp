@@ -1,6 +1,7 @@
 """
 Email notification utility for SecondBrain payment system.
 """
+
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -15,17 +16,18 @@ from .email_queue import email_queue
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler('logs/email_notifications.log'),
-        logging.StreamHandler()
-    ]
+        logging.FileHandler("logs/email_notifications.log"),
+        logging.StreamHandler(),
+    ],
 )
 logger = logging.getLogger(__name__)
 
+
 class EmailNotifier:
     """Handles email notifications for payment events."""
-    
+
     def __init__(self):
         """Initialize email notifier with configuration."""
         self.config = self._load_config()
@@ -34,29 +36,29 @@ class EmailNotifier:
         self.smtp_server = self.config["email_alerts"]["smtp_server"]
         self.smtp_port = self.config["email_alerts"]["smtp_port"]
         self.smtp_password = self.config["email_alerts"]["smtp_password"]
-    
+
     def _load_config(self) -> dict:
         """Load email configuration from file."""
         config_path = Path("config/payment_config.json")
         with open(config_path) as f:
             return json.load(f)
-    
+
     def send_notification(
         self,
         subject: str,
         body: str,
         recipients: Optional[List[str]] = None,
-        html_body: Optional[str] = None
+        html_body: Optional[str] = None,
     ) -> bool:
         """
         Send email notification.
-        
+
         Args:
             subject: Email subject
             body: Plain text email body
             recipients: Optional list of additional recipients
             html_body: Optional HTML version of the email body
-        
+
         Returns:
             bool: True if email was sent successfully, False otherwise
         """
@@ -64,25 +66,22 @@ class EmailNotifier:
             # Add to queue instead of sending directly
             for recipient in recipients or [self.receiver]:
                 email_queue.add_email(
-                    subject=subject,
-                    recipient=recipient,
-                    body=body,
-                    html_body=html_body
+                    subject=subject, recipient=recipient, body=body, html_body=html_body
                 )
-            
+
             logger.info(f"Email notification queued: {subject}")
             return True
-            
+
         except Exception as e:
             logger.error(f"Failed to queue email notification: {e}")
             return False
-    
+
     def _get_email_template(self, template_name: str, data: Dict[str, Any]) -> tuple:
         """Get email template with data."""
         templates = {
-            'payment_success': {
-                'subject': "✅ SecondBrain Payment Received",
-                'body': f"""
+            "payment_success": {
+                "subject": "✅ SecondBrain Payment Received",
+                "body": f"""
                 A new payment was received:
                 
                 Customer: {data['email']}
@@ -93,7 +92,7 @@ class EmailNotifier:
                 
                 Thank you for your business!
                 """,
-                'html_body': f"""
+                "html_body": f"""
                 <html>
                     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -110,11 +109,11 @@ class EmailNotifier:
                         </div>
                     </body>
                 </html>
-                """
+                """,
             },
-            'subscription_cancelled': {
-                'subject': "⚠️ SecondBrain Subscription Cancelled",
-                'body': f"""
+            "subscription_cancelled": {
+                "subject": "⚠️ SecondBrain Subscription Cancelled",
+                "body": f"""
                 A subscription has been cancelled:
                 
                 Customer: {data['email']}
@@ -124,7 +123,7 @@ class EmailNotifier:
                 
                 Please follow up with the customer.
                 """,
-                'html_body': f"""
+                "html_body": f"""
                 <html>
                     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -140,11 +139,11 @@ class EmailNotifier:
                         </div>
                     </body>
                 </html>
-                """
+                """,
             },
-            'payment_failed': {
-                'subject': "❌ SecondBrain Payment Failed",
-                'body': f"""
+            "payment_failed": {
+                "subject": "❌ SecondBrain Payment Failed",
+                "body": f"""
                 A payment has failed:
                 
                 Customer: {data['email']}
@@ -155,7 +154,7 @@ class EmailNotifier:
                 
                 Please check the payment details and follow up with the customer.
                 """,
-                'html_body': f"""
+                "html_body": f"""
                 <html>
                     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -172,11 +171,11 @@ class EmailNotifier:
                         </div>
                     </body>
                 </html>
-                """
+                """,
             },
-            'subscription_updated': {
-                'subject': "🔄 SecondBrain Subscription Updated",
-                'body': f"""
+            "subscription_updated": {
+                "subject": "🔄 SecondBrain Subscription Updated",
+                "body": f"""
                 A subscription has been updated:
                 
                 Customer: {data['email']}
@@ -187,7 +186,7 @@ class EmailNotifier:
                 
                 Please review the changes.
                 """,
-                'html_body': f"""
+                "html_body": f"""
                 <html>
                     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -204,11 +203,11 @@ class EmailNotifier:
                         </div>
                     </body>
                 </html>
-                """
+                """,
             },
-            'trial_ending': {
-                'subject': "⏰ SecondBrain Trial Ending Soon",
-                'body': f"""
+            "trial_ending": {
+                "subject": "⏰ SecondBrain Trial Ending Soon",
+                "body": f"""
                 A trial subscription is ending soon:
                 
                 Customer: {data['email']}
@@ -218,7 +217,7 @@ class EmailNotifier:
                 
                 Please follow up with the customer.
                 """,
-                'html_body': f"""
+                "html_body": f"""
                 <html>
                     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -234,78 +233,109 @@ class EmailNotifier:
                         </div>
                     </body>
                 </html>
-                """
-            }
+                """,
+            },
         }
-        
+
         template = templates.get(template_name)
         if not template:
             raise ValueError(f"Unknown template: {template_name}")
-        
-        return template['subject'], template['body'], template['html_body']
-    
-    def send_payment_notification(self, email: str, amount: float, plan: str, transaction_id: Optional[str] = None) -> bool:
+
+        return template["subject"], template["body"], template["html_body"]
+
+    def send_payment_notification(
+        self, email: str, amount: float, plan: str, transaction_id: Optional[str] = None
+    ) -> bool:
         """Send notification for successful payment."""
         template_data = {
-            'email': email,
-            'amount': amount,
-            'plan': plan,
-            'transaction_id': transaction_id,
-            'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            "email": email,
+            "amount": amount,
+            "plan": plan,
+            "transaction_id": transaction_id,
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
-        
-        subject, body, html_body = self._get_email_template('payment_success', template_data)
-        return self.send_notification(subject, body, recipients=[email], html_body=html_body)
-    
-    def send_cancellation_notification(self, email: str, plan: str, reason: Optional[str] = None) -> bool:
+
+        subject, body, html_body = self._get_email_template(
+            "payment_success", template_data
+        )
+        return self.send_notification(
+            subject, body, recipients=[email], html_body=html_body
+        )
+
+    def send_cancellation_notification(
+        self, email: str, plan: str, reason: Optional[str] = None
+    ) -> bool:
         """Send notification for subscription cancellation."""
         template_data = {
-            'email': email,
-            'plan': plan,
-            'reason': reason,
-            'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            "email": email,
+            "plan": plan,
+            "reason": reason,
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
-        
-        subject, body, html_body = self._get_email_template('subscription_cancelled', template_data)
-        return self.send_notification(subject, body, recipients=[email], html_body=html_body)
-    
-    def send_payment_failed_notification(self, email: str, amount: float, plan: str, error: Optional[str] = None) -> bool:
+
+        subject, body, html_body = self._get_email_template(
+            "subscription_cancelled", template_data
+        )
+        return self.send_notification(
+            subject, body, recipients=[email], html_body=html_body
+        )
+
+    def send_payment_failed_notification(
+        self, email: str, amount: float, plan: str, error: Optional[str] = None
+    ) -> bool:
         """Send notification for failed payment."""
         template_data = {
-            'email': email,
-            'amount': amount,
-            'plan': plan,
-            'error': error,
-            'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            "email": email,
+            "amount": amount,
+            "plan": plan,
+            "error": error,
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
-        
-        subject, body, html_body = self._get_email_template('payment_failed', template_data)
-        return self.send_notification(subject, body, recipients=[email], html_body=html_body)
-    
-    def send_subscription_update_notification(self, email: str, plan: str, status: str, changes: Optional[str] = None) -> bool:
+
+        subject, body, html_body = self._get_email_template(
+            "payment_failed", template_data
+        )
+        return self.send_notification(
+            subject, body, recipients=[email], html_body=html_body
+        )
+
+    def send_subscription_update_notification(
+        self, email: str, plan: str, status: str, changes: Optional[str] = None
+    ) -> bool:
         """Send notification for subscription update."""
         template_data = {
-            'email': email,
-            'plan': plan,
-            'status': status,
-            'changes': changes,
-            'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            "email": email,
+            "plan": plan,
+            "status": status,
+            "changes": changes,
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
-        
-        subject, body, html_body = self._get_email_template('subscription_updated', template_data)
-        return self.send_notification(subject, body, recipients=[email], html_body=html_body)
-    
-    def send_trial_ending_notification(self, email: str, plan: str, end_date: str, days_remaining: int) -> bool:
+
+        subject, body, html_body = self._get_email_template(
+            "subscription_updated", template_data
+        )
+        return self.send_notification(
+            subject, body, recipients=[email], html_body=html_body
+        )
+
+    def send_trial_ending_notification(
+        self, email: str, plan: str, end_date: str, days_remaining: int
+    ) -> bool:
         """Send notification for trial ending soon."""
         template_data = {
-            'email': email,
-            'plan': plan,
-            'end_date': end_date,
-            'days_remaining': days_remaining
+            "email": email,
+            "plan": plan,
+            "end_date": end_date,
+            "days_remaining": days_remaining,
         }
-        
-        subject, body, html_body = self._get_email_template('trial_ending', template_data)
-        return self.send_notification(subject, body, recipients=[email], html_body=html_body)
+
+        subject, body, html_body = self._get_email_template(
+            "trial_ending", template_data
+        )
+        return self.send_notification(
+            subject, body, recipients=[email], html_body=html_body
+        )
+
 
 # Create a singleton instance
-email_notifier = EmailNotifier() 
+email_notifier = EmailNotifier()

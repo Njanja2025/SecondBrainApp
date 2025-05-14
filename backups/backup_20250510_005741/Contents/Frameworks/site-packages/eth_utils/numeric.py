@@ -13,12 +13,10 @@ from typing import (
 
 class Comparable(ABC):
     @abstractmethod
-    def __lt__(self, other: Any) -> bool:
-        ...
+    def __lt__(self, other: Any) -> bool: ...
 
     @abstractmethod
-    def __gt__(self, other: Any) -> bool:
-        ...
+    def __gt__(self, other: Any) -> bool: ...
 
 
 TComparable = Union[Comparable, numbers.Real, int, float, decimal.Decimal]

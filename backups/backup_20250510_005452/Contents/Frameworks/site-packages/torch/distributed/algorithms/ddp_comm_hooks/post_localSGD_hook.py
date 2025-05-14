@@ -57,9 +57,7 @@ class PostLocalSGDState:
             self.iter += 1
 
         if self.iter == self.start_localSGD_iter:
-            logger.info(
-                "Start to apply local SGD after %s iterations.", self.iter
-            )
+            logger.info("Start to apply local SGD after %s iterations.", self.iter)
 
 
 def post_localSGD_hook(

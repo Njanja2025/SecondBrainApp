@@ -590,10 +590,12 @@ class GraphMLWriter(GraphML):
                     "edge",
                     source=str(u),
                     target=str(v),
-                    id=str(data.get(self.edge_id_from_attribute))
-                    if self.edge_id_from_attribute
-                    and self.edge_id_from_attribute in data
-                    else str(key),
+                    id=(
+                        str(data.get(self.edge_id_from_attribute))
+                        if self.edge_id_from_attribute
+                        and self.edge_id_from_attribute in data
+                        else str(key)
+                    ),
                 )
                 default = G.graph.get("edge_default", {})
                 self.add_attributes("edge", edge_element, data, default)

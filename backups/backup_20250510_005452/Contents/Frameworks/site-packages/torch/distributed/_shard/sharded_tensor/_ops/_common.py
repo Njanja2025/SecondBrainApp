@@ -6,6 +6,7 @@ from torch.distributed._shard.sharded_tensor import (
 )
 from torch.distributed._shard.common_op_utils import _basic_validation
 
+
 def _sharded_op_common(op, early_stop_func, extra_check):
     """
     Inject sharded tensor op registration with common logics executed before
@@ -34,6 +35,7 @@ def _sharded_op_common(op, early_stop_func, extra_check):
         func (Callable): Torch function for which we want to provide a sharded
             implementation (ex: torch.transpose)
     """
+
     def decorator_sharded_func(wrapped_func):
         @functools.wraps(wrapped_func)
         def wrapper(types, args=(), kwargs=None, pg=None):
@@ -53,6 +55,7 @@ def _sharded_op_common(op, early_stop_func, extra_check):
         return wrapper
 
     return decorator_sharded_func
+
 
 def _register_sharded_op_on_local_shards(
     op, early_stop_func=None, extra_check=None, customized_func=None
@@ -83,6 +86,7 @@ def _register_sharded_op_on_local_shards(
         func (Callable): registered implementation for sharded op for
         ``__torch_function__`` dispatch.
     """
+
     @_sharded_op_impl(op)
     @_sharded_op_common(op, early_stop_func, extra_check)
     def sharded_tensor_op_on_local_shards(types, args=(), kwargs=None, pg=None):
@@ -103,5 +107,5 @@ def _register_sharded_op_on_local_shards(
             st_metadata,
             process_group=pg,
             init_rrefs=st._init_rrefs,
-            sharding_spec=st.sharding_spec()
+            sharding_spec=st.sharding_spec(),
         )

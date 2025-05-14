@@ -6,14 +6,18 @@ from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
+
 class OptimizationRule:
-    def __init__(self, name: str, condition: callable, action: callable, description: str):
+    def __init__(
+        self, name: str, condition: callable, action: callable, description: str
+    ):
         self.name = name
         self.condition = condition
         self.action = action
         self.description = description
         self.last_applied = None
         self.application_count = 0
+
 
 class Evolver:
     def __init__(self):
@@ -23,43 +27,42 @@ class Evolver:
         self.optimization_metrics = {}
         self.performance_threshold = 0.8  # 80% threshold for optimization triggers
         self.rules = self._initialize_rules()
-        
+
     def _initialize_rules(self) -> List[OptimizationRule]:
         """Initialize optimization rules."""
         return [
             OptimizationRule(
                 name="memory_compression",
                 condition=lambda agent: (
-                    hasattr(agent, 'memory') and 
-                    len(agent.memory.log) > 1000
+                    hasattr(agent, "memory") and len(agent.memory.log) > 1000
                 ),
                 action=self._compress_memory,
-                description="Compress old memory entries to reduce memory usage"
+                description="Compress old memory entries to reduce memory usage",
             ),
             OptimizationRule(
                 name="command_history_cleanup",
                 condition=lambda agent: (
-                    hasattr(agent, 'voice_processor') and 
-                    len(agent.voice_processor.command_history) > 500
+                    hasattr(agent, "voice_processor")
+                    and len(agent.voice_processor.command_history) > 500
                 ),
                 action=self._cleanup_command_history,
-                description="Clean up old command history entries"
+                description="Clean up old command history entries",
             ),
             OptimizationRule(
                 name="blockchain_cache_optimization",
                 condition=lambda agent: (
-                    hasattr(agent, 'blockchain') and 
-                    hasattr(agent.blockchain, 'contract_manager')
+                    hasattr(agent, "blockchain")
+                    and hasattr(agent.blockchain, "contract_manager")
                 ),
                 action=self._optimize_blockchain_cache,
-                description="Optimize blockchain contract cache"
-            )
+                description="Optimize blockchain contract cache",
+            ),
         ]
 
     def scan_and_upgrade(self, agent: Any) -> Dict[str, Any]:
         """Scan for potential improvements and upgrade the agent."""
         current_time = time.time()
-        
+
         if current_time - self.last_scan_time < self.scan_interval:
             return {"status": "skipped", "reason": "too_soon"}
 
@@ -69,7 +72,7 @@ class Evolver:
         try:
             # Update performance metrics
             self._update_performance_metrics(agent)
-            
+
             # Check rules and apply optimizations
             applied_optimizations = []
             for rule in self.rules:
@@ -77,11 +80,13 @@ class Evolver:
                     if self._should_apply_rule(rule, agent):
                         optimization_result = rule.action(agent)
                         if optimization_result.get("status") == "success":
-                            applied_optimizations.append({
-                                "rule": rule.name,
-                                "description": rule.description,
-                                "result": optimization_result
-                            })
+                            applied_optimizations.append(
+                                {
+                                    "rule": rule.name,
+                                    "description": rule.description,
+                                    "result": optimization_result,
+                                }
+                            )
                             rule.last_applied = current_time
                             rule.application_count += 1
                 except Exception as e:
@@ -92,7 +97,7 @@ class Evolver:
                 "timestamp": current_time,
                 "status": "upgraded" if applied_optimizations else "no_upgrades",
                 "optimizations": applied_optimizations,
-                "metrics": self.optimization_metrics
+                "metrics": self.optimization_metrics,
             }
             self.upgrade_history.append(evolution_record)
 
@@ -102,7 +107,7 @@ class Evolver:
             error_record = {
                 "timestamp": current_time,
                 "status": "error",
-                "error": str(e)
+                "error": str(e),
             }
             self.upgrade_history.append(error_record)
             logger.error(f"Error during evolution scan: {str(e)}")
@@ -112,7 +117,9 @@ class Evolver:
         """Determine if a rule should be applied based on conditions and history."""
         try:
             # Check if rule was recently applied
-            if rule.last_applied and time.time() - rule.last_applied < 3600:  # 1 hour cooldown
+            if (
+                rule.last_applied and time.time() - rule.last_applied < 3600
+            ):  # 1 hour cooldown
                 return False
 
             # Check rule condition
@@ -126,27 +133,29 @@ class Evolver:
         """Update performance metrics from agent state."""
         try:
             metrics = {}
-            
+
             # Memory metrics
-            if hasattr(agent, 'memory'):
+            if hasattr(agent, "memory"):
                 memory_stats = agent.memory.analyze_performance()
                 metrics["memory"] = {
                     "total_entries": len(agent.memory.log),
-                    "task_distribution": memory_stats["task_distribution"]
+                    "task_distribution": memory_stats["task_distribution"],
                 }
 
             # Voice processor metrics
-            if hasattr(agent, 'voice_processor'):
+            if hasattr(agent, "voice_processor"):
                 metrics["voice"] = {
                     "total_commands": len(agent.voice_processor.command_history),
-                    "success_rate": self._calculate_command_success_rate(agent)
+                    "success_rate": self._calculate_command_success_rate(agent),
                 }
 
             # Blockchain metrics
-            if hasattr(agent, 'blockchain'):
+            if hasattr(agent, "blockchain"):
                 metrics["blockchain"] = {
                     "connected": agent.blockchain.network_manager.web3 is not None,
-                    "contracts_deployed": len(getattr(agent.blockchain.contract_manager, 'contracts', {}))
+                    "contracts_deployed": len(
+                        getattr(agent.blockchain.contract_manager, "contracts", {})
+                    ),
                 }
 
             self.optimization_metrics = metrics
@@ -162,7 +171,8 @@ class Evolver:
                 return 1.0
 
             successful = sum(
-                1 for cmd in history 
+                1
+                for cmd in history
                 if isinstance(cmd, dict) and cmd.get("status") == "success"
             )
             return successful / len(history)
@@ -174,13 +184,15 @@ class Evolver:
     async def _compress_memory(self, agent: Any) -> Dict[str, Any]:
         """Compress old memory entries."""
         try:
-            if not hasattr(agent, 'memory'):
+            if not hasattr(agent, "memory"):
                 return {"status": "error", "error": "No memory system found"}
 
             cutoff_date = datetime.now() - timedelta(days=7)
             old_entries = [
-                entry for entry in agent.memory.log 
-                if datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S") < cutoff_date
+                entry
+                for entry in agent.memory.log
+                if datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S")
+                < cutoff_date
             ]
 
             if not old_entries:
@@ -191,7 +203,7 @@ class Evolver:
                 "period_start": old_entries[0]["timestamp"],
                 "period_end": old_entries[-1]["timestamp"],
                 "total_entries": len(old_entries),
-                "entry_types": {}
+                "entry_types": {},
             }
 
             for entry in old_entries:
@@ -202,20 +214,24 @@ class Evolver:
 
             # Remove old entries and add summary
             agent.memory.log = [
-                entry for entry in agent.memory.log 
-                if datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S") >= cutoff_date
+                entry
+                for entry in agent.memory.log
+                if datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S")
+                >= cutoff_date
             ]
-            agent.memory.log.append({
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "type": "memory_summary",
-                "description": "Compressed old entries",
-                "summary": summary
-            })
+            agent.memory.log.append(
+                {
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "type": "memory_summary",
+                    "description": "Compressed old entries",
+                    "summary": summary,
+                }
+            )
 
             return {
                 "status": "success",
                 "compressed_entries": len(old_entries),
-                "summary": summary
+                "summary": summary,
             }
 
         except Exception as e:
@@ -224,7 +240,7 @@ class Evolver:
     async def _cleanup_command_history(self, agent: Any) -> Dict[str, Any]:
         """Clean up old command history."""
         try:
-            if not hasattr(agent, 'voice_processor'):
+            if not hasattr(agent, "voice_processor"):
                 return {"status": "error", "error": "No voice processor found"}
 
             cutoff_date = datetime.now() - timedelta(days=1)
@@ -233,7 +249,7 @@ class Evolver:
             return {
                 "status": "success",
                 "action": "history_cleanup",
-                "cutoff_date": cutoff_date.isoformat()
+                "cutoff_date": cutoff_date.isoformat(),
             }
 
         except Exception as e:
@@ -242,15 +258,20 @@ class Evolver:
     async def _optimize_blockchain_cache(self, agent: Any) -> Dict[str, Any]:
         """Optimize blockchain contract cache."""
         try:
-            if not hasattr(agent, 'blockchain') or not hasattr(agent.blockchain, 'contract_manager'):
-                return {"status": "error", "error": "No blockchain contract manager found"}
+            if not hasattr(agent, "blockchain") or not hasattr(
+                agent.blockchain, "contract_manager"
+            ):
+                return {
+                    "status": "error",
+                    "error": "No blockchain contract manager found",
+                }
 
             # Implementation depends on your blockchain manager's structure
             # This is a placeholder for the actual implementation
             return {
                 "status": "success",
                 "action": "cache_optimization",
-                "details": "Blockchain cache optimized"
+                "details": "Blockchain cache optimized",
             }
 
         except Exception as e:
@@ -258,7 +279,9 @@ class Evolver:
 
     def get_upgrade_history(self, limit: Optional[int] = None) -> List[Dict]:
         """Return the history of upgrade attempts with optional limit."""
-        history = sorted(self.upgrade_history, key=lambda x: x["timestamp"], reverse=True)
+        history = sorted(
+            self.upgrade_history, key=lambda x: x["timestamp"], reverse=True
+        )
         return history[:limit] if limit else history
 
     def get_optimization_metrics(self) -> Dict[str, Any]:
@@ -267,9 +290,12 @@ class Evolver:
 
     def get_rule_statistics(self) -> List[Dict[str, Any]]:
         """Get statistics about optimization rules."""
-        return [{
-            "name": rule.name,
-            "description": rule.description,
-            "times_applied": rule.application_count,
-            "last_applied": rule.last_applied
-        } for rule in self.rules] 
+        return [
+            {
+                "name": rule.name,
+                "description": rule.description,
+                "times_applied": rule.application_count,
+                "last_applied": rule.last_applied,
+            }
+            for rule in self.rules
+        ]

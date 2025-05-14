@@ -198,13 +198,17 @@ def parse_size_to_int(size_as_str: str) -> int:
     # Parse unit
     unit = size_as_str[-2:].upper()
     if unit not in SIZE_UNITS:
-        raise ValueError(f"Unit '{unit}' not supported. Supported units are TB, GB, MB, KB. Got '{size_as_str}'.")
+        raise ValueError(
+            f"Unit '{unit}' not supported. Supported units are TB, GB, MB, KB. Got '{size_as_str}'."
+        )
     multiplier = SIZE_UNITS[unit]
 
     # Parse value
     try:
         value = float(size_as_str[:-2].strip())
     except ValueError as e:
-        raise ValueError(f"Could not parse the size value from '{size_as_str}': {e}") from e
+        raise ValueError(
+            f"Could not parse the size value from '{size_as_str}': {e}"
+        ) from e
 
     return int(value * multiplier)

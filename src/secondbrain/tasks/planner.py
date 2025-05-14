@@ -1,8 +1,10 @@
 """
 Task planning module for the AI Agent system.
 """
+
 from typing import Optional, Dict, Any
 import time
+
 
 class TaskPlanner:
     def __init__(self):
@@ -15,18 +17,18 @@ class TaskPlanner:
         Returns None if no task is currently needed.
         """
         current_time = time.time()
-        
+
         # Rate limiting
         if current_time - self.last_plan_time < self.plan_interval:
             return None
-            
+
         self.last_plan_time = current_time
-        
+
         # TODO: Implement more sophisticated task planning
         # This is a placeholder that returns a demo task
         return {
             "description": "Demo Task: System Status Check",
             "action": "status_check",
             "priority": 1,
-            "timestamp": current_time
-        } 
+            "timestamp": current_time,
+        }

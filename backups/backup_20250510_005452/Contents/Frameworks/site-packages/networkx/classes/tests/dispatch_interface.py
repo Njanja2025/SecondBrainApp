@@ -124,6 +124,7 @@ class LoopbackBackendInterface:
 
             def G_new_datadict(old_dd):
                 return G.edge_attr_dict_factory(old_dd)
+
         elif edge_attrs:
 
             def G_new_datadict(old_dd):
@@ -132,6 +133,7 @@ class LoopbackBackendInterface:
                     for attr, default in edge_attrs.items()
                     if default is not None or attr in old_dd
                 )
+
         else:
 
             def G_new_datadict(old_dd):
@@ -144,6 +146,7 @@ class LoopbackBackendInterface:
                     (k, G_new_datadict(dd)) for k, dd in keydict.items()
                 )
                 return kd
+
         else:
             G_new_inner = G_new_datadict
 

@@ -56,7 +56,9 @@ class BaseInferenceType(dict):
         """
         output = cls.parse_obj(data)
         if not isinstance(output, list):
-            raise ValueError(f"Invalid input data for {cls}. Expected a list, but got {type(output)}.")
+            raise ValueError(
+                f"Invalid input data for {cls}. Expected a list, but got {type(output)}."
+            )
         return output
 
     @classmethod
@@ -67,11 +69,15 @@ class BaseInferenceType(dict):
         """
         output = cls.parse_obj(data)
         if isinstance(output, list):
-            raise ValueError(f"Invalid input data for {cls}. Expected a single instance, but got a list.")
+            raise ValueError(
+                f"Invalid input data for {cls}. Expected a single instance, but got a list."
+            )
         return output
 
     @classmethod
-    def parse_obj(cls: Type[T], data: Union[bytes, str, List, Dict]) -> Union[List[T], T]:
+    def parse_obj(
+        cls: Type[T], data: Union[bytes, str, List, Dict]
+    ) -> Union[List[T], T]:
         """Parse server response as a dataclass or list of dataclasses.
 
         To enable future-compatibility, we want to handle cases where the server return more fields than expected.
@@ -101,7 +107,9 @@ class BaseInferenceType(dict):
                     field_type = cls.__dataclass_fields__[key].type
 
                     # if `field_type` is a `BaseInferenceType`, parse it
-                    if inspect.isclass(field_type) and issubclass(field_type, BaseInferenceType):
+                    if inspect.isclass(field_type) and issubclass(
+                        field_type, BaseInferenceType
+                    ):
                         value = field_type.parse_obj(value)
 
                     # otherwise, recursively parse nested dataclasses (if possible)
@@ -113,7 +121,9 @@ class BaseInferenceType(dict):
                                 expected_type = get_args(expected_type)[
                                     0
                                 ]  # assume same type for all items in the list
-                            if inspect.isclass(expected_type) and issubclass(expected_type, BaseInferenceType):
+                            if inspect.isclass(expected_type) and issubclass(
+                                expected_type, BaseInferenceType
+                            ):
                                 value = expected_type.parse_obj(value)
                                 break
                 init_values[key] = value

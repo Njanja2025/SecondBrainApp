@@ -8,7 +8,9 @@ from typing import Any, Dict, Literal, Optional
 from .base import BaseInferenceType, dataclass_with_extra
 
 
-SummarizationTruncationStrategy = Literal["do_not_truncate", "longest_first", "only_first", "only_second"]
+SummarizationTruncationStrategy = Literal[
+    "do_not_truncate", "longest_first", "only_first", "only_second"
+]
 
 
 @dataclass_with_extra

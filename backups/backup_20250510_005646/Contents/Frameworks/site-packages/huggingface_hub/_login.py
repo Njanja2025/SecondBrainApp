@@ -142,7 +142,9 @@ def logout(token_name: Optional[str] = None) -> None:
         [`ValueError`](https://docs.python.org/3/library/exceptions.html#ValueError):
             If the access token name is not found.
     """
-    if get_token() is None and not get_stored_tokens():  # No active token and no saved access tokens
+    if (
+        get_token() is None and not get_stored_tokens()
+    ):  # No active token and no saved access tokens
         logger.warning("Not logged in!")
         return
     if not token_name:
@@ -190,7 +192,9 @@ def auth_switch(token_name: str, add_to_git_credential: bool = False) -> None:
     """
     token = _get_token_by_name(token_name)
     if not token:
-        raise ValueError(f"Access token {token_name} not found in {constants.HF_STORED_TOKENS_PATH}")
+        raise ValueError(
+            f"Access token {token_name} not found in {constants.HF_STORED_TOKENS_PATH}"
+        )
     # Write token to HF_TOKEN_PATH
     _set_active_token(token_name, add_to_git_credential)
     logger.info(f"The current active token is: {token_name}")
@@ -225,7 +229,11 @@ def auth_list() -> None:
         masked_token = f"{token[:3]}****{token[-4:]}" if token != "<not set>" else token
         is_current = "*" if token == current_token else " "
 
-        print(f"{is_current} {{:<{max_offset}}}| {{:<15}}".format(token_name, masked_token))
+        print(
+            f"{is_current} {{:<{max_offset}}}| {{:<15}}".format(
+                token_name, masked_token
+            )
+        )
 
     if _get_token_from_environment():
         logger.warning(
@@ -248,7 +256,9 @@ def auth_list() -> None:
     custom_message="Fine-grained tokens added complexity to the permissions, making it irrelevant to check if a token has 'write' access.",
 )
 @_deprecate_positional_args(version="1.0")
-def interpreter_login(*, new_session: bool = True, write_permission: bool = False) -> None:
+def interpreter_login(
+    *, new_session: bool = True, write_permission: bool = False
+) -> None:
     """
     Displays a prompt to log in to the HF website and store the token.
 
@@ -348,10 +358,14 @@ def notebook_login(*, new_session: bool = True, write_permission: bool = False) 
         logger.info("User is already logged in.")
         return
 
-    box_layout = widgets.Layout(display="flex", flex_flow="column", align_items="center", width="50%")
+    box_layout = widgets.Layout(
+        display="flex", flex_flow="column", align_items="center", width="50%"
+    )
 
     token_widget = widgets.Password(description="Token:")
-    git_checkbox_widget = widgets.Checkbox(value=True, description="Add token as git credential?")
+    git_checkbox_widget = widgets.Checkbox(
+        value=True, description="Add token as git credential?"
+    )
     token_finish_button = widgets.Button(description="Login")
 
     login_token_widget = widgets.VBox(
@@ -382,7 +396,9 @@ def notebook_login(*, new_session: bool = True, write_permission: bool = False) 
         except Exception as error:
             message = str(error)
         # Print result (success message or error)
-        login_token_widget.children = [widgets.Label(line) for line in message.split("\n") if line.strip()]
+        login_token_widget.children = [
+            widgets.Label(line) for line in message.split("\n") if line.strip()
+        ]
 
     token_finish_button.on_click(login_token_event)
 
@@ -399,7 +415,9 @@ def _login(
     from .hf_api import whoami  # avoid circular import
 
     if token.startswith("api_org"):
-        raise ValueError("You must use your personal account token, not an organization token.")
+        raise ValueError(
+            "You must use your personal account token, not an organization token."
+        )
 
     token_info = whoami(token)
     permission = token_info["auth"]["accessToken"]["role"]
@@ -409,7 +427,9 @@ def _login(
     # Store token locally
     _save_token(token=token, token_name=token_name)
     # Set active token
-    _set_active_token(token_name=token_name, add_to_git_credential=add_to_git_credential)
+    _set_active_token(
+        token_name=token_name, add_to_git_credential=add_to_git_credential
+    )
     logger.info("Login successful.")
     if _get_token_from_environment():
         logger.warning(
@@ -454,7 +474,9 @@ def _set_active_token(
     """
     token = _get_token_by_name(token_name)
     if not token:
-        raise ValueError(f"Token {token_name} not found in {constants.HF_STORED_TOKENS_PATH}")
+        raise ValueError(
+            f"Token {token_name} not found in {constants.HF_STORED_TOKENS_PATH}"
+        )
     if add_to_git_credential:
         if _is_git_credential_helper_configured():
             set_git_credential(token)

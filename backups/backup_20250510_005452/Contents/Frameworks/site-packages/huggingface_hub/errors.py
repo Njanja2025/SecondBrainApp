@@ -67,9 +67,16 @@ class HfHubHTTPError(HTTPError):
     ```
     """
 
-    def __init__(self, message: str, response: Optional[Response] = None, *, server_message: Optional[str] = None):
+    def __init__(
+        self,
+        message: str,
+        response: Optional[Response] = None,
+        *,
+        server_message: Optional[str] = None,
+    ):
         self.request_id = (
-            response.headers.get("x-request-id") or response.headers.get("X-Amzn-Trace-Id")
+            response.headers.get("x-request-id")
+            or response.headers.get("X-Amzn-Trace-Id")
             if response is not None
             else None
         )

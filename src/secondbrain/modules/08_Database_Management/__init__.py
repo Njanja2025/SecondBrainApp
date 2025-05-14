@@ -9,12 +9,12 @@ from .queries.query_manager import QueryManager, QueryConfig
 from .backup_restore.backup_manager import BackupManager, BackupConfig
 
 __all__ = [
-    'ModelManager',
-    'ModelConfig',
-    'MigrationManager',
-    'MigrationConfig',
-    'QueryManager',
-    'QueryConfig',
-    'BackupManager',
-    'BackupConfig'
-] 
+    "ModelManager",
+    "ModelConfig",
+    "MigrationManager",
+    "MigrationConfig",
+    "QueryManager",
+    "QueryConfig",
+    "BackupManager",
+    "BackupConfig",
+]

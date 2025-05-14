@@ -10,7 +10,18 @@ from queue import Queue
 import sys
 from threading import Thread
 from types import TracebackType
-from typing import TYPE_CHECKING, Callable, Dict, Generator, List, Optional, Tuple, Type, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+    cast,
+)
 
 import torch
 
@@ -48,7 +59,11 @@ class Task:
     """
 
     def __init__(
-        self, stream: AbstractStream, *, compute: Callable[[], Batch], finalize: Optional[Callable[[Batch], None]],
+        self,
+        stream: AbstractStream,
+        *,
+        compute: Callable[[], Batch],
+        finalize: Optional[Callable[[Batch], None]],
     ) -> None:
         self.stream = stream
         self._compute = compute
@@ -88,7 +103,9 @@ def worker(in_queue: InQueue, out_queue: OutQueue, device: torch.device) -> None
     out_queue.put(done)
 
 
-def create_workers(devices: List[torch.device],) -> Tuple[List[InQueue], List[OutQueue]]:
+def create_workers(
+    devices: List[torch.device],
+) -> Tuple[List[InQueue], List[OutQueue]]:
     """Spawns worker threads. A worker thread is bound to a device."""
     in_queues: List[InQueue] = []
     out_queues: List[OutQueue] = []
@@ -115,7 +132,11 @@ def create_workers(devices: List[torch.device],) -> Tuple[List[InQueue], List[Ou
             out_queue = Queue()
             workers[device] = (in_queue, out_queue)
 
-            t = Thread(target=worker, args=(in_queue, out_queue, device), daemon=True,)
+            t = Thread(
+                target=worker,
+                args=(in_queue, out_queue, device),
+                daemon=True,
+            )
             t.start()
 
         in_queues.append(in_queue)
@@ -123,8 +144,11 @@ def create_workers(devices: List[torch.device],) -> Tuple[List[InQueue], List[Ou
 
     return (in_queues, out_queues)
 
+
 @contextmanager
-def spawn_workers(devices: List[torch.device],) -> Generator[Tuple[List[InQueue], List[OutQueue]], None, None]:
+def spawn_workers(
+    devices: List[torch.device],
+) -> Generator[Tuple[List[InQueue], List[OutQueue]], None, None]:
     try:
         (in_queues, out_queues) = create_workers(devices)
         yield (in_queues, out_queues)

@@ -1,6 +1,7 @@
 """
 Security Agent for smart contract vulnerability scanning and system protection.
 """
+
 import os
 import re
 from typing import List, Tuple, Dict, Any
@@ -11,6 +12,7 @@ from ..phantom.phantom_core import PhantomCore
 
 logger = logging.getLogger(__name__)
 
+
 class SecurityAgent:
     def __init__(self):
         self.threats = []
@@ -20,38 +22,38 @@ class SecurityAgent:
             "tx.origin": {
                 "pattern": r"tx\.origin",
                 "severity": "HIGH",
-                "description": "Use of tx.origin is dangerous - can be manipulated by attackers"
+                "description": "Use of tx.origin is dangerous - can be manipulated by attackers",
             },
             "call.value": {
                 "pattern": r"call\.value",
                 "severity": "HIGH",
-                "description": "Use of call.value is risky - use transfer() or send() instead"
+                "description": "Use of call.value is risky - use transfer() or send() instead",
             },
             "selfdestruct": {
                 "pattern": r"selfdestruct|suicide",
                 "severity": "CRITICAL",
-                "description": "Use of selfdestruct can permanently destroy contract"
+                "description": "Use of selfdestruct can permanently destroy contract",
             },
             "reentrancy": {
                 "pattern": r"\.call{.*?\bvalue:",
                 "severity": "CRITICAL",
-                "description": "Potential reentrancy vulnerability"
+                "description": "Potential reentrancy vulnerability",
             },
             "unchecked_return": {
                 "pattern": r"\.send\(|\.call\{",
                 "severity": "MEDIUM",
-                "description": "Unchecked return value from external call"
+                "description": "Unchecked return value from external call",
             },
             "timestamp_dependency": {
                 "pattern": r"block\.timestamp|now",
                 "severity": "MEDIUM",
-                "description": "Timestamp manipulation vulnerability"
+                "description": "Timestamp manipulation vulnerability",
             },
             "assembly": {
                 "pattern": r"assembly\s*{",
                 "severity": "WARNING",
-                "description": "Use of assembly - ensure it's necessary"
-            }
+                "description": "Use of assembly - ensure it's necessary",
+            },
         }
 
     async def initialize(self):
@@ -74,32 +76,32 @@ class SecurityAgent:
                 return {"status": "error", "message": error_msg}
 
             self.phantom.log_event("Contract Scan", f"Starting scan of {file_path}")
-            
+
             issues = []
-            with open(file_path, 'r') as f:
+            with open(file_path, "r") as f:
                 content = f.read()
-                lines = content.split('\n')
-                
+                lines = content.split("\n")
+
                 # Scan for known vulnerability patterns
                 for vuln_name, vuln_info in self.vulnerability_patterns.items():
                     matches = re.finditer(vuln_info["pattern"], content)
                     for match in matches:
-                        line_no = content[:match.start()].count('\n') + 1
+                        line_no = content[: match.start()].count("\n") + 1
                         issue = {
                             "line": line_no,
                             "type": vuln_name,
                             "severity": vuln_info["severity"],
                             "description": vuln_info["description"],
-                            "code": lines[line_no - 1].strip()
+                            "code": lines[line_no - 1].strip(),
                         }
                         issues.append(issue)
-                        
+
                         # Log critical and high severity issues
                         if issue["severity"] in ["CRITICAL", "HIGH"]:
                             self.phantom.log_event(
                                 "Vulnerability",
                                 f"{issue['severity']}: {issue['type']} at line {line_no}",
-                                "WARNING"
+                                "WARNING",
                             )
 
             # Sort issues by severity
@@ -111,28 +113,30 @@ class SecurityAgent:
 
             # Generate security report
             report = self._generate_security_report(issues, file_path)
-            
+
             # Log scan completion
             self.phantom.log_event(
                 "Contract Scan",
-                f"Completed scan of {file_path}. Found {len(issues)} issues."
+                f"Completed scan of {file_path}. Found {len(issues)} issues.",
             )
-            
+
             # Notify through voice
             if issues:
                 critical_count = sum(1 for i in issues if i["severity"] == "CRITICAL")
                 high_count = sum(1 for i in issues if i["severity"] == "HIGH")
-                
+
                 msg = f"Security scan completed. Found {len(issues)} issues: "
                 if critical_count:
                     msg += f"{critical_count} critical, "
                 if high_count:
                     msg += f"{high_count} high severity, "
                 msg += "Please review the security report."
-                
+
                 await respond_with_voice(msg)
             else:
-                await respond_with_voice("Contract scan completed. No vulnerabilities found.")
+                await respond_with_voice(
+                    "Contract scan completed. No vulnerabilities found."
+                )
 
             return report
 
@@ -143,7 +147,9 @@ class SecurityAgent:
             await respond_with_voice("Error during security scan")
             return {"status": "error", "message": error_msg}
 
-    def _generate_security_report(self, issues: List[Dict], file_path: str) -> Dict[str, Any]:
+    def _generate_security_report(
+        self, issues: List[Dict], file_path: str
+    ) -> Dict[str, Any]:
         """Generate a detailed security report."""
         report = {
             "status": "completed",
@@ -154,16 +160,16 @@ class SecurityAgent:
                 "critical": sum(1 for i in issues if i["severity"] == "CRITICAL"),
                 "high": sum(1 for i in issues if i["severity"] == "HIGH"),
                 "medium": sum(1 for i in issues if i["severity"] == "MEDIUM"),
-                "warning": sum(1 for i in issues if i["severity"] == "WARNING")
+                "warning": sum(1 for i in issues if i["severity"] == "WARNING"),
             },
             "issues": issues,
-            "system_health": self.phantom_mcp.state.system_health
+            "system_health": self.phantom_mcp.state.system_health,
         }
 
         # Log report summary
         self.phantom.log_event(
             "Security Report",
-            f"Generated for {file_path}: {report['summary']['total_issues']} issues found"
+            f"Generated for {file_path}: {report['summary']['total_issues']} issues found",
         )
 
         # Log detailed report
@@ -171,7 +177,9 @@ class SecurityAgent:
         logger.info(f"File: {file_path}")
         logger.info(f"Total Issues: {report['summary']['total_issues']}")
         for issue in issues:
-            logger.info(f"[{issue['severity']}] Line {issue['line']}: {issue['description']}")
+            logger.info(
+                f"[{issue['severity']}] Line {issue['line']}: {issue['description']}"
+            )
 
         return report
 
@@ -186,7 +194,7 @@ class SecurityAgent:
                 self.phantom.log_event(
                     "System Health",
                     f"Low system health detected: {system_status['system_health']}",
-                    "WARNING"
+                    "WARNING",
                 )
                 await self._handle_security_threat()
         except Exception as e:
@@ -199,20 +207,18 @@ class SecurityAgent:
         try:
             # Log threat detection
             self.phantom.log_event(
-                "Security Threat",
-                "Initiating threat response procedures",
-                "WARNING"
+                "Security Threat", "Initiating threat response procedures", "WARNING"
             )
-            
+
             # Create security checkpoint
             await self.phantom_mcp.create_backup("security_threat")
-            
+
             # Trigger system optimization
             await self.phantom_mcp.improve_system("process_optimization")
-            
+
             # Log security event
             logger.warning("Security threat detected - protective measures activated")
-            
+
         except Exception as e:
             error_msg = f"Error handling security threat: {str(e)}"
             self.phantom.log_event("Threat Response", error_msg, "ERROR")
@@ -225,6 +231,8 @@ class SecurityAgent:
             "active_threats": len(self.threats),
             "last_scan": self.phantom_mcp.state.last_update.isoformat(),
             "system_health": self.phantom_mcp.state.system_health,
-            "security_level": "HIGH" if self.phantom_mcp.state.system_health > 0.8 else "MEDIUM",
-            "phantom_status": phantom_status
-        } 
+            "security_level": (
+                "HIGH" if self.phantom_mcp.state.system_health > 0.8 else "MEDIUM"
+            ),
+            "phantom_status": phantom_status,
+        }

@@ -54,7 +54,9 @@ def list_credential_helpers(folder: Optional[str] = None) -> List[str]:
         raise EnvironmentError(exc.stderr)
 
 
-def set_git_credential(token: str, username: str = "hf_user", folder: Optional[str] = None) -> None:
+def set_git_credential(
+    token: str, username: str = "hf_user", folder: Optional[str] = None
+) -> None:
     """Save a username/token pair in git credential for HF Hub registry.
 
     Credentials are saved in all configured helpers (store, cache, macOS keychain,...).
@@ -73,11 +75,15 @@ def set_git_credential(token: str, username: str = "hf_user", folder: Optional[s
         stdin,
         _,
     ):
-        stdin.write(f"url={ENDPOINT}\nusername={username.lower()}\npassword={token}\n\n")
+        stdin.write(
+            f"url={ENDPOINT}\nusername={username.lower()}\npassword={token}\n\n"
+        )
         stdin.flush()
 
 
-def unset_git_credential(username: str = "hf_user", folder: Optional[str] = None) -> None:
+def unset_git_credential(
+    username: str = "hf_user", folder: Optional[str] = None
+) -> None:
     """Erase credentials from git credential for HF Hub registry.
 
     Credentials are erased from the configured helpers (store, cache, macOS

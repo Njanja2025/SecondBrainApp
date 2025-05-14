@@ -1,6 +1,7 @@
 """
 Phantom MCP (Master Control Program) for system optimization and evolution.
 """
+
 import logging
 import asyncio
 from typing import Dict, List, Any, Optional
@@ -14,6 +15,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+
 class SystemState:
     def __init__(self):
         self.cpu_usage = 0.0
@@ -21,6 +23,7 @@ class SystemState:
         self.active_processes = []
         self.system_health = 1.0
         self.last_update = datetime.now()
+
 
 class PhantomMCP:
     def __init__(self):
@@ -30,34 +33,34 @@ class PhantomMCP:
         self.active_improvements = set()
         self.system_checkpoints = []
         self.backup_schedule = {}
-        self.backup_dir = Path.home() / '.secondbrain' / 'backups'
+        self.backup_dir = Path.home() / ".secondbrain" / "backups"
         self.backup_dir.mkdir(parents=True, exist_ok=True)
-        
+
     async def initialize(self):
         """Initialize the Phantom MCP system."""
         logger.info("Initializing Phantom MCP...")
         await self._load_neural_patterns()
         await self._initialize_system_monitoring()
         await self._start_improvement_cycle()
-        
+
     async def _load_neural_patterns(self):
         """Load and initialize neural patterns for system optimization."""
         self.neural_patterns = {
             "memory_optimization": {
                 "pattern": "adaptive_memory_management",
                 "threshold": 0.75,
-                "actions": ["compress", "optimize", "redistribute"]
+                "actions": ["compress", "optimize", "redistribute"],
             },
             "process_optimization": {
                 "pattern": "dynamic_process_scaling",
                 "threshold": 0.85,
-                "actions": ["scale", "balance", "optimize"]
+                "actions": ["scale", "balance", "optimize"],
             },
             "learning_optimization": {
                 "pattern": "continuous_learning",
                 "threshold": 0.90,
-                "actions": ["learn", "adapt", "evolve"]
-            }
+                "actions": ["learn", "adapt", "evolve"],
+            },
         }
 
     async def _initialize_system_monitoring(self):
@@ -72,12 +75,12 @@ class PhantomMCP:
             self.improvement_metrics = {
                 "cycles_completed": 0,
                 "successful_improvements": 0,
-                "failed_improvements": 0
+                "failed_improvements": 0,
             }
-            
+
             # Start improvement cycle task
             self.improvement_task = asyncio.create_task(self._improvement_loop())
-            
+
         except Exception as e:
             logger.error(f"Failed to start improvement cycle: {str(e)}")
 
@@ -88,13 +91,13 @@ class PhantomMCP:
                 # Check system state
                 if self.state.system_health < 0.9:
                     await self._trigger_optimization()
-                
+
                 # Update metrics
                 self.improvement_metrics["cycles_completed"] += 1
-                
+
                 # Sleep between cycles
                 await asyncio.sleep(300)  # 5 minutes
-                
+
             except Exception as e:
                 logger.error(f"Error in improvement loop: {str(e)}")
                 self.improvement_metrics["failed_improvements"] += 1
@@ -108,26 +111,26 @@ class PhantomMCP:
                 "cpu_usage": self.state.cpu_usage,
                 "memory_usage": self.state.memory_usage,
                 "system_health": self.state.system_health,
-                "active_processes": len(self.state.active_processes)
+                "active_processes": len(self.state.active_processes),
             }
-            
+
             # Save metrics to file
             metrics_file = self.backup_dir / "state_metrics.json"
             if metrics_file.exists():
-                with open(metrics_file, 'r') as f:
+                with open(metrics_file, "r") as f:
                     history = json.load(f)
             else:
                 history = []
-                
+
             history.append(metrics)
-            
+
             # Keep last 1000 metrics
             if len(history) > 1000:
                 history = history[-1000:]
-                
-            with open(metrics_file, 'w') as f:
+
+            with open(metrics_file, "w") as f:
                 json.dump(history, f)
-                
+
         except Exception as e:
             logger.error(f"Failed to record state metrics: {str(e)}")
 
@@ -137,20 +140,22 @@ class PhantomMCP:
             # Check last checkpoint time
             if not self.system_checkpoints:
                 return True
-                
+
             last_checkpoint = self.system_checkpoints[-1]
-            time_since_checkpoint = (datetime.now() - datetime.fromisoformat(last_checkpoint["timestamp"])).total_seconds()
-            
+            time_since_checkpoint = (
+                datetime.now() - datetime.fromisoformat(last_checkpoint["timestamp"])
+            ).total_seconds()
+
             # Create checkpoint if:
             # 1. More than 1 hour since last checkpoint
             # 2. System health decreased significantly
             # 3. Memory usage increased significantly
             return (
-                time_since_checkpoint > 3600 or  # 1 hour
-                self.state.system_health < 0.7 or
-                self.state.memory_usage > 0.9
+                time_since_checkpoint > 3600  # 1 hour
+                or self.state.system_health < 0.7
+                or self.state.memory_usage > 0.9
             )
-            
+
         except Exception as e:
             logger.error(f"Error checking checkpoint creation: {str(e)}")
             return False
@@ -161,31 +166,33 @@ class PhantomMCP:
             # Get system metrics
             cpu_percent = psutil.cpu_percent(interval=1)
             memory = psutil.virtual_memory()
-            disk = psutil.disk_usage('/')
-            
+            disk = psutil.disk_usage("/")
+
             # Calculate overall health
             health_metrics = {
                 "cpu_health": 1.0 - (cpu_percent / 100.0),
                 "memory_health": 1.0 - (memory.percent / 100.0),
-                "disk_health": 1.0 - (disk.percent / 100.0)
+                "disk_health": 1.0 - (disk.percent / 100.0),
             }
-            
+
             # Weight the metrics
             weights = {"cpu_health": 0.4, "memory_health": 0.4, "disk_health": 0.2}
-            overall_health = sum(metric * weights[name] for name, metric in health_metrics.items())
-            
+            overall_health = sum(
+                metric * weights[name] for name, metric in health_metrics.items()
+            )
+
             return {
                 "overall_health": overall_health,
                 "needs_maintenance": overall_health < 0.8,
-                "metrics": health_metrics
+                "metrics": health_metrics,
             }
-            
+
         except Exception as e:
             logger.error(f"Error calculating health metrics: {str(e)}")
             return {
                 "overall_health": 0.5,  # Default to medium health on error
                 "needs_maintenance": True,
-                "metrics": {}
+                "metrics": {},
             }
 
     async def _get_cpu_usage(self) -> float:
@@ -209,9 +216,9 @@ class PhantomMCP:
         """Get list of active processes."""
         try:
             processes = []
-            for proc in psutil.process_iter(['pid', 'name', 'cpu_percent']):
+            for proc in psutil.process_iter(["pid", "name", "cpu_percent"]):
                 try:
-                    if proc.info['cpu_percent'] > 0:
+                    if proc.info["cpu_percent"] > 0:
                         processes.append(f"{proc.info['name']} ({proc.info['pid']})")
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
@@ -226,15 +233,15 @@ class PhantomMCP:
             try:
                 # Update system state
                 await self._update_system_state()
-                
+
                 # Check for optimization opportunities
                 if self.state.system_health < 0.9:
                     await self._trigger_optimization()
-                
+
                 # Create system checkpoint if needed
                 if self._should_create_checkpoint():
                     await self._create_system_checkpoint()
-                
+
                 await asyncio.sleep(60)  # Monitor every minute
             except Exception as e:
                 logger.error(f"Error in system monitoring: {str(e)}")
@@ -246,10 +253,10 @@ class PhantomMCP:
             try:
                 health_metrics = await self._calculate_health_metrics()
                 self.state.system_health = health_metrics["overall_health"]
-                
+
                 if health_metrics["needs_maintenance"]:
                     await self._perform_maintenance()
-                
+
                 await asyncio.sleep(300)  # Check every 5 minutes
             except Exception as e:
                 logger.error(f"Error in health check: {str(e)}")
@@ -263,7 +270,7 @@ class PhantomMCP:
             self.state.memory_usage = await self._get_memory_usage()
             self.state.active_processes = await self._get_active_processes()
             self.state.last_update = datetime.now()
-            
+
             # Record state for analysis
             self._record_state_metrics()
         except Exception as e:
@@ -273,29 +280,37 @@ class PhantomMCP:
         """Improve specific system area using neural patterns."""
         try:
             if target_area not in self.neural_patterns:
-                return {"status": "error", "message": f"Unknown target area: {target_area}"}
+                return {
+                    "status": "error",
+                    "message": f"Unknown target area: {target_area}",
+                }
 
             pattern = self.neural_patterns[target_area]
             if target_area in self.active_improvements:
-                return {"status": "skipped", "message": "Improvement already in progress"}
+                return {
+                    "status": "skipped",
+                    "message": "Improvement already in progress",
+                }
 
             self.active_improvements.add(target_area)
             try:
                 # Apply improvement pattern
                 improvement_result = await self._apply_improvement_pattern(pattern)
-                
+
                 # Record improvement
-                self.evolution_history.append({
-                    "timestamp": datetime.now().isoformat(),
-                    "area": target_area,
-                    "pattern": pattern["pattern"],
-                    "result": improvement_result
-                })
+                self.evolution_history.append(
+                    {
+                        "timestamp": datetime.now().isoformat(),
+                        "area": target_area,
+                        "pattern": pattern["pattern"],
+                        "result": improvement_result,
+                    }
+                )
 
                 return {
                     "status": "success",
                     "area": target_area,
-                    "improvements": improvement_result
+                    "improvements": improvement_result,
                 }
             finally:
                 self.active_improvements.remove(target_area)
@@ -325,7 +340,9 @@ class PhantomMCP:
     async def create_backup(self, backup_type: str = "full") -> Dict[str, Any]:
         """Create a system backup."""
         try:
-            backup_id = hashlib.sha256(str(datetime.now().timestamp()).encode()).hexdigest()[:16]
+            backup_id = hashlib.sha256(
+                str(datetime.now().timestamp()).encode()
+            ).hexdigest()[:16]
             backup_data = {
                 "id": backup_id,
                 "timestamp": datetime.now().isoformat(),
@@ -334,9 +351,11 @@ class PhantomMCP:
                 "system_state": {
                     "cpu_usage": self.state.cpu_usage,
                     "memory_usage": self.state.memory_usage,
-                    "system_health": self.state.system_health
+                    "system_health": self.state.system_health,
                 },
-                "evolution_history": self.evolution_history[-100:]  # Last 100 improvements
+                "evolution_history": self.evolution_history[
+                    -100:
+                ],  # Last 100 improvements
             }
 
             # Store backup (implement actual storage mechanism)
@@ -345,7 +364,7 @@ class PhantomMCP:
             return {
                 "status": "success",
                 "backup_id": backup_id,
-                "timestamp": backup_data["timestamp"]
+                "timestamp": backup_data["timestamp"],
             }
 
         except Exception as e:
@@ -357,7 +376,7 @@ class PhantomMCP:
         try:
             # Load backup data (implement actual loading mechanism)
             backup_data = await self._load_backup(backup_id)
-            
+
             # Verify backup integrity
             if not self._verify_backup_integrity(backup_data):
                 raise ValueError("Backup integrity check failed")
@@ -365,14 +384,14 @@ class PhantomMCP:
             # Restore system state
             self.neural_patterns = backup_data["neural_patterns"]
             self.evolution_history = backup_data["evolution_history"]
-            
+
             # Reinitialize system with restored data
             await self.initialize()
 
             return {
                 "status": "success",
                 "restored_from": backup_id,
-                "timestamp": backup_data["timestamp"]
+                "timestamp": backup_data["timestamp"],
             }
 
         except Exception as e:
@@ -389,7 +408,7 @@ class PhantomMCP:
             "last_update": self.state.last_update.isoformat(),
             "active_improvements": list(self.active_improvements),
             "neural_patterns": len(self.neural_patterns),
-            "evolution_history": len(self.evolution_history)
+            "evolution_history": len(self.evolution_history),
         }
 
     async def _optimize_memory_usage(self) -> Dict[str, Any]:
@@ -435,4 +454,4 @@ class PhantomMCP:
     async def _perform_maintenance(self):
         """Perform system maintenance."""
         # Implement maintenance logic
-        pass 
+        pass

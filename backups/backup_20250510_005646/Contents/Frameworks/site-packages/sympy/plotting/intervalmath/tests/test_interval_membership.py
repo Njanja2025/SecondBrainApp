@@ -20,8 +20,8 @@ def test_getitem():
 
 def test_str():
     a = intervalMembership(True, False)
-    assert str(a) == 'intervalMembership(True, False)'
-    assert repr(a) == 'intervalMembership(True, False)'
+    assert str(a) == "intervalMembership(True, False)"
+    assert repr(a) == "intervalMembership(True, False)"
 
 
 def test_equivalence():
@@ -37,7 +37,7 @@ def test_equivalence():
 
 
 def test_not():
-    x = Symbol('x')
+    x = Symbol("x")
 
     r1 = x > -1
     r2 = x <= -1
@@ -78,7 +78,7 @@ def test_boolean():
     s = [
         intervalMembership(False, False),
         intervalMembership(None, None),
-        intervalMembership(True, True)
+        intervalMembership(True, True),
     ]
 
     # Reduced tests for 'And'
@@ -91,7 +91,7 @@ def test_boolean():
         intervalMembership(None, None),
         intervalMembership(False, False),
         intervalMembership(None, None),
-        intervalMembership(True, True)
+        intervalMembership(True, True),
     ]
     a1_iter = iter(a1)
     for i in range(len(s)):
@@ -108,7 +108,7 @@ def test_boolean():
         intervalMembership(True, None),
         intervalMembership(True, False),
         intervalMembership(True, None),
-        intervalMembership(True, True)
+        intervalMembership(True, True),
     ]
     a1_iter = iter(a1)
     for i in range(len(s)):
@@ -125,7 +125,7 @@ def test_boolean():
         intervalMembership(None, None),
         intervalMembership(True, False),
         intervalMembership(None, None),
-        intervalMembership(False, True)
+        intervalMembership(False, True),
     ]
     a1_iter = iter(a1)
     for i in range(len(s)):
@@ -136,7 +136,7 @@ def test_boolean():
     a1 = [
         intervalMembership(True, False),
         intervalMembership(None, None),
-        intervalMembership(False, True)
+        intervalMembership(False, True),
     ]
     a1_iter = iter(a1)
     for i in range(len(s)):

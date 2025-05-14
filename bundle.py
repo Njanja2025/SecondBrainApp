@@ -9,6 +9,7 @@ import zipfile
 from pathlib import Path
 from datetime import datetime
 
+
 def create_bundle():
     # Define paths
     root_dir = Path("SecondBrainApp")
@@ -21,18 +22,18 @@ def create_bundle():
     dist_dir.mkdir(exist_ok=True)
 
     # Create zip file
-    with zipfile.ZipFile(bundle_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    with zipfile.ZipFile(bundle_path, "w", zipfile.ZIP_DEFLATED) as zipf:
         # Add project files
         for root, dirs, files in os.walk(root_dir):
             # Skip unnecessary directories
-            if any(skip in root for skip in ['.git', '__pycache__']):
+            if any(skip in root for skip in [".git", "__pycache__"]):
                 continue
-            
+
             for file in files:
                 # Skip unnecessary files
-                if file.endswith(('.pyc', '.pyo')):
+                if file.endswith((".pyc", ".pyo")):
                     continue
-                
+
                 file_path = Path(root) / file
                 arcname = file_path.relative_to(root_dir)
                 zipf.write(file_path, arcname)
@@ -72,7 +73,7 @@ This bundle contains the complete SecondBrainApp system with all modules, includ
 ## Support
 For support, please contact: support@secondbrainapp.com
 """
-        zipf.writestr('README.md', readme_content)
+        zipf.writestr("README.md", readme_content)
         print("Added: README.md")
 
         # Add requirements.txt
@@ -82,11 +83,12 @@ schedule>=1.1.0
 requests>=2.26.0
 python-dotenv>=0.19.0
 """
-        zipf.writestr('requirements.txt', requirements)
+        zipf.writestr("requirements.txt", requirements)
         print("Added: requirements.txt")
 
     print(f"\nBundle created successfully at: {bundle_path}")
     return str(bundle_path)
+
 
 if __name__ == "__main__":
     try:
@@ -100,4 +102,4 @@ if __name__ == "__main__":
         print("- Daily summary reports")
     except Exception as e:
         print(f"Error creating bundle: {str(e)}")
-        sys.exit(1) 
+        sys.exit(1)

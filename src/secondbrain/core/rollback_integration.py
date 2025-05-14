@@ -13,12 +13,13 @@ from ..gui.recovery_dialog import RecoveryDialog
 
 logger = logging.getLogger(__name__)
 
+
 class RollbackIntegration:
     """Integration class for rollback system."""
-    
+
     def __init__(self, app_name: str, version: str):
         """Initialize the rollback integration.
-        
+
         Args:
             app_name: Name of the application
             version: Current version of the application
@@ -26,20 +27,20 @@ class RollbackIntegration:
         self.app_name = app_name
         self.version = version
         self._setup_logging()
-    
+
     def _setup_logging(self):
         """Set up logging for the rollback system."""
         logging.basicConfig(
             level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         )
-    
+
     def create_backup(self, notes: Optional[str] = None) -> bool:
         """Create a backup of the current version.
-        
+
         Args:
             notes: Optional notes for the backup
-            
+
         Returns:
             bool: True if backup was successful, False otherwise
         """
@@ -53,13 +54,13 @@ class RollbackIntegration:
         except Exception as e:
             logger.error(f"Error creating backup: {str(e)}")
             return False
-    
+
     def show_recovery_dialog(self, parent=None) -> Optional[str]:
         """Show the recovery dialog.
-        
+
         Args:
             parent: Parent widget for the dialog
-            
+
         Returns:
             Optional[str]: Version that was restored, if any
         """
@@ -67,26 +68,28 @@ class RollbackIntegration:
             dialog = RecoveryDialog(parent)
             dialog.rollback_performed.connect(self._on_rollback)
             dialog.exec_()
-            return dialog.restored_version if hasattr(dialog, 'restored_version') else None
+            return (
+                dialog.restored_version if hasattr(dialog, "restored_version") else None
+            )
         except Exception as e:
             logger.error(f"Error showing recovery dialog: {str(e)}")
             return None
-    
+
     def _on_rollback(self, version: str):
         """Handle rollback event.
-        
+
         Args:
             version: Version that was restored
         """
         logger.info(f"Rolled back to version {version}")
         # Add any additional rollback handling here
-    
+
     def cleanup_old_backups(self, keep_count: int = 5) -> bool:
         """Clean up old backups.
-        
+
         Args:
             keep_count: Number of backups to keep
-            
+
         Returns:
             bool: True if cleanup was successful, False otherwise
         """
@@ -100,13 +103,13 @@ class RollbackIntegration:
         except Exception as e:
             logger.error(f"Error cleaning up backups: {str(e)}")
             return False
-    
+
     def get_backup_info(self, version: str) -> Optional[dict]:
         """Get information about a specific backup.
-        
+
         Args:
             version: Version to get information for
-            
+
         Returns:
             Optional[dict]: Backup information if found, None otherwise
         """
@@ -115,10 +118,10 @@ class RollbackIntegration:
         except Exception as e:
             logger.error(f"Error getting backup info: {str(e)}")
             return None
-    
+
     def list_backups(self) -> list:
         """List all available backups.
-        
+
         Returns:
             list: List of backup information dictionaries
         """
@@ -128,13 +131,14 @@ class RollbackIntegration:
             logger.error(f"Error listing backups: {str(e)}")
             return []
 
+
 # Example usage
 if __name__ == "__main__":
     integration = RollbackIntegration("SecondBrain", "1.0.0")
-    
+
     # Create a backup
     integration.create_backup("Initial backup")
-    
+
     # List backups
     backups = integration.list_backups()
     print("\nAvailable Backups:")
@@ -144,6 +148,6 @@ if __name__ == "__main__":
         print(f"Status: {backup['status']}")
         print(f"Notes: {backup['notes']}")
         print("-" * 40)
-    
+
     # Clean up old backups
-    integration.cleanup_old_backups(keep_count=3) 
+    integration.cleanup_old_backups(keep_count=3)

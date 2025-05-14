@@ -8,12 +8,10 @@ __all__ = [
     "QuantizationTracer",
 ]
 
+
 class ScopeContextManager(torch.fx.proxy.ScopeContextManager):
     def __init__(
-        self,
-        scope: Scope,
-        current_module: torch.nn.Module,
-        current_module_path: str
+        self, scope: Scope, current_module: torch.nn.Module, current_module_path: str
     ):
         super().__init__(scope, Scope(current_module_path, type(current_module)))
 
@@ -36,7 +34,10 @@ class QuantizationTracer(Tracer):
     def is_leaf_module(self, m: torch.nn.Module, module_qualified_name: str) -> bool:
         return (
             (
-                (m.__module__.startswith("torch.nn") or m.__module__.startswith("torch.ao.nn"))
+                (
+                    m.__module__.startswith("torch.nn")
+                    or m.__module__.startswith("torch.ao.nn")
+                )
                 and not isinstance(m, torch.nn.Sequential)
             )
             or module_qualified_name in self.skipped_module_names

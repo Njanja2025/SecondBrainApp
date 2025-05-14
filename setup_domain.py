@@ -1,6 +1,7 @@
 """
 Domain and SSL Setup Script for SecondBrainApp SaaS Portal
 """
+
 import os
 import sys
 import logging
@@ -14,33 +15,33 @@ from deploy_config import DeployConfig
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
+
 class DomainSetup:
     """Handle domain and SSL setup."""
-    
+
     def __init__(self, config: DeployConfig):
         """Initialize domain setup."""
         self.config = config
         self.domain = config.domain
         self.email = config.admin_email
-        
+
     def check_dns(self) -> Tuple[bool, str]:
         """
         Check if DNS records are properly configured.
-        
+
         Returns:
             Tuple of (success, message)
         """
         try:
             # Check A record
             resolver = dns.resolver.Resolver()
-            answers = resolver.resolve(self.domain, 'A')
+            answers = resolver.resolve(self.domain, "A")
             ip_addresses = [str(rdata) for rdata in answers]
-            
+
             # Verify IP is reachable
             for ip in ip_addresses:
                 try:
@@ -48,15 +49,15 @@ class DomainSetup:
                     sock.settimeout(5)
                     result = sock.connect_ex((ip, 80))
                     sock.close()
-                    
+
                     if result == 0:
                         logger.info(f"DNS A record is configured correctly: {ip}")
                         return True, f"DNS A record points to {ip}"
                 except Exception as e:
                     logger.warning(f"Failed to connect to {ip}: {e}")
-                    
+
             return False, "No reachable IP addresses found"
-            
+
         except dns.resolver.NXDOMAIN:
             return False, f"Domain {self.domain} does not exist"
         except dns.resolver.NoAnswer:
@@ -64,11 +65,11 @@ class DomainSetup:
         except Exception as e:
             logger.error(f"Failed to check DNS: {e}")
             return False, str(e)
-            
+
     def check_ssl(self) -> Tuple[bool, str]:
         """
         Check if SSL certificate is valid.
-        
+
         Returns:
             Tuple of (success, message)
         """
@@ -76,37 +77,37 @@ class DomainSetup:
             # Check certificate files
             cert_path = Path(self.config.ssl_cert_path)
             key_path = Path(self.config.ssl_key_path)
-            
+
             if not cert_path.exists():
                 return False, f"SSL certificate not found at {cert_path}"
             if not key_path.exists():
                 return False, f"SSL key not found at {key_path}"
-                
+
             # Verify certificate
             cmd = ["openssl", "x509", "-in", str(cert_path), "-noout", "-text"]
             result = subprocess.run(cmd, capture_output=True, text=True)
-            
+
             if result.returncode != 0:
                 return False, f"Invalid SSL certificate: {result.stderr}"
-                
+
             # Check expiration
             cmd = ["openssl", "x509", "-in", str(cert_path), "-noout", "-enddate"]
             result = subprocess.run(cmd, capture_output=True, text=True)
-            
+
             if result.returncode != 0:
                 return False, f"Failed to check certificate expiration: {result.stderr}"
-                
+
             logger.info("SSL certificate is valid")
             return True, "SSL certificate is valid"
-            
+
         except Exception as e:
             logger.error(f"Failed to check SSL: {e}")
             return False, str(e)
-            
+
     def setup_ssl(self) -> Tuple[bool, str]:
         """
         Set up SSL certificate using certbot.
-        
+
         Returns:
             Tuple of (success, message)
         """
@@ -117,38 +118,47 @@ class DomainSetup:
             except subprocess.CalledProcessError:
                 logger.info("Installing certbot...")
                 subprocess.run(["sudo", "apt-get", "update"], check=True)
-                subprocess.run(["sudo", "apt-get", "install", "-y", "certbot"], check=True)
-                
+                subprocess.run(
+                    ["sudo", "apt-get", "install", "-y", "certbot"], check=True
+                )
+
             # Check if certificate already exists
             success, message = self.check_ssl()
             if success:
                 return True, "SSL certificate already exists"
-                
+
             # Obtain SSL certificate
             cmd = [
-                "sudo", "certbot", "certonly", "--standalone",
-                "-d", self.domain,
-                "--email", self.email,
-                "--agree-tos", "--non-interactive",
-                "--preferred-challenges", "http"
+                "sudo",
+                "certbot",
+                "certonly",
+                "--standalone",
+                "-d",
+                self.domain,
+                "--email",
+                self.email,
+                "--agree-tos",
+                "--non-interactive",
+                "--preferred-challenges",
+                "http",
             ]
-            
+
             result = subprocess.run(cmd, capture_output=True, text=True)
-            
+
             if result.returncode != 0:
                 return False, f"Failed to obtain SSL certificate: {result.stderr}"
-                
+
             logger.info("SSL certificate obtained successfully")
             return True, "SSL certificate obtained successfully"
-            
+
         except Exception as e:
             logger.error(f"Failed to setup SSL: {e}")
             return False, str(e)
-            
+
     def configure_nginx(self) -> Tuple[bool, str]:
         """
         Configure Nginx with SSL.
-        
+
         Returns:
             Tuple of (success, message)
         """
@@ -159,8 +169,10 @@ class DomainSetup:
             except subprocess.CalledProcessError:
                 logger.info("Installing Nginx...")
                 subprocess.run(["sudo", "apt-get", "update"], check=True)
-                subprocess.run(["sudo", "apt-get", "install", "-y", "nginx"], check=True)
-                
+                subprocess.run(
+                    ["sudo", "apt-get", "install", "-y", "nginx"], check=True
+                )
+
             # Create Nginx config
             config = f"""
 server {{
@@ -219,29 +231,39 @@ server {{
             config_path = f"/etc/nginx/sites-available/{self.domain}"
             with open(config_path, "w") as f:
                 f.write(config)
-                
+
             # Enable site
-            subprocess.run(["sudo", "ln", "-sf", config_path, 
-                          f"/etc/nginx/sites-enabled/{self.domain}"], check=True)
-            
+            subprocess.run(
+                [
+                    "sudo",
+                    "ln",
+                    "-sf",
+                    config_path,
+                    f"/etc/nginx/sites-enabled/{self.domain}",
+                ],
+                check=True,
+            )
+
             # Test and reload Nginx
-            result = subprocess.run(["sudo", "nginx", "-t"], capture_output=True, text=True)
+            result = subprocess.run(
+                ["sudo", "nginx", "-t"], capture_output=True, text=True
+            )
             if result.returncode != 0:
                 return False, f"Nginx configuration test failed: {result.stderr}"
-                
+
             subprocess.run(["sudo", "systemctl", "reload", "nginx"], check=True)
-            
+
             logger.info("Nginx configured successfully")
             return True, "Nginx configured successfully"
-            
+
         except Exception as e:
             logger.error(f"Failed to configure Nginx: {e}")
             return False, str(e)
-            
+
     def setup(self) -> Tuple[bool, str]:
         """
         Run complete domain and SSL setup.
-        
+
         Returns:
             Tuple of (success, message)
         """
@@ -250,46 +272,48 @@ server {{
             success, message = self.check_dns()
             if not success:
                 return False, f"DNS check failed: {message}"
-                
+
             # Setup SSL
             success, message = self.setup_ssl()
             if not success:
                 return False, f"SSL setup failed: {message}"
-                
+
             # Configure Nginx
             success, message = self.configure_nginx()
             if not success:
                 return False, f"Nginx configuration failed: {message}"
-                
+
             logger.info("Domain and SSL setup completed successfully")
             return True, "Domain and SSL setup completed successfully"
-            
+
         except Exception as e:
             logger.error(f"Setup failed: {e}")
             return False, str(e)
+
 
 def main():
     """Run domain setup."""
     try:
         # Load configuration
         config = DeployConfig.from_env()
-        
+
         # Initialize setup
         setup = DomainSetup(config)
-        
+
         # Run setup
         success, message = setup.setup()
-        
+
         if success:
             logger.info(message)
             sys.exit(0)
         else:
             logger.error(message)
             sys.exit(1)
-            
+
     except Exception as e:
         logger.error(f"Setup failed: {e}")
         sys.exit(1)
 
-if __name__ == '__main__':
-    main() 
+
+if __name__ == "__main__":
+    main()

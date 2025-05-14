@@ -46,7 +46,11 @@ def get_token() -> Optional[str]:
     Returns:
         `str` or `None`: The token, `None` if it doesn't exist.
     """
-    return _get_token_from_google_colab() or _get_token_from_environment() or _get_token_from_file()
+    return (
+        _get_token_from_google_colab()
+        or _get_token_from_environment()
+        or _get_token_from_file()
+    )
 
 
 def _get_token_from_google_colab() -> Optional[str]:
@@ -115,7 +119,9 @@ def _get_token_from_google_colab() -> Optional[str]:
 
 def _get_token_from_environment() -> Optional[str]:
     # `HF_TOKEN` has priority (keep `HUGGING_FACE_HUB_TOKEN` for backward compatibility)
-    return _clean_token(os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN"))
+    return _clean_token(
+        os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
+    )
 
 
 def _get_token_from_file() -> Optional[str]:
@@ -140,7 +146,10 @@ def get_stored_tokens() -> Dict[str, str]:
     config = configparser.ConfigParser()
     try:
         config.read(tokens_path)
-        stored_tokens = {token_name: config.get(token_name, "hf_token") for token_name in config.sections()}
+        stored_tokens = {
+            token_name: config.get(token_name, "hf_token")
+            for token_name in config.sections()
+        }
     except configparser.Error as e:
         logger.error(f"Error parsing stored tokens file: {e}")
         stored_tokens = {}

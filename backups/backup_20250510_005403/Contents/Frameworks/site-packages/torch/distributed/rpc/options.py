@@ -9,6 +9,7 @@ DeviceType = Union[int, str, torch.device]
 
 __all__ = ["TensorPipeRpcBackendOptions"]
 
+
 def _to_device(device: DeviceType) -> torch.device:
     device = torch.device(device)
     if device.type != "cuda":

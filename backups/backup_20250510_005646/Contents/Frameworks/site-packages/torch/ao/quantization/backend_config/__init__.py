@@ -1,4 +1,10 @@
-from .backend_config import BackendConfig, BackendPatternConfig, DTypeConfig, DTypeWithConstraints, ObservationType
+from .backend_config import (
+    BackendConfig,
+    BackendPatternConfig,
+    DTypeConfig,
+    DTypeWithConstraints,
+    ObservationType,
+)
 from .fbgemm import get_fbgemm_backend_config
 from .native import get_native_backend_config, get_native_backend_config_dict
 from .qnnpack import get_qnnpack_backend_config

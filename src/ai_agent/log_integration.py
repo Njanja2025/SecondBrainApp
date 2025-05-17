@@ -8,8 +8,12 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
 import dropbox
 from dropbox.exceptions import AuthError
+import io
+import yaml
+import psutil
 
 class LogIntegration:
     def __init__(self, config_path=None):
@@ -20,7 +24,6 @@ class LogIntegration:
         
     def load_config(self):
         """Load configuration from YAML file"""
-        import yaml
         with open(self.config_path, 'r') as f:
             self.config = yaml.safe_load(f)
             
@@ -109,10 +112,15 @@ class LogIntegration:
             with open(log_file_path, 'r') as f:
                 log_content = f.read()
                 
+            # Generate summary
+            summary = self.generate_summary(log_file_path)
+            
             # Upload to Google Drive
             if self.gdrive_service:
+                # Upload log file
                 file_metadata = {
-                    'name': f'baddy_agent_log_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
+                    'name': f'baddy_agent_log_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log',
+                    'parents': [self.config.get('google_drive_folder_id', '')]
                 }
                 media = MediaIoBaseUpload(
                     io.BytesIO(log_content.encode()),
@@ -126,8 +134,25 @@ class LogIntegration:
                 ).execute()
                 self.logger.info(f"Log synced to Google Drive: {file.get('id')}")
                 
+                # Upload summary
+                summary_metadata = {
+                    'name': f'baddy_agent_summary_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json',
+                    'parents': [self.config.get('google_drive_folder_id', '')]
+                }
+                summary_media = MediaIoBaseUpload(
+                    io.BytesIO(json.dumps(summary, indent=2).encode()),
+                    mimetype='application/json',
+                    resumable=True
+                )
+                self.gdrive_service.files().create(
+                    body=summary_metadata,
+                    media_body=summary_media,
+                    fields='id'
+                ).execute()
+                
             # Upload to Dropbox
             if self.dropbox_client:
+                # Upload log file
                 dropbox_path = f"/logs/baddy_agent_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
                 self.dropbox_client.files_upload(
                     log_content.encode(),
@@ -135,12 +160,20 @@ class LogIntegration:
                 )
                 self.logger.info(f"Log synced to Dropbox: {dropbox_path}")
                 
+                # Upload summary
+                summary_path = f"/logs/baddy_agent_summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                self.dropbox_client.files_upload(
+                    json.dumps(summary, indent=2).encode(),
+                    summary_path
+                )
+                
             # Send to Njanja.net
             if self.config.get('njanja_net_webhook'):
                 response = requests.post(
                     self.config['njanja_net_webhook'],
                     json={
                         'log_content': log_content,
+                        'summary': summary,
                         'timestamp': datetime.now().isoformat(),
                         'source': 'BaddyAgent'
                     }
@@ -159,11 +192,30 @@ class LogIntegration:
             with open(log_file_path, 'r') as f:
                 logs = f.readlines()
                 
+            # Count different types of entries
+            error_count = sum(1 for log in logs if 'ERROR' in log)
+            warning_count = sum(1 for log in logs if 'WARNING' in log)
+            info_count = sum(1 for log in logs if 'INFO' in log)
+            
+            # Get last command
+            last_command = next((log for log in reversed(logs) if 'Command executed' in log), 'None')
+            
+            # Get system stats
+            cpu_percent = psutil.cpu_percent()
+            memory = psutil.virtual_memory()
+            disk = psutil.disk_usage('/')
+            
             summary = {
                 'total_entries': len(logs),
-                'error_count': sum(1 for log in logs if 'ERROR' in log),
-                'warning_count': sum(1 for log in logs if 'WARNING' in log),
-                'last_command': next((log for log in reversed(logs) if 'Command executed' in log), 'None'),
+                'error_count': error_count,
+                'warning_count': warning_count,
+                'info_count': info_count,
+                'last_command': last_command,
+                'system_stats': {
+                    'cpu_usage': f"{cpu_percent}%",
+                    'memory_usage': f"{memory.percent}%",
+                    'disk_usage': f"{disk.percent}%"
+                },
                 'timestamp': datetime.now().isoformat()
             }
             

@@ -31,3 +31,42 @@ gcp_pubsub_topic: "projects/your-project/topics/your-topic"
 # notify_email: "admin@example.com"
 # notify_slack_webhook: "https://hooks.slack.com/services/..."
 # max_tasks_per_cycle: 20 
+
+# Log Integration Configuration
+
+# Google Drive Settings
+google_drive_enabled: true
+google_drive_folder_id: ""  # Add your Google Drive folder ID here
+
+# Dropbox Settings
+dropbox_enabled: true
+dropbox_access_token: ""  # Add your Dropbox access token here
+
+# Njanja.net Integration
+njanja_net_webhook: ""  # Add your Njanja.net webhook URL here
+
+# Log Settings
+log_retention_days: 30
+log_sync_interval_minutes: 60
+
+# System Monitoring
+monitor_cpu_threshold: 80  # Alert if CPU usage exceeds 80%
+monitor_memory_threshold: 85  # Alert if memory usage exceeds 85%
+monitor_disk_threshold: 90  # Alert if disk usage exceeds 90%
+
+# Notification Settings
+notify_on_error: true
+notify_on_warning: true
+notify_on_system_alert: true
+
+# Cloud Sync Settings
+sync_on_startup: true
+sync_on_shutdown: true
+sync_on_error: true
+sync_on_warning: true
+
+# Summary Generation
+include_system_stats: true
+include_command_history: true
+include_error_details: true
+include_warning_details: true 

@@ -1,5 +1,11 @@
 # Baddy Agent
 
+<p align="center">
+  <img src="assets/logo.png" width="200" alt="Baddy Agent Logo">
+</p>
+
+> Baddy Agent: Quantum-enhanced command assistant for SecondBrainApp with voice + typed input.
+
 Baddy Agent is an advanced AI-powered assistant designed to automate tasks, manage systems, and enhance productivity through voice commands and intelligent automation.
 
 ## 🌟 Features

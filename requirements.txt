@@ -231,4 +231,8 @@ google-auth-oauthlib>=0.4.6
 notion-client>=0.9.0
 
 # System monitoring
-schedule>=1.1.0 
+schedule>=1.1.0
+
+# Additional requests
+requests
+psutil 

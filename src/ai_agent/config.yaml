@@ -1,0 +1,33 @@
+# Baddy Agent & CLAUD Configuration
+# You can override these with environment variables as well.
+
+claud_sync_endpoint: "https://your-cloud-endpoint/api/sync"
+claud_upgrade_endpoint: "https://your-cloud-endpoint/api/version"
+notify_email: "admin@example.com"
+smtp_server: "smtp.gmail.com"
+smtp_port: 465
+smtp_password: "your-email-password"
+notify_slack_webhook: "https://hooks.slack.com/services/..."
+notify_teams_webhook: "https://outlook.office.com/webhook/..."
+error_threshold: 3
+health_check_interval: 600  # seconds
+max_tasks_per_cycle: 20
+# File locations
+usage_file: "src/ai_agent/command_usage.json"
+audit_file: "src/ai_agent/audit.log"
+task_queue_file: "src/ai_agent/task_queue.json"
+openai_api_key: "sk-..."  # Your OpenAI API key for NLP and self-build
+# Web dashboard
+enable_dashboard: true
+# Port for FastAPI dashboard
+dashboard_port: 8080
+# Plugins and self-upgrade
+github_repo: "https://github.com/youruser/yourrepo.git"
+plugins_dir: "src/ai_agent/plugins"
+# AWS/GCP integration
+aws_sns_arn: "arn:aws:sns:us-east-1:123456789012:YourTopic"
+gcp_pubsub_topic: "projects/your-project/topics/your-topic"
+# Add more config options as needed, e.g.:
+# notify_email: "admin@example.com"
+# notify_slack_webhook: "https://hooks.slack.com/services/..."
+# max_tasks_per_cycle: 20 

@@ -180,8 +180,7 @@ main() {
     # Verify installation
     verify_installation
     
-    print_status "Setup complete! You can now run the application with:"
-    echo "python launch_secondbrain.py"
+    print_status "Setup complete. To run: source venv/bin/activate && python3 src/ai_agent/baddy_agent.py"
 }
 
 # Run main function

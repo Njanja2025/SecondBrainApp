@@ -10,12 +10,13 @@ check_requirements() {
         exit 1
     fi
     
-    # Check Python version
-    python_version=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
-    if (( $(echo "$python_version < 3.8" | bc -l) )); then
+    # Check Python version (forced to Python 3.10)
+    if (( $(echo "$(/opt/homebrew/opt/python@3.10/bin/python3 -c 'import sys; print(\".\".join(map(str, sys.version_info[:2])))')" '< 3.8' | bc -l) )); then
         echo "Error: Python 3.8 or higher is required"
         exit 1
     fi
+    
+    python_version=$(/opt/homebrew/opt/python@3.10/bin/python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
     
     # Check available memory
     if [[ "$OSTYPE" == "darwin"* ]]; then

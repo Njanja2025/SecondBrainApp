@@ -1,59 +1,89 @@
 # Core dependencies
-PyQt5>=5.15.0
-numpy>=1.19.0
-pandas>=1.1.0
-scipy>=1.5.0
-matplotlib>=3.3.0
-seaborn>=0.11.0
+PyQt6>=6.4.0
+pyaudio>=0.2.13
+SpeechRecognition>=3.10.0
+openai>=1.0.0
+python-dotenv>=1.0.0
+PyYAML>=6.0.1
+requests>=2.31.0
+
+# Cloud integration
+dropbox>=11.36.2
+google-auth-oauthlib>=1.0.0
+google-auth-httplib2>=0.1.0
+google-api-python-client>=2.0.0
+
+# System monitoring
+psutil>=5.9.0
+py-cpuinfo>=9.0.0
+GPUtil>=1.4.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.1
+
+# Development
+black>=23.7.0
+flake8>=6.1.0
+mypy>=1.5.1
+isort>=5.12.0
+
+# Documentation
+Sphinx>=7.1.2
+sphinx-rtd-theme>=1.3.0
+
+# Utilities
+python-dateutil>=2.8.2
+tqdm>=4.66.1
+colorama>=0.4.6
+rich>=13.5.2
 
 # Voice and AI
 pyttsx3>=2.90
-SpeechRecognition>=3.8.0
-pyaudio>=0.2.11
-openai>=0.27.0
 transformers>=4.0.0
 torch>=1.7.0
+pytorch-lightning>=1.4.0
+optuna>=2.10.0
 
-# System monitoring
-psutil>=5.8.0
-py-cpuinfo>=8.0.0
-gputil>=1.4.0
-netifaces>=0.11.0
-pywin32>=300; sys_platform == 'win32'
-pyobjc-framework-CoreServices>=9.0; sys_platform == 'darwin'
+# Natural language processing
+spacy>=3.1.0
+nltk>=3.6.0
+gensim>=4.0.0
+textblob>=0.15.0
 
-# Testing and development
-pytest>=6.0.0
-pytest-cov>=2.10.0
-pytest-mock>=3.3.0
-black>=20.8b1
-flake8>=3.9.0
-mypy>=0.910
-isort>=5.9.0
-pylint>=2.8.0
+# Image processing
+pillow>=8.3.0
+opencv-python>=4.5.0
+scikit-image>=0.18.0
+imgaug>=0.4.0
 
-# Documentation
-sphinx>=4.0.0
-sphinx-rtd-theme>=0.5.0
-mkdocs>=1.2.0
-mkdocs-material>=7.0.0
+# Audio processing
+librosa>=0.8.0
+soundfile>=0.10.0
+pydub>=0.25.0
+audiomentations>=0.20.0
 
-# Security
-cryptography>=3.4.0
-pyjwt>=2.1.0
+# Utilities
+pytz>=2021.1
+pyyaml>=5.4.0
+click>=8.0.0
+
+# Quantum and Phantom Dependencies
+scikit-learn==1.3.0
+matplotlib==3.7.2
+tensorflow==2.13.0
+torch==2.0.1
+qiskit==0.44.2
+pycryptodome==3.19.0
+
+# Security and Authentication
+PyJWT>=2.1.0
 bcrypt>=3.2.0
-python-dotenv>=0.19.0
 
-# Database
-sqlalchemy>=1.4.0
-alembic>=1.7.0
-psycopg2-binary>=2.9.0
-redis>=3.5.0
-
-# Web and API
+# API and Web
 fastapi>=0.68.0
 uvicorn>=0.15.0
-requests>=2.26.0
 aiohttp>=3.7.0
 websockets>=9.1.0
 
@@ -94,13 +124,9 @@ pydub>=0.25.0
 audiomentations>=0.20.0
 
 # Utilities
-tqdm>=4.62.0
-python-dateutil>=2.8.0
 pytz>=2021.1
 pyyaml>=5.4.0
-toml>=0.10.0
 click>=8.0.0
-rich>=10.0.0
 
 # Quantum and Phantom Dependencies
 scikit-learn==1.3.0
@@ -112,12 +138,13 @@ pycryptodome==3.19.0
 
 # Security and Authentication
 PyJWT>=2.1.0
-bcrypt==4.0.1
+bcrypt>=3.2.0
 
 # API and Web
-fastapi==0.103.1
-uvicorn==0.23.2
-websockets==11.0.3
+fastapi>=0.68.0
+uvicorn>=0.15.0
+aiohttp>=3.7.0
+websockets>=9.1.0
 
 # Testing and Development
 pytest-cov>=2.12.1
@@ -200,9 +227,6 @@ gputil==1.4.0
 google-auth>=2.3.0
 openpyxl==3.1.2
 
-# Data handling
-PyYAML==6.0.1
-
 # Documentation
 sphinx==7.2.6
 sphinx-rtd-theme==1.3.0
@@ -218,12 +242,6 @@ PyQt6==6.2.0
 
 # Background Jobs / Scheduling
 apscheduler==3.10.4
-
-# Phantom Core (Custom Module)
-# To install from local directory:
-# pip install /full/path/to/guardian-phantom-core
-# Or from GitHub:
-# pip install git+https://github.com/YOUR_USER/guardian-phantom-core.git
 
 # Integration
 google-api-python-client>=2.19.1

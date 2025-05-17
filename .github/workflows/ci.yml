@@ -1,19 +1,16 @@
-name: Launch Baddy Agent CI
+name: Baddy Agent CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
-  workflow_dispatch:  # Allows manual triggering
+    branches: [ main ]
 
 jobs:
-  build:
+  test:
     runs-on: macos-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Set up Python 3.10
@@ -21,25 +18,82 @@ jobs:
         with:
           python-version: 3.10
 
-      - name: Install Requirements
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt || true
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
 
-      - name: Run Basic Health Test
+      - name: Run Tests
         run: |
-          echo "Launching Baddy Agent Headless Test"
-          python src/cli_agent/baddy_agent.py --test-mode || true
+          python -m pytest tests/ --cov=src --cov-report=xml
 
-      - name: Run Unit Tests
-        run: |
-          python -m pytest tests/ || true
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
 
-      - name: Check Log Integration
-        run: |
-          python src/ai_agent/log_integration.py --test || true
+  build:
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Verify App Bundle
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install Dependencies
         run: |
-          sh create_app_bundle.command || true
-          ls -la BaddyAgent.app || true 
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          brew install create-dmg
+
+      - name: Create App Bundle
+        run: |
+          ./create_app_bundle.command
+
+      - name: Create DMG
+        run: |
+          ./create_dmg.command
+
+      - name: Create Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python src/ai_agent/release.py \
+            --version ${GITHUB_REF#refs/tags/v} \
+            --app BaddyAgent.app \
+            --notes release_notes.md
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Upload to Cloud
+        env:
+          DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
+          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
+        run: |
+          python src/ai_agent/cloud_upload.py \
+            --dropbox BaddyAgent.dmg \
+            --gdrive BaddyAgent.dmg \
+            --version ${GITHUB_REF#refs/tags/v} 

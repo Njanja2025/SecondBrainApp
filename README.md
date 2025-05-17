@@ -1,124 +1,102 @@
-# Baddy Agent v1.0 - Launch-Ready Edition
+# Baddy Agent
 
-A powerful AI assistant with voice control, system monitoring, and cloud integration capabilities.
+Baddy Agent is an advanced AI-powered assistant designed to automate tasks, manage systems, and enhance productivity through voice commands and intelligent automation.
 
-## Features
+## 🌟 Features
 
-- 🎤 Voice Command Interface
-- 🤖 Smart Tray Integration
-- 🔍 System Monitoring
-- ☁️ Cloud Sync (Google Drive, Dropbox)
-- 🛡️ Phantom Mode
-- 📊 Web Dashboard
-- 🔄 Auto-Update System
+- **Voice Activation**: Natural language processing for voice commands
+- **System Monitoring**: Real-time monitoring of system resources and performance
+- **Automated Task Execution**: Schedule and automate routine tasks
+- **Cloud Integration**: Seamless sync with Dropbox and Google Drive
+- **Tray Interface**: Easy access through macOS menu bar
+- **Auto-Launch**: Automatic startup on system boot
+- **Phantom Mode**: Background operation with minimal resource usage
 
-## Installation
+## 🚀 Installation
+
+### Prerequisites
+- macOS 10.15 or later
+- Python 3.10 or later
+- Homebrew (for package management)
 
 ### Quick Install
+1. Download the latest release:
+   - [BaddyAgent.dmg](https://github.com/Njanja2025/SecondBrainApp/releases) (macOS Installer)
+   - [BaddyAgent.zip](https://github.com/Njanja2025/SecondBrainApp/releases) (Portable Version)
 
-1. Download the latest release from the [Releases](https://github.com/Njanja2025/SecondBrainApp/releases) page
-2. Run the installation script:
-```bash
-./install_baddy_agent.command
-```
+2. For DMG installation:
+   - Double-click the DMG file
+   - Drag BaddyAgent.app to Applications
+   - Launch from Applications or Spotlight
+
+3. For ZIP installation:
+   - Extract the ZIP file
+   - Run `./install_baddy_agent.command`
 
 ### Manual Installation
-
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/Njanja2025/SecondBrainApp.git
 cd SecondBrainApp
-```
 
-2. Create and activate virtual environment:
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-3. Install dependencies:
-```bash
+# Install dependencies
 pip install -r requirements.txt
+
+# Run the application
+python src/ui_agent/baddy_agent.py
 ```
 
-4. Run the installation script:
-```bash
-./install_baddy_agent.command
-```
-
-## Usage
-
-### Starting Baddy Agent
-
-1. **Quick Launch**: Double-click `BaddyAgent.app` in Applications
-2. **Command Line**: Run `./Launch_BaddyAgent.command`
-3. **Tray Icon**: Click the 🤖 icon in the menu bar
+## 💻 Usage
 
 ### Voice Commands
+- "Hey Baddy, start monitoring"
+- "Hey Baddy, check system status"
+- "Hey Baddy, sync with cloud"
+- "Hey Baddy, enable phantom mode"
 
-- "Hey Baddy" - Activate voice recognition
-- "Start Phantom Mode" - Enable enhanced security
-- "Show Status" - Display system information
-- "Open Dashboard" - Launch web interface
-- "Sync Now" - Trigger cloud synchronization
+### Tray Menu
+- Click the tray icon to access:
+  - System Status
+  - Voice Toggle
+  - Cloud Sync
+  - Settings
+  - Quit
 
-### Tray Menu Features
-
-- Start/Stop Voice
-- Activate/Deactivate Phantom Mode
-- System Status
-- Quick Access to:
-  - Logs
-  - Diagnostics
-  - Dashboard
-  - GitHub Repository
-  - Web Console
-- Actions:
-  - Sync Now
-  - Recovery Mode
-  - Shutdown
-
-## Configuration
+## 🔧 Configuration
 
 Edit `src/ai_agent/config.yaml` to customize:
-- Cloud service settings
+- Cloud service credentials
 - System monitoring thresholds
-- Notification preferences
-- Log retention policies
+- Notification settings
+- Logging preferences
 
-## Development
+## 📚 Documentation
 
-### Running Tests
+- [User Guide](https://github.com/Njanja2025/SecondBrainApp/wiki)
+- [API Reference](https://github.com/Njanja2025/SecondBrainApp/wiki/API)
+- [Troubleshooting](https://github.com/Njanja2025/SecondBrainApp/wiki/Troubleshooting)
 
-```bash
-python -m pytest tests/
-```
+## 🤝 Contributing
 
-### Building from Source
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-1. Create app bundle:
-```bash
-./create_app_bundle.command
-```
+## 📄 License
 
-2. Create DMG installer:
-```bash
-./create_dmg.command
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
+## 🙏 Acknowledgments
 
-- GitHub Issues: [Report Bugs](https://github.com/Njanja2025/SecondBrainApp/issues)
-- Documentation: [Wiki](https://github.com/Njanja2025/SecondBrainApp/wiki)
-- Email: support@njanja.net
+- OpenAI for NLP capabilities
+- Dropbox and Google Drive for cloud integration
+- The open-source community for various libraries and tools
 
-## License
+## 📞 Support
 
-© 2024 Njanja2025. All rights reserved.
-
-## Acknowledgments
-
-- OpenAI for voice recognition
-- Google Cloud for storage integration
-- Dropbox for file synchronization
-- The open-source community for various tools and libraries 
+For support, please:
+1. Check the [Troubleshooting Guide](https://github.com/Njanja2025/SecondBrainApp/wiki/Troubleshooting)
+2. Open an [Issue](https://github.com/Njanja2025/SecondBrainApp/issues)
+3. Contact support@baddyagent.com 

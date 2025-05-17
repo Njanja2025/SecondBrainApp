@@ -1,128 +1,124 @@
-# SecondBrain Backup System
+# Baddy Agent v1.0 - Launch-Ready Edition
 
-A robust, voice-enabled backup system for SecondBrain journaling with cloud sync and health monitoring.
+A powerful AI assistant with voice control, system monitoring, and cloud integration capabilities.
 
 ## Features
 
-- 🎤 Voice announcements using Samantha
-- 🔄 Automatic daily backups
-- ☁️ Cloud sync with Dropbox
-- 🔒 Encrypted vault storage
-- 📊 Health monitoring and reporting
-- 📧 Email notifications
-- ✅ Backup verification
+- 🎤 Voice Command Interface
+- 🤖 Smart Tray Integration
+- 🔍 System Monitoring
+- ☁️ Cloud Sync (Google Drive, Dropbox)
+- 🛡️ Phantom Mode
+- 📊 Web Dashboard
+- 🔄 Auto-Update System
 
 ## Installation
 
-1. Download the latest release from the [Releases](https://github.com/yourusername/secondbrain/releases) page
-2. Mount the DMG file
-3. Drag SecondBrain Backup to your Applications folder
-4. Launch the application to complete setup
+### Quick Install
 
-## Configuration
-
-### Voice Settings
-Edit `src/secondbrain/backup/voice_config.json`:
-```json
-{
-    "voice_enabled": true,
-    "voice_name": "Samantha",
-    "confirmation_message": "Backup completed and synced successfully.",
-    "error_message": "There was an error during the backup process.",
-    "play_audio": true,
-    "audio_file": "src/secondbrain/voice/NjanjaIntro.aiff",
-    "intro_enabled": true,
-    "intro_message": "Starting SecondBrain backup process."
-}
+1. Download the latest release from the [Releases](https://github.com/Njanja2025/SecondBrainApp/releases) page
+2. Run the installation script:
+```bash
+./install_baddy_agent.command
 ```
 
-### Cloud Settings
-Edit `src/secondbrain/backup/cloud_config.json`:
-```json
-{
-    "use_cloud": true,
-    "provider": "dropbox",
-    "access_token": "YOUR_DROPBOX_TOKEN",
-    "local_vault_path": "~/Documents/.secondbrain/backups",
-    "cloud_path": "/SecondBrain_Backups"
-}
+### Manual Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/Njanja2025/SecondBrainApp.git
+cd SecondBrainApp
+```
+
+2. Create and activate virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Run the installation script:
+```bash
+./install_baddy_agent.command
 ```
 
 ## Usage
 
-### Manual Backup
+### Starting Baddy Agent
+
+1. **Quick Launch**: Double-click `BaddyAgent.app` in Applications
+2. **Command Line**: Run `./Launch_BaddyAgent.command`
+3. **Tray Icon**: Click the 🤖 icon in the menu bar
+
+### Voice Commands
+
+- "Hey Baddy" - Activate voice recognition
+- "Start Phantom Mode" - Enable enhanced security
+- "Show Status" - Display system information
+- "Open Dashboard" - Launch web interface
+- "Sync Now" - Trigger cloud synchronization
+
+### Tray Menu Features
+
+- Start/Stop Voice
+- Activate/Deactivate Phantom Mode
+- System Status
+- Quick Access to:
+  - Logs
+  - Diagnostics
+  - Dashboard
+  - GitHub Repository
+  - Web Console
+- Actions:
+  - Sync Now
+  - Recovery Mode
+  - Shutdown
+
+## Configuration
+
+Edit `src/ai_agent/config.yaml` to customize:
+- Cloud service settings
+- System monitoring thresholds
+- Notification preferences
+- Log retention policies
+
+## Development
+
+### Running Tests
+
 ```bash
-python3 src/secondbrain/backup/backup_cli.py --auto --verify
+python -m pytest tests/
 ```
 
-### Verify Backups
+### Building from Source
+
+1. Create app bundle:
 ```bash
-python3 src/secondbrain/backup/vault_verifier.py
+./create_app_bundle.command
 ```
 
-### Health Monitoring
+2. Create DMG installer:
 ```bash
-python3 src/secondbrain/backup/monitor_backup_health.py
+./create_dmg.command
 ```
-
-## System Requirements
-
-- macOS 10.15 or later
-- Python 3.7+
-- Dropbox account (for cloud sync)
-- Email account (for notifications)
-
-## Dependencies
-
-- pyttsx3 (voice synthesis)
-- dropbox (cloud sync)
-- cryptography (encryption)
-- requests (API communication)
-
-## Security
-
-- All backups are encrypted using AES-256
-- Cloud sync uses OAuth2 authentication
-- Local vault is protected by system permissions
-- No sensitive data is stored in logs
-
-## Monitoring
-
-The system includes:
-- Daily health checks
-- Email notifications
-- Backup verification
-- Cloud sync status
-- Voice confirmations
-
-## Troubleshooting
-
-1. Check logs in `/tmp/secondbrain_backup.log`
-2. Verify voice configuration
-3. Test cloud connection
-4. Run health check
-
-## License
-
-MIT License - see LICENSE file for details
 
 ## Support
 
-For support, please:
-1. Check the [Wiki](https://github.com/yourusername/secondbrain/wiki)
-2. Open an [Issue](https://github.com/yourusername/secondbrain/issues)
-3. Contact support@secondbrain.ai
+- GitHub Issues: [Report Bugs](https://github.com/Njanja2025/SecondBrainApp/issues)
+- Documentation: [Wiki](https://github.com/Njanja2025/SecondBrainApp/wiki)
+- Email: support@njanja.net
 
-## Contributing
+## License
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+© 2024 Njanja2025. All rights reserved.
 
 ## Acknowledgments
 
-- Samantha voice by Apple
-- Dropbox API
-- Python community 
+- OpenAI for voice recognition
+- Google Cloud for storage integration
+- Dropbox for file synchronization
+- The open-source community for various tools and libraries 

@@ -69,4 +69,27 @@ sync_on_warning: true
 include_system_stats: true
 include_command_history: true
 include_error_details: true
-include_warning_details: true 
+include_warning_details: true
+
+# Baddy Agent Cloud Upload Configuration
+
+# Version information
+version: "1.0.0"
+
+# Upload Settings
+upload_settings:
+  max_retries: 3
+  chunk_size: 4194304  # 4MB chunks for large file uploads
+  timeout: 300  # 5 minutes timeout for uploads
+
+# Logging Configuration
+logging:
+  level: INFO
+  file: "baddy_agent.log"
+  max_size: 10485760  # 10MB
+  backup_count: 5
+
+# GitHub Configuration
+github_token: ""  # Add your GitHub personal access token here
+github_owner: ""  # Add your GitHub username or organization name
+github_repo: "BaddyAgent"  # Repository name 

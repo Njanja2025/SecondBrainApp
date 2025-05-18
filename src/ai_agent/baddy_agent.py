@@ -23,13 +23,37 @@ import importlib.util
 import glob
 import subprocess
 import sys
+import logging
 
+# Try to import plugins, but don't fail if they don't exist
+try:
+    from plugins import load_plugins
+except ImportError:
+    def load_plugins():
+        """Placeholder for plugin loading when plugins module is not available."""
+        log("[PLUGINS] No plugins module found. Running without plugins.")
+
+# Constants
 TASK_FILE = "src/ai_agent/agent_tasks.txt"
 LOG_FILE = "logs/baddy_agent.log"
 VERSION = "1.1.0"
 CLAUD_SYNC_FILE = "logs/claud_last_sync.txt"
 REMOTE_VERSION = "1.2.0"  # Simulated remote version
 CONFIG_FILE = "src/ai_agent/config.yaml"
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(LOG_FILE),
+        logging.StreamHandler()
+    ]
+)
+
+def log(message):
+    """Log a message to both file and console."""
+    logging.info(message)
 
 # File locking context manager
 @contextmanager
@@ -487,8 +511,38 @@ def send_gcp_event(event):
     log(f"[GCP] Event: {event}")
 
 # Load plugins and self-built handlers on startup
-load_plugins()
-load_self_built_handlers()
+def load_plugins():
+    """Load any plugin modules from the plugins directory."""
+    plugin_dir = os.path.join(os.path.dirname(__file__), "plugins")
+    if os.path.exists(plugin_dir):
+        for plugin_file in os.listdir(plugin_dir):
+            if plugin_file.endswith(".py") and not plugin_file.startswith("__"):
+                try:
+                    plugin_name = plugin_file[:-3]
+                    spec = importlib.util.spec_from_file_location(
+                        plugin_name,
+                        os.path.join(plugin_dir, plugin_file)
+                    )
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    log(f"[PLUGINS] Loaded plugin: {plugin_name}")
+                except Exception as e:
+                    log(f"[PLUGINS] Failed to load plugin {plugin_file}: {e}")
+
+def load_self_built_handlers():
+    """Load any self-built command handlers."""
+    handlers_file = os.path.join(os.path.dirname(__file__), "self_built_handlers.py")
+    if os.path.exists(handlers_file):
+        try:
+            spec = importlib.util.spec_from_file_location(
+                "self_built_handlers",
+                handlers_file
+            )
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            log("[SELF-BUILD] Loaded self-built handlers")
+        except Exception as e:
+            log(f"[SELF-BUILD] Failed to load handlers: {e}")
 
 # Start web dashboard if enabled
 if config.get("enable_dashboard", True):

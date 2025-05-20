@@ -18,7 +18,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt || true
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Confirm CI is operational
-        run: echo "✅ Baddy Agent CI passed successfully!" 
+      - name: Confirm CI is working
+        run: echo "✅ Baddy Agent CI pipeline check complete!" 

@@ -1,12 +1,31 @@
-# Baddy Agent
+![SecondBrain Logo](assets/secondbrain_logo.png)
 
-<p align="center">
-  <img src="assets/logo.png" width="200" alt="Baddy Agent Logo">
-</p>
+# Baddy-Agent
 
-> Baddy Agent: Quantum-enhanced command assistant for SecondBrainApp with voice + typed input.
+Standalone AI Agent for **SecondBrainApp**  
+Voice & typed command core powered by **Phantom AI**, **Claude**, and **Quantum intelligence**.
 
-Baddy Agent is an advanced AI-powered assistant designed to automate tasks, manage systems, and enhance productivity through voice commands and intelligent automation.
+---
+
+### **Key Features**
+- Voice + typed command control
+- Modular logic for workflows & empires
+- Cloud + local execution cores
+- Integrated with Njax Studio, Vault, Games, Market
+
+---
+
+### **Folders Explained**
+- `app_core/` — Launch intelligence and startup handlers  
+- `config/` — App settings, permissions, agent config  
+- `core/` — Intelligence logic, phantom memory  
+- `SecondBrainApp/` — Main system integration  
+- `assets/` — Icons, logos, GUI visuals
+
+---
+
+**Created & Controlled by:**  
+> [Njanja2025](https://github.com/Njanja2025) | Baddy Agent v1.0
 
 ## 🌟 Features
 

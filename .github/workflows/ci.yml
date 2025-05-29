@@ -13,6 +13,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Git Identity (Baddy Agent)
+        run: |
+          git config --global user.name "Baddy Agent"
+          git config --global user.email "baddy@njanja.net"
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:

@@ -66,12 +66,10 @@ jobs:
           brew install create-dmg
 
       - name: Create App Bundle
-        run: |
-          ./create_app_bundle.command
+        run: ./create_app_bundle.command
 
       - name: Create DMG
-        run: |
-          ./create_dmg.command
+        run: ./create_dmg.command
 
   release:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
@@ -94,8 +92,8 @@ jobs:
       - name: Create Release
         run: |
           python src/ci_agent/release.py \
-          --app BaddyAgent.app \
-          --notes release_notes.md
+            --app BaddyAgent.app \
+            --notes release_notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -120,8 +118,44 @@ jobs:
       - name: Upload to Cloud
         run: |
           python src/ci_agent/cloud_upload.py \
-          --input BaddyAgent.dmg \
-          --version ${{ github.ref_name }}
+            --input BaddyAgent.dmg \
+            --version ${{ github.ref_name }}
         env:
           DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
           GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
+
+      - name: Sync to Thronesight
+        run: bash scripts/thronesight_sync.sh
+        env:
+          THRONESIGHT_API_KEY: ${{ secrets.THRONESIGHT_API_KEY }}
+
+  notify:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          STATUS: ${{ needs.build.result || 'success' }}
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{
+            \"username\": \"Baddy Agent CI\",
+            \"embeds\": [{
+              \"title\": \"🔔 CI Pipeline Report\",
+              \"description\": \"Workflow completed with status: **$STATUS**\",
+              \"color\": $([[ \"$STATUS\" == 'success' ]] && echo 3066993 || echo 15158332)
+            }]
+          }" \
+          $DISCORD_WEBHOOK
+
+      - name: Comment on PR with result
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: test-summary
+          message: |
+            🧪 **Test Summary**
+            Job: Baddy Agent CI
+            Status: ${{ job.status }}

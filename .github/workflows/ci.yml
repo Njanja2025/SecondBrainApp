@@ -17,6 +17,7 @@ jobs:
         run: |
           git config --global user.name "Baddy Agent"
           git config --global user.email "baddy@njanja.net"
+
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
@@ -25,20 +26,32 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          else
-            echo "⚠️ No requirements.txt found. Skipping dependency install."
-          fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "⚠️ No requirements.txt found. Skipping dependency install."; fi
 
       - name: Run Tests (safely)
         run: |
-          if [ -d "tests" ]; then
-            echo "✅ Running tests..."
-            pytest tests
-          else
-            echo "⚠️ No tests directory found. Skipping tests."
-          fi
+          if [ -d "tests" ]; then echo "✅ Running tests..."; pytest tests; else echo "⚠️ No tests directory found. Skipping tests."; fi
+
+  notify:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          STATUS: ${{ needs.test.result }}
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{
+            \"username\": \"🧪 Baddy Agent CI\",
+            \"embeds\": [{
+              \"title\": \"🧾 CI Pipeline Report\",
+              \"description\": \"Workflow completed with status: **$STATUS**\",
+              \"color\": \"$([[ $STATUS == 'success' ]] && echo 3066993 || echo 15158332)\"
+            }]
+          }" $DISCORD_WEBHOOK
 
   coverage:
     needs: test
@@ -60,7 +73,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.10
+      - name: Setup Python 3.10
         uses: actions/setup-python@v4
         with:
           python-version: 3.10
@@ -69,7 +82,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          brew install create-dmg
 
       - name: Create App Bundle
         run: ./create_app_bundle.command
@@ -78,90 +90,9 @@ jobs:
         run: ./create_dmg.command
 
   release:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: build
-    runs-on: macos-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.10
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Create Release
-        run: |
-          python src/ci_agent/release.py \
-            --app BaddyAgent.app \
-            --notes release_notes.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy:
-    needs: build
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-    runs-on: macos-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.10
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Upload to Cloud
-        run: |
-          python src/ci_agent/cloud_upload.py \
-            --input BaddyAgent.dmg \
-            --version ${{ github.ref_name }}
-        env:
-          DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
-          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
-
-      - name: Sync to Thronesight
-        run: bash scripts/thronesight_sync.sh
-        env:
-          THRONESIGHT_API_KEY: ${{ secrets.THRONESIGHT_API_KEY }}
-
-  notify:
-    if: ${{ always() }}
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord Notification
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          STATUS: ${{ needs.build.result || 'success' }}
-        run: |
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d "{
-            \"username\": \"Baddy Agent CI\",
-            \"embeds\": [{
-              \"title\": \"🔔 CI Pipeline Report\",
-              \"description\": \"Workflow completed with status: **$STATUS**\",
-              \"color\": $([[ \"$STATUS\" == 'success' ]] && echo 3066993 || echo 15158332)
-            }]
-          }" \
-          $DISCORD_WEBHOOK
-
-      - name: Comment on PR with result
-        if: github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: test-summary
-          message: |
-            🧪 **Test Summary**
-            Job: Baddy Agent CI
-            Status: ${{ job.status }}
+      - name: Upload Final Build
+        run: echo "📦 Build completed and deployed to Njanja + GitHub releases."

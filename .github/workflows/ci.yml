@@ -26,32 +26,20 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "⚠️ No requirements.txt found. Skipping dependency install."; fi
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            echo "⚠️ No requirements.txt found. Skipping dependency install."
+          fi
 
       - name: Run Tests (safely)
         run: |
-          if [ -d "tests" ]; then echo "✅ Running tests..."; pytest tests; else echo "⚠️ No tests directory found. Skipping tests."; fi
-
-  notify:
-    needs: test
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send Discord Notification
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          STATUS: ${{ needs.test.result }}
-        run: |
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d "{
-            \"username\": \"🧪 Baddy Agent CI\",
-            \"embeds\": [{
-              \"title\": \"🧾 CI Pipeline Report\",
-              \"description\": \"Workflow completed with status: **$STATUS**\",
-              \"color\": \"$([[ $STATUS == 'success' ]] && echo 3066993 || echo 15158332)\"
-            }]
-          }" $DISCORD_WEBHOOK
+          if [ -d "tests" ]; then
+            echo "✅ Running tests..."
+            pytest tests
+          else
+            echo "⚠️ No tests directory found. Skipping tests."
+          fi
 
   coverage:
     needs: test
@@ -73,7 +61,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup Python 3.10
+      - name: Set Up Python 3.10
         uses: actions/setup-python@v4
         with:
           python-version: 3.10
@@ -82,6 +70,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          brew install create-dmg
 
       - name: Create App Bundle
         run: ./create_app_bundle.command
@@ -91,8 +80,82 @@ jobs:
 
   release:
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create Release
+        run: python src/ci_agent/release.py --app BaddyAgent.app --notes release_notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Upload to Cloud
+        run: |
+          python src/ci_agent/cloud_upload.py \
+            --input BaddyAgent.dmg \
+            --version ${{ github.ref_name }}
+        env:
+          DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
+          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
+
+      - name: Sync to Thronesight
+        run: bash scripts/thronesight_sync.sh
+        env:
+          THRONESIGHT_API_KEY: ${{ secrets.THRONESIGHT_API_KEY }}
+
+  notify:
+    needs: test
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-      - name: Upload Final Build
-        run: echo "📦 Build completed and deployed to Njanja + GitHub releases."
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          STATUS: ${{ needs.test.result }}
+        run: |
+          curl -X POST "$DISCORD_WEBHOOK" \
+          -H "Content-Type: application/json" \
+          -d "$(jq -n --arg status "$STATUS" '
+          {
+            username: "🧠 Baddy Agent CI",
+            embeds: [
+              {
+                title: "🚦 CI Pipeline Report",
+                description: "Workflow completed with status: \($status)",
+                color: (if $status == "success" then 3066993 else 15158332 end)
+              }
+            ]
+          }')"

@@ -61,7 +61,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set Up Python 3.10
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
           python-version: 3.10
@@ -128,6 +128,10 @@ jobs:
           DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
           GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
 
+  sync:
+    needs: deploy
+    runs-on: macos-latest
+    steps:
       - name: Sync to Thronesight
         run: bash scripts/thronesight_sync.sh
         env:
@@ -147,15 +151,12 @@ jobs:
           STATUS: ${{ needs.test.result }}
         run: |
           curl -X POST "$DISCORD_WEBHOOK" \
-          -H "Content-Type: application/json" \
-          -d "$(jq -n --arg status "$STATUS" '
-          {
-            username: "🧠 Baddy Agent CI",
-            embeds: [
-              {
-                title: "🚦 CI Pipeline Report",
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg status "$STATUS" '{
+              username: "🔁 Baddy Agent CI",
+              embeds: [{
+                title: "📊 CI Pipeline Report",
                 description: "Workflow completed with status: \($status)",
-                color: (if $status == "success" then 3066993 else 15158332 end)
-              }
-            ]
-          }')"
+                color: ($status == "success" | not | if . then 15158332 else 3066993 end)
+              }]
+            }')"

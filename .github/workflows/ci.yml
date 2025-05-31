@@ -14,23 +14,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: '3.11'
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run Tests
+      - name: Run Tests (safely)
         run: |
           if [ -d "tests" ]; then
             echo "Running tests..."
-            pytest tests || true
+            pytest tests
           else
             echo "No tests directory found. Skipping tests."
           fi
@@ -55,18 +55,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
           brew install create-dmg
 
-      - name: Create App Bundle
+      - name: Create App Bundle Command
         run: ./create_app_bundle.sh
 
       - name: Create DMG
@@ -87,7 +87,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Create Release
@@ -133,15 +133,15 @@ jobs:
         run: sudo apt-get install -y jq
 
       - name: Send Discord Notification
-        run: |
-          jq -n --arg status "${{ needs.test.result }}" \
-          '{
-              username: "CI Pipeline Report",
-              embeds: [{
-                title: "Workflow completed with status: \($status)",
-                description: "CI finished with: \($status)",
-                color: ($status == "success" | tonumber)
-              }]
-          }' | curl -H "Content-Type: application/json" -d @- "${{ secrets.DISCORD_WEBHOOK }}"
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          STATUS: ${{ needs.test.result }}
+        run: |
+          jq -n --arg status "$STATUS" '{
+            username: "CI Pipeline Report",
+            embeds: [{
+              title: "Workflow completed with status: \($status)",
+              description: "CI finished with: \($status)",
+              color: ($status == "success" | tonumber | 3066993)
+            }]
+          }' | curl -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK"

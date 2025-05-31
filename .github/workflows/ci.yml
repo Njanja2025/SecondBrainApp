@@ -16,34 +16,21 @@ jobs:
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.11
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt || true
+          pip install -r requirements.txt
 
       - name: Run Tests (safely)
         run: |
           if [ -d "tests" ]; then
-            echo "Running tests..."
-            pytest tests || echo "Tests failed — continuing anyway..."
+            echo "✅ Running tests..."
+            pytest tests
           else
-            echo "No tests directory found. Skipping tests."
+            echo "⚠️ No tests directory found. Skipping tests."
           fi
-
-  coverage:
-    needs: test
-    runs-on: macos-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Upload Coverage
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.xml
-          fail_ci_if_error: false
 
   build:
     needs: test
@@ -55,19 +42,19 @@ jobs:
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.11
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt || true
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
           brew install create-dmg
 
       - name: Create App Bundle Command
-        run: ./create_app_bundle.sh
+        run: ./scripts/create_app_bundle.sh
 
       - name: Create DMG
-        run: ./create_dmg_command.sh
+        run: ./scripts/create_dmg_command.sh
 
   release:
     needs: build
@@ -80,15 +67,15 @@ jobs:
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.11
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt || true
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Create Release Notes
-        run: python src/ci/create_release.py --app BaddyAgent.app --notes release_notes.md
+      - name: Create Release
+        run: python src/cli_deploy/release.py --app BaddyAgent.app --notes release_notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -100,14 +87,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.11
 
-      - name: Deploy to Njanja Server (ci.njanja.net)
-        run: |
-          python scripts/deploy_ci.py --ref ${{ github.ref_name }}
+      - name: Sync to Dropbox and Drive
+        run: python src/cli_deploy/upload.py --input BaddyAgent.dmg --ref ${{ github.ref_name }}
         env:
           DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
           GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
@@ -126,22 +112,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install jq
-        run: sudo apt-get install jq
+        run: sudo apt-get install -y jq
 
       - name: Send Discord Notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           STATUS: ${{ job.status }}
         run: |
-          curl -X POST "$DISCORD_WEBHOOK" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "content": "",
-            "embeds": [
-              {
-                "title": "🧠 Baddy Agent CI Pipeline Report",
-                "description": "Workflow completed with status: '${STATUS}'",
-                "color": '${{ job.status == 'success' && 3066993 || 15158332 }}'
-              }
-            ]
-          }'
+          jq -n --arg status "$STATUS" \
+            '{
+              "content": "Workflow completed with status: \($status)",
+              "embeds": [{
+                "title": "🔧 CI Pipeline Report",
+                "description": "Workflow completed with status: \($status)",
+                "color": ($status == "success" | not | if . then 15158332 else 3066993 end)
+              }]
+            }' | curl -H "Content-Type: application/json" -d @- $DISCORD_WEBHOOK

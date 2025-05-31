@@ -7,6 +7,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_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 }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      ...
 
     steps:
     - name: Checkout repository

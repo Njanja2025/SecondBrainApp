@@ -8,29 +8,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GH_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 }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      ...
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "No requirements.txt found."; fi
 
-    - name: Install dependencies (safe mode)
-      run: |
-        echo "Checking for requirements.txt..."
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "No requirements.txt file found."; fi
-
-    - name: Validate CI Health
-      run: |
-        echo "✅ Baddy Agent CI check completed successfully!"
+      - name: Validate CI Health
+        run: echo "Baddy Agent CI check completed successfully!"
 
   release:
     needs: build
@@ -38,4 +32,4 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Upload Final Build
-        run: echo "Build completed and deployed to Njanja + GitHub releases." 
+        run: echo "Build completed and deployed to Njanja + GitHub releases."

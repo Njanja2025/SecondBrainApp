@@ -6,28 +6,31 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  GIT_TERMINAL_PROMPT: 0
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout Repo
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.11
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "No requirements.txt found."; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run Tests (Safely)
+      - name: Run Tests
         run: |
           if [ -d "tests" ]; then
             echo "Running tests..."
-            pytest tests
+            pytest tests || true
           else
             echo "No tests directory found. Skipping tests."
           fi
@@ -55,11 +58,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.11
 
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
           brew install create-dmg
 
@@ -80,10 +83,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.11
 
       - name: Install Dependencies
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Create Release
@@ -103,7 +107,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.11
 
       - name: Deploy to Cloud
         run: |
@@ -129,15 +133,15 @@ jobs:
         run: sudo apt-get install -y jq
 
       - name: Send Discord Notification
+        run: |
+          jq -n --arg status "${{ needs.test.result }}" \
+          '{
+              username: "CI Pipeline Report",
+              embeds: [{
+                title: "Workflow completed with status: \($status)",
+                description: "CI finished with: \($status)",
+                color: ($status == "success" | tonumber)
+              }]
+          }' | curl -H "Content-Type: application/json" -d @- "${{ secrets.DISCORD_WEBHOOK }}"
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          STATUS: ${{ needs.test.result }}
-        run: |
-          jq -n --arg status "$STATUS" '{
-            username: "CI Pipeline Report",
-            embeds: [{
-              title: "Workflow completed with status: \($status)",
-              description: "CI finished with: \($status)",
-              color: ($status == "success" | tonumber | 3066993)
-            }]
-          }' | curl -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK"

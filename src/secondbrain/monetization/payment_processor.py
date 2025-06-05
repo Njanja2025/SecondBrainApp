@@ -6,7 +6,7 @@ import json
 import logging
 import stripe
 from pathlib import Path
-from typing import Dict, Optional
+from typing import List, Dict, Optional
 from .security import SecurityManager
 
 logger = logging.getLogger(__name__)
@@ -15,15 +15,26 @@ logger = logging.getLogger(__name__)
 class PaymentProcessor:
     """Handles payment processing and subscription management."""
 
-    def __init__(self, config_path: str = "config/payment_config.json"):
+    def __init__(
+        self,
+        stripe_api_key: str = None,
+        webhook_secret: str = None,
+        config_path: str = "config/payment_config.json",
+    ):
         """Initialize the payment processor."""
         self.config_path = config_path
         self.config = self._load_config()
         self.security = SecurityManager(config_path)
 
-        # Initialize Stripe with API key
-        stripe.api_key = self.security.decrypt_api_key(self.config["stripe_secret_key"])
+        # Use provided API key or from config
+        if stripe_api_key is not None:
+            stripe.api_key = stripe_api_key
+        else:
+            stripe.api_key = self.security.decrypt_api_key(
+                self.config.get("stripe_secret_key", "")
+            )
         self.stripe = stripe
+        self.webhook_secret = webhook_secret or self.config.get("webhook_secret", None)
 
     def _load_config(self) -> Dict:
         """Load configuration from file."""
@@ -39,11 +50,24 @@ class PaymentProcessor:
 
     def create_payment_intent(self, amount: int, currency: str = "usd") -> Dict:
         """Create a payment intent."""
+        if currency not in self.config.get("supported_currencies", []):
+            raise ValueError(f"Unsupported currency: {currency}")
         try:
             intent = self.stripe.PaymentIntent.create(
                 amount=amount, currency=currency, payment_method_types=["card"]
             )
-            return intent
+            # If intent is a dict (mocked), return as is; else, convert to dict
+            if isinstance(intent, dict):
+                return {
+                    "payment_intent_id": intent.get("id"),
+                    "client_secret": intent.get("client_secret"),
+                    "status": intent.get("status"),
+                }
+            return {
+                "payment_intent_id": intent.id,
+                "client_secret": intent.client_secret,
+                "status": intent.status,
+            }
         except Exception as e:
             logger.error(f"Failed to create payment intent: {e}")
             self.security.log_failed_attempt("payment_intent_creation", str(e))

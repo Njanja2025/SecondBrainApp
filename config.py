@@ -120,3 +120,6 @@ HEALTH_CHECK_SETTINGS = {
         {"name": "dashboard", "enabled": True},
     ],
 }
+
+if 'logging' not in globals():
+    logging = {}

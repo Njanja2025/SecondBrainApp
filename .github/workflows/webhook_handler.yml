@@ -1,0 +1,32 @@
+name: Webhook Handler CI
+
+on:
+  push:
+    paths:
+      - 'src/secondbrain/webhook_handler.py'
+      - 'tests/test_webhook_handler.py'
+      - '.github/workflows/webhook_handler.yml'
+  pull_request:
+    paths:
+      - 'src/secondbrain/webhook_handler.py'
+      - 'tests/test_webhook_handler.py'
+      - '.github/workflows/webhook_handler.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install Flask==2.3.2 pytest==7.4.0
+          pip install -r requirements.txt || true
+      - name: Run webhook handler tests
+        run: |
+          PYTHONPATH=src pytest tests/test_webhook_handler.py --disable-warnings -v

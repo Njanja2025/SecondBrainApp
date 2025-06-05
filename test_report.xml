@@ -1,0 +1,1039 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="10" failures="26" skipped="0" tests="80" time="13.712" timestamp="2025-06-05T02:49:48.280894" hostname="macbooks-MacBook-Pro.local"><testcase classname="tests.test_cli" name="test_setup_logging" time="0.003" /><testcase classname="tests.test_cli" name="test_load_config" time="0.008" /><testcase classname="tests.test_cli" name="test_load_config_missing_file" time="0.003" /><testcase classname="tests.test_cli" name="test_load_config_invalid_json" time="0.003" /><testcase classname="tests.test_cli" name="test_create_payment_processor" time="0.004"><failure message="cryptography.fernet.InvalidToken">mock_config = '/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_create_payment_processor0/payment.json'
+
+    def test_create_payment_processor(mock_config):
+        """Test payment processor creation."""
+        config = load_config(mock_config)
+&gt;       processor = create_payment_processor(config)
+
+tests/test_cli.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/secondbrain/monetization/cli.py:43: in create_payment_processor
+    return PaymentProcessor(
+src/secondbrain/monetization/payment_processor.py:25: in __init__
+    stripe.api_key = self.security.decrypt_api_key(self.config["stripe_secret_key"])
+src/secondbrain/monetization/security.py:59: in decrypt_api_key
+    return self.cipher_suite.decrypt(encrypted_key.encode()).decode()
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:86: in decrypt
+    timestamp, data = Fernet._get_unverified_token_data(token)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+token = b'sk_test_your_secret_key_here'
+
+    @staticmethod
+    def _get_unverified_token_data(
+        token: typing.Union[bytes, str]
+    ) -&gt; typing.Tuple[int, bytes]:
+        if not isinstance(token, (str, bytes)):
+            raise TypeError("token must be bytes or str")
+    
+        try:
+            data = base64.urlsafe_b64decode(token)
+        except (TypeError, binascii.Error):
+            raise InvalidToken
+    
+        if not data or data[0] != 0x80:
+&gt;           raise InvalidToken
+E           cryptography.fernet.InvalidToken
+
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:122: InvalidToken</failure></testcase><testcase classname="tests.test_cli" name="test_create_payment_processor_missing_config" time="0.004"><failure message="cryptography.fernet.InvalidToken">tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_create_payment_processor_0')
+
+    def test_create_payment_processor_missing_config(tmp_path):
+        """Test payment processor creation with missing configuration."""
+        config_path = tmp_path / "missing.json"
+        with open(config_path, "w") as f:
+            json.dump({}, f)
+    
+        config = load_config(str(config_path))
+        with pytest.raises(SystemExit):
+&gt;           create_payment_processor(config)
+
+tests/test_cli.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/secondbrain/monetization/cli.py:43: in create_payment_processor
+    return PaymentProcessor(
+src/secondbrain/monetization/payment_processor.py:25: in __init__
+    stripe.api_key = self.security.decrypt_api_key(self.config["stripe_secret_key"])
+src/secondbrain/monetization/security.py:59: in decrypt_api_key
+    return self.cipher_suite.decrypt(encrypted_key.encode()).decode()
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:86: in decrypt
+    timestamp, data = Fernet._get_unverified_token_data(token)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+token = b'sk_test_your_secret_key_here'
+
+    @staticmethod
+    def _get_unverified_token_data(
+        token: typing.Union[bytes, str]
+    ) -&gt; typing.Tuple[int, bytes]:
+        if not isinstance(token, (str, bytes)):
+            raise TypeError("token must be bytes or str")
+    
+        try:
+            data = base64.urlsafe_b64decode(token)
+        except (TypeError, binascii.Error):
+            raise InvalidToken
+    
+        if not data or data[0] != 0x80:
+&gt;           raise InvalidToken
+E           cryptography.fernet.InvalidToken
+
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:122: InvalidToken</failure></testcase><testcase classname="tests.test_cli" name="test_handle_create_payment" time="0.003"><failure message="TypeError: 'NoneType' object is not subscriptable">mock_processor = &lt;Mock id='5324208592'&gt;
+
+    def test_handle_create_payment(mock_processor):
+        """Test create payment command."""
+        args = Mock(
+            amount="10.00",
+            currency="usd",
+            customer_id="cus_test123",
+            payment_method_id="pm_test123",
+            metadata=None,
+        )
+    
+        mock_processor.create_payment_intent.return_value = {
+            "payment_intent_id": "pi_test123",
+            "client_secret": "pi_test123_secret",
+            "status": "requires_payment_method",
+        }
+    
+        with patch("sys.stdout") as mock_stdout:
+            handle_create_payment(args, mock_processor)
+&gt;           output = mock_stdout.write.call_args[0][0]
+E           TypeError: 'NoneType' object is not subscriptable
+
+tests/test_cli.py:116: TypeError</failure></testcase><testcase classname="tests.test_cli" name="test_handle_confirm_payment" time="0.004"><failure message="TypeError: 'NoneType' object is not subscriptable">mock_processor = &lt;Mock id='5323869584'&gt;
+
+    def test_handle_confirm_payment(mock_processor):
+        """Test confirm payment command."""
+        args = Mock(payment_intent_id="pi_test123", payment_method_id="pm_test123")
+    
+        mock_processor.confirm_payment.return_value = {
+            "status": "succeeded",
+            "amount": 10.00,
+            "currency": "usd",
+        }
+    
+        with patch("sys.stdout") as mock_stdout:
+            handle_confirm_payment(args, mock_processor)
+&gt;           output = mock_stdout.write.call_args[0][0]
+E           TypeError: 'NoneType' object is not subscriptable
+
+tests/test_cli.py:136: TypeError</failure></testcase><testcase classname="tests.test_cli" name="test_handle_list_payment_methods" time="0.004"><failure message="TypeError: 'NoneType' object is not subscriptable">mock_processor = &lt;Mock id='5323887840'&gt;
+
+    def test_handle_list_payment_methods(mock_processor):
+        """Test list payment methods command."""
+        args = Mock(customer_id="cus_test123")
+    
+        mock_processor.get_payment_methods.return_value = [
+            {"id": "pm_test123", "type": "card", "card": {"brand": "visa", "last4": "4242"}}
+        ]
+    
+        with patch("sys.stdout") as mock_stdout:
+            handle_list_payment_methods(args, mock_processor)
+&gt;           output = mock_stdout.write.call_args[0][0]
+E           TypeError: 'NoneType' object is not subscriptable
+
+tests/test_cli.py:154: TypeError</failure></testcase><testcase classname="tests.test_cli" name="test_handle_add_payment_method" time="0.003"><failure message="TypeError: 'NoneType' object is not subscriptable">mock_processor = &lt;Mock id='5324151328'&gt;
+
+    def test_handle_add_payment_method(mock_processor):
+        """Test add payment method command."""
+        args = Mock(customer_id="cus_test123", payment_method_id="pm_test123")
+    
+        mock_processor.add_payment_method.return_value = True
+    
+        with patch("sys.stdout") as mock_stdout:
+            handle_add_payment_method(args, mock_processor)
+&gt;           output = mock_stdout.write.call_args[0][0]
+E           TypeError: 'NoneType' object is not subscriptable
+
+tests/test_cli.py:171: TypeError</failure></testcase><testcase classname="tests.test_cli" name="test_handle_remove_payment_method" time="0.004"><failure message="TypeError: 'NoneType' object is not subscriptable">mock_processor = &lt;Mock id='5324474112'&gt;
+
+    def test_handle_remove_payment_method(mock_processor):
+        """Test remove payment method command."""
+        args = Mock(payment_method_id="pm_test123")
+    
+        mock_processor.remove_payment_method.return_value = True
+    
+        with patch("sys.stdout") as mock_stdout:
+            handle_remove_payment_method(args, mock_processor)
+&gt;           output = mock_stdout.write.call_args[0][0]
+E           TypeError: 'NoneType' object is not subscriptable
+
+tests/test_cli.py:183: TypeError</failure></testcase><testcase classname="tests.test_cli" name="test_handle_start_webhook_server" time="0.003"><failure message="AttributeError: &lt;class 'src.secondbrain.monetization.webhook_handler.WebhookHandler'&gt; does not have the attribute 'run'">mock_processor = &lt;Mock id='5323390208'&gt;
+
+    def test_handle_start_webhook_server(mock_processor):
+        """Test start webhook server command."""
+        args = Mock(host="0.0.0.0", port=5000, debug=False)
+    
+&gt;       with (
+            patch(
+                "src.secondbrain.monetization.webhook_handler.create_webhook_handler"
+            ) as mock_create,
+            patch(
+                "src.secondbrain.monetization.webhook_handler.WebhookHandler.run"
+            ) as mock_run,
+        ):
+
+tests/test_cli.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../.pyenv/versions/3.10.13/lib/python3.10/unittest/mock.py:1447: in __enter__
+    original, local = self.get_original()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;unittest.mock._patch object at 0x13d4c4460&gt;
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+&gt;           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: &lt;class 'src.secondbrain.monetization.webhook_handler.WebhookHandler'&gt; does not have the attribute 'run'
+
+../../.pyenv/versions/3.10.13/lib/python3.10/unittest/mock.py:1420: AttributeError</failure></testcase><testcase classname="tests.test_companion_journaling_backup" name="test_create_backup" time="0.021" /><testcase classname="tests.test_companion_journaling_backup" name="test_backup_journal_entries" time="0.010" /><testcase classname="tests.test_companion_journaling_backup" name="test_backup_emotional_logs" time="0.008" /><testcase classname="tests.test_companion_journaling_backup" name="test_backup_memory_entries" time="0.008" /><testcase classname="tests.test_companion_journaling_backup" name="test_backup_interaction_patterns" time="0.009" /><testcase classname="tests.test_companion_journaling_backup" name="test_cleanup_old_backups" time="0.006" /><testcase classname="tests.test_payment_integration" name="test_create_subscription" time="0.008"><failure message="cryptography.fernet.InvalidToken">token = b'sk_test_123'
+
+    @staticmethod
+    def _get_unverified_token_data(
+        token: typing.Union[bytes, str]
+    ) -&gt; typing.Tuple[int, bytes]:
+        if not isinstance(token, (str, bytes)):
+            raise TypeError("token must be bytes or str")
+    
+        try:
+&gt;           data = base64.urlsafe_b64decode(token)
+
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../.pyenv/versions/3.10.13/lib/python3.10/base64.py:133: in urlsafe_b64decode
+    return b64decode(s)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+s = b'sk/test/123', altchars = None, validate = False
+
+    def b64decode(s, altchars=None, validate=False):
+        """Decode the Base64 encoded bytes-like object or ASCII string s.
+    
+        Optional altchars must be a bytes-like object or ASCII string of length 2
+        which specifies the alternative alphabet used instead of the '+' and '/'
+        characters.
+    
+        The result is returned as a bytes object.  A binascii.Error is raised if
+        s is incorrectly padded.
+    
+        If validate is False (the default), characters that are neither in the
+        normal base-64 alphabet nor the alternative alphabet are discarded prior
+        to the padding check.  If validate is True, these non-alphabet characters
+        in the input result in a binascii.Error.
+        """
+        s = _bytes_from_decode_data(s)
+        if altchars is not None:
+            altchars = _bytes_from_decode_data(altchars)
+            assert len(altchars) == 2, repr(altchars)
+            s = s.translate(bytes.maketrans(altchars, b'+/'))
+        if validate and not re.fullmatch(b'[A-Za-z0-9+/]*={0,2}', s):
+            raise binascii.Error('Non-base64 digit found')
+&gt;       return binascii.a2b_base64(s)
+E       binascii.Error: Incorrect padding
+
+../../.pyenv/versions/3.10.13/lib/python3.10/base64.py:87: Error
+
+During handling of the above exception, another exception occurred:
+
+mock_stripe = {'session': &lt;MagicMock name='Session' id='5324146528'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5324158768'&gt;}
+test_config = '/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_create_subscription0/test_payment_config.json'
+
+    def test_create_subscription(mock_stripe, test_config):
+        """Test subscription creation."""
+&gt;       processor = PaymentProcessor(test_config)
+
+tests/test_payment_integration.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/secondbrain/monetization/payment_processor.py:25: in __init__
+    stripe.api_key = self.security.decrypt_api_key(self.config["stripe_secret_key"])
+src/secondbrain/monetization/security.py:59: in decrypt_api_key
+    return self.cipher_suite.decrypt(encrypted_key.encode()).decode()
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:86: in decrypt
+    timestamp, data = Fernet._get_unverified_token_data(token)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+token = b'sk_test_123'
+
+    @staticmethod
+    def _get_unverified_token_data(
+        token: typing.Union[bytes, str]
+    ) -&gt; typing.Tuple[int, bytes]:
+        if not isinstance(token, (str, bytes)):
+            raise TypeError("token must be bytes or str")
+    
+        try:
+            data = base64.urlsafe_b64decode(token)
+        except (TypeError, binascii.Error):
+&gt;           raise InvalidToken
+E           cryptography.fernet.InvalidToken
+
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:119: InvalidToken</failure></testcase><testcase classname="tests.test_payment_integration" name="test_webhook_handling" time="0.007"><failure message="cryptography.fernet.InvalidToken">token = b'sk_test_123'
+
+    @staticmethod
+    def _get_unverified_token_data(
+        token: typing.Union[bytes, str]
+    ) -&gt; typing.Tuple[int, bytes]:
+        if not isinstance(token, (str, bytes)):
+            raise TypeError("token must be bytes or str")
+    
+        try:
+&gt;           data = base64.urlsafe_b64decode(token)
+
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../.pyenv/versions/3.10.13/lib/python3.10/base64.py:133: in urlsafe_b64decode
+    return b64decode(s)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+s = b'sk/test/123', altchars = None, validate = False
+
+    def b64decode(s, altchars=None, validate=False):
+        """Decode the Base64 encoded bytes-like object or ASCII string s.
+    
+        Optional altchars must be a bytes-like object or ASCII string of length 2
+        which specifies the alternative alphabet used instead of the '+' and '/'
+        characters.
+    
+        The result is returned as a bytes object.  A binascii.Error is raised if
+        s is incorrectly padded.
+    
+        If validate is False (the default), characters that are neither in the
+        normal base-64 alphabet nor the alternative alphabet are discarded prior
+        to the padding check.  If validate is True, these non-alphabet characters
+        in the input result in a binascii.Error.
+        """
+        s = _bytes_from_decode_data(s)
+        if altchars is not None:
+            altchars = _bytes_from_decode_data(altchars)
+            assert len(altchars) == 2, repr(altchars)
+            s = s.translate(bytes.maketrans(altchars, b'+/'))
+        if validate and not re.fullmatch(b'[A-Za-z0-9+/]*={0,2}', s):
+            raise binascii.Error('Non-base64 digit found')
+&gt;       return binascii.a2b_base64(s)
+E       binascii.Error: Incorrect padding
+
+../../.pyenv/versions/3.10.13/lib/python3.10/base64.py:87: Error
+
+During handling of the above exception, another exception occurred:
+
+mock_stripe = {'session': &lt;MagicMock name='Session' id='5323860064'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5323851760'&gt;}
+test_config = '/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_webhook_handling0/test_payment_config.json'
+
+    def test_webhook_handling(mock_stripe, test_config):
+        """Test webhook event handling."""
+&gt;       processor = PaymentProcessor(test_config)
+
+tests/test_payment_integration.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/secondbrain/monetization/payment_processor.py:25: in __init__
+    stripe.api_key = self.security.decrypt_api_key(self.config["stripe_secret_key"])
+src/secondbrain/monetization/security.py:59: in decrypt_api_key
+    return self.cipher_suite.decrypt(encrypted_key.encode()).decode()
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:86: in decrypt
+    timestamp, data = Fernet._get_unverified_token_data(token)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+token = b'sk_test_123'
+
+    @staticmethod
+    def _get_unverified_token_data(
+        token: typing.Union[bytes, str]
+    ) -&gt; typing.Tuple[int, bytes]:
+        if not isinstance(token, (str, bytes)):
+            raise TypeError("token must be bytes or str")
+    
+        try:
+            data = base64.urlsafe_b64decode(token)
+        except (TypeError, binascii.Error):
+&gt;           raise InvalidToken
+E           cryptography.fernet.InvalidToken
+
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:119: InvalidToken</failure></testcase><testcase classname="tests.test_payment_integration" name="test_security_features" time="0.018"><failure message="AssertionError: assert False&#10; +  where False = &lt;bound method SecurityManager.verify_webhook_signature of &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d6619c0&gt;&gt;(payload='test_payload', signature='test_signature')&#10; +    where &lt;bound method SecurityManager.verify_webhook_signature of &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d6619c0&gt;&gt; = &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d6619c0&gt;.verify_webhook_signature">test_config = '/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_security_features0/test_payment_config.json'
+
+    def test_security_features(test_config):
+        """Test security features."""
+        security = SecurityManager(test_config)
+    
+        # Test API key encryption
+        original_key = "sk_test_123"
+        encrypted_key = security.encrypt_api_key(original_key)
+        decrypted_key = security.decrypt_api_key(encrypted_key)
+    
+        assert encrypted_key != original_key
+        assert decrypted_key == original_key
+    
+        # Test webhook verification
+&gt;       assert security.verify_webhook_signature(
+            payload="test_payload", signature="test_signature"
+        )
+E       AssertionError: assert False
+E        +  where False = &lt;bound method SecurityManager.verify_webhook_signature of &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d6619c0&gt;&gt;(payload='test_payload', signature='test_signature')
+E        +    where &lt;bound method SecurityManager.verify_webhook_signature of &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d6619c0&gt;&gt; = &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d6619c0&gt;.verify_webhook_signature
+
+tests/test_payment_integration.py:120: AssertionError</failure></testcase><testcase classname="tests.test_payment_integration" name="test_logging" time="0.004"><failure message="cryptography.fernet.InvalidToken">token = b'sk_test_123'
+
+    @staticmethod
+    def _get_unverified_token_data(
+        token: typing.Union[bytes, str]
+    ) -&gt; typing.Tuple[int, bytes]:
+        if not isinstance(token, (str, bytes)):
+            raise TypeError("token must be bytes or str")
+    
+        try:
+&gt;           data = base64.urlsafe_b64decode(token)
+
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../.pyenv/versions/3.10.13/lib/python3.10/base64.py:133: in urlsafe_b64decode
+    return b64decode(s)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+s = b'sk/test/123', altchars = None, validate = False
+
+    def b64decode(s, altchars=None, validate=False):
+        """Decode the Base64 encoded bytes-like object or ASCII string s.
+    
+        Optional altchars must be a bytes-like object or ASCII string of length 2
+        which specifies the alternative alphabet used instead of the '+' and '/'
+        characters.
+    
+        The result is returned as a bytes object.  A binascii.Error is raised if
+        s is incorrectly padded.
+    
+        If validate is False (the default), characters that are neither in the
+        normal base-64 alphabet nor the alternative alphabet are discarded prior
+        to the padding check.  If validate is True, these non-alphabet characters
+        in the input result in a binascii.Error.
+        """
+        s = _bytes_from_decode_data(s)
+        if altchars is not None:
+            altchars = _bytes_from_decode_data(altchars)
+            assert len(altchars) == 2, repr(altchars)
+            s = s.translate(bytes.maketrans(altchars, b'+/'))
+        if validate and not re.fullmatch(b'[A-Za-z0-9+/]*={0,2}', s):
+            raise binascii.Error('Non-base64 digit found')
+&gt;       return binascii.a2b_base64(s)
+E       binascii.Error: Incorrect padding
+
+../../.pyenv/versions/3.10.13/lib/python3.10/base64.py:87: Error
+
+During handling of the above exception, another exception occurred:
+
+test_config = '/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_logging0/test_payment_config.json'
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_logging0')
+
+    def test_logging(test_config, tmp_path):
+        """Test payment logging."""
+&gt;       processor = PaymentProcessor(test_config)
+
+tests/test_payment_integration.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/secondbrain/monetization/payment_processor.py:25: in __init__
+    stripe.api_key = self.security.decrypt_api_key(self.config["stripe_secret_key"])
+src/secondbrain/monetization/security.py:59: in decrypt_api_key
+    return self.cipher_suite.decrypt(encrypted_key.encode()).decode()
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:86: in decrypt
+    timestamp, data = Fernet._get_unverified_token_data(token)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+token = b'sk_test_123'
+
+    @staticmethod
+    def _get_unverified_token_data(
+        token: typing.Union[bytes, str]
+    ) -&gt; typing.Tuple[int, bytes]:
+        if not isinstance(token, (str, bytes)):
+            raise TypeError("token must be bytes or str")
+    
+        try:
+            data = base64.urlsafe_b64decode(token)
+        except (TypeError, binascii.Error):
+&gt;           raise InvalidToken
+E           cryptography.fernet.InvalidToken
+
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:119: InvalidToken</failure></testcase><testcase classname="tests.test_payment_integration" name="test_companion_backup_trigger" time="0.009"><failure message="cryptography.fernet.InvalidToken">token = b'sk_test_123'
+
+    @staticmethod
+    def _get_unverified_token_data(
+        token: typing.Union[bytes, str]
+    ) -&gt; typing.Tuple[int, bytes]:
+        if not isinstance(token, (str, bytes)):
+            raise TypeError("token must be bytes or str")
+    
+        try:
+&gt;           data = base64.urlsafe_b64decode(token)
+
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../.pyenv/versions/3.10.13/lib/python3.10/base64.py:133: in urlsafe_b64decode
+    return b64decode(s)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+s = b'sk/test/123', altchars = None, validate = False
+
+    def b64decode(s, altchars=None, validate=False):
+        """Decode the Base64 encoded bytes-like object or ASCII string s.
+    
+        Optional altchars must be a bytes-like object or ASCII string of length 2
+        which specifies the alternative alphabet used instead of the '+' and '/'
+        characters.
+    
+        The result is returned as a bytes object.  A binascii.Error is raised if
+        s is incorrectly padded.
+    
+        If validate is False (the default), characters that are neither in the
+        normal base-64 alphabet nor the alternative alphabet are discarded prior
+        to the padding check.  If validate is True, these non-alphabet characters
+        in the input result in a binascii.Error.
+        """
+        s = _bytes_from_decode_data(s)
+        if altchars is not None:
+            altchars = _bytes_from_decode_data(altchars)
+            assert len(altchars) == 2, repr(altchars)
+            s = s.translate(bytes.maketrans(altchars, b'+/'))
+        if validate and not re.fullmatch(b'[A-Za-z0-9+/]*={0,2}', s):
+            raise binascii.Error('Non-base64 digit found')
+&gt;       return binascii.a2b_base64(s)
+E       binascii.Error: Incorrect padding
+
+../../.pyenv/versions/3.10.13/lib/python3.10/base64.py:87: Error
+
+During handling of the above exception, another exception occurred:
+
+mock_stripe = {'session': &lt;MagicMock name='Session' id='5324791168'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5324786944'&gt;}
+test_config = '/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_companion_backup_trigger0/test_payment_config.json'
+
+    def test_companion_backup_trigger(mock_stripe, test_config):
+        """Test CompanionMCP backup trigger on successful payment."""
+        with patch("src.secondbrain.companion.backup.CompanionBackup") as mock_backup:
+&gt;           processor = PaymentProcessor(test_config)
+
+tests/test_payment_integration.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/secondbrain/monetization/payment_processor.py:25: in __init__
+    stripe.api_key = self.security.decrypt_api_key(self.config["stripe_secret_key"])
+src/secondbrain/monetization/security.py:59: in decrypt_api_key
+    return self.cipher_suite.decrypt(encrypted_key.encode()).decode()
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:86: in decrypt
+    timestamp, data = Fernet._get_unverified_token_data(token)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+token = b'sk_test_123'
+
+    @staticmethod
+    def _get_unverified_token_data(
+        token: typing.Union[bytes, str]
+    ) -&gt; typing.Tuple[int, bytes]:
+        if not isinstance(token, (str, bytes)):
+            raise TypeError("token must be bytes or str")
+    
+        try:
+            data = base64.urlsafe_b64decode(token)
+        except (TypeError, binascii.Error):
+&gt;           raise InvalidToken
+E           cryptography.fernet.InvalidToken
+
+../../.pyenv/versions/3.10.13/lib/python3.10/site-packages/cryptography/fernet.py:119: InvalidToken</failure></testcase><testcase classname="tests.test_payment_processor" name="test_create_default_config" time="0.008"><error message="failed on setup with &quot;TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'&quot;">mock_stripe = {'payment_intent': &lt;MagicMock name='PaymentIntent' id='5324173904'&gt;, 'payment_method': &lt;MagicMock name='PaymentMethod' id='5325231088'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5325239872'&gt;}
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_create_default_config0')
+
+    @pytest.fixture
+    def payment_processor(mock_stripe, tmp_path):
+        """Create a payment processor instance."""
+        config_path = tmp_path / "payment_config.json"
+&gt;       processor = PaymentProcessor(
+            stripe_api_key="test_key",
+            webhook_secret="test_secret",
+            config_path=str(config_path),
+        )
+E       TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'
+
+tests/test_payment_processor.py:60: TypeError</error></testcase><testcase classname="tests.test_payment_processor" name="test_create_payment_intent" time="0.006"><error message="failed on setup with &quot;TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'&quot;">mock_stripe = {'payment_intent': &lt;MagicMock name='PaymentIntent' id='5325031408'&gt;, 'payment_method': &lt;MagicMock name='PaymentMethod' id='5325033040'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5325896960'&gt;}
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_create_payment_intent0')
+
+    @pytest.fixture
+    def payment_processor(mock_stripe, tmp_path):
+        """Create a payment processor instance."""
+        config_path = tmp_path / "payment_config.json"
+&gt;       processor = PaymentProcessor(
+            stripe_api_key="test_key",
+            webhook_secret="test_secret",
+            config_path=str(config_path),
+        )
+E       TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'
+
+tests/test_payment_processor.py:60: TypeError</error></testcase><testcase classname="tests.test_payment_processor" name="test_create_payment_intent_invalid_currency" time="0.006"><error message="failed on setup with &quot;TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'&quot;">mock_stripe = {'payment_intent': &lt;MagicMock name='PaymentIntent' id='5325192400'&gt;, 'payment_method': &lt;MagicMock name='PaymentMethod' id='5325180304'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5324688688'&gt;}
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_create_payment_intent_inv0')
+
+    @pytest.fixture
+    def payment_processor(mock_stripe, tmp_path):
+        """Create a payment processor instance."""
+        config_path = tmp_path / "payment_config.json"
+&gt;       processor = PaymentProcessor(
+            stripe_api_key="test_key",
+            webhook_secret="test_secret",
+            config_path=str(config_path),
+        )
+E       TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'
+
+tests/test_payment_processor.py:60: TypeError</error></testcase><testcase classname="tests.test_payment_processor" name="test_confirm_payment" time="0.008"><error message="failed on setup with &quot;TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'&quot;">mock_stripe = {'payment_intent': &lt;MagicMock name='PaymentIntent' id='5325033856'&gt;, 'payment_method': &lt;MagicMock name='PaymentMethod' id='5325037264'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5324973264'&gt;}
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_confirm_payment0')
+
+    @pytest.fixture
+    def payment_processor(mock_stripe, tmp_path):
+        """Create a payment processor instance."""
+        config_path = tmp_path / "payment_config.json"
+&gt;       processor = PaymentProcessor(
+            stripe_api_key="test_key",
+            webhook_secret="test_secret",
+            config_path=str(config_path),
+        )
+E       TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'
+
+tests/test_payment_processor.py:60: TypeError</error></testcase><testcase classname="tests.test_payment_processor" name="test_get_payment_methods" time="0.009"><error message="failed on setup with &quot;TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'&quot;">mock_stripe = {'payment_intent': &lt;MagicMock name='PaymentIntent' id='5326126768'&gt;, 'payment_method': &lt;MagicMock name='PaymentMethod' id='5324166512'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5325062592'&gt;}
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_get_payment_methods0')
+
+    @pytest.fixture
+    def payment_processor(mock_stripe, tmp_path):
+        """Create a payment processor instance."""
+        config_path = tmp_path / "payment_config.json"
+&gt;       processor = PaymentProcessor(
+            stripe_api_key="test_key",
+            webhook_secret="test_secret",
+            config_path=str(config_path),
+        )
+E       TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'
+
+tests/test_payment_processor.py:60: TypeError</error></testcase><testcase classname="tests.test_payment_processor" name="test_add_payment_method" time="0.009"><error message="failed on setup with &quot;TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'&quot;">mock_stripe = {'payment_intent': &lt;MagicMock name='PaymentIntent' id='5325452384'&gt;, 'payment_method': &lt;MagicMock name='PaymentMethod' id='5325445616'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5325592160'&gt;}
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_add_payment_method0')
+
+    @pytest.fixture
+    def payment_processor(mock_stripe, tmp_path):
+        """Create a payment processor instance."""
+        config_path = tmp_path / "payment_config.json"
+&gt;       processor = PaymentProcessor(
+            stripe_api_key="test_key",
+            webhook_secret="test_secret",
+            config_path=str(config_path),
+        )
+E       TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'
+
+tests/test_payment_processor.py:60: TypeError</error></testcase><testcase classname="tests.test_payment_processor" name="test_remove_payment_method" time="0.007"><error message="failed on setup with &quot;TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'&quot;">mock_stripe = {'payment_intent': &lt;MagicMock name='PaymentIntent' id='5325418992'&gt;, 'payment_method': &lt;MagicMock name='PaymentMethod' id='5325410064'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5325653184'&gt;}
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_remove_payment_method0')
+
+    @pytest.fixture
+    def payment_processor(mock_stripe, tmp_path):
+        """Create a payment processor instance."""
+        config_path = tmp_path / "payment_config.json"
+&gt;       processor = PaymentProcessor(
+            stripe_api_key="test_key",
+            webhook_secret="test_secret",
+            config_path=str(config_path),
+        )
+E       TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'
+
+tests/test_payment_processor.py:60: TypeError</error></testcase><testcase classname="tests.test_payment_processor" name="test_handle_webhook_event" time="0.007"><error message="failed on setup with &quot;TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'&quot;">mock_stripe = {'payment_intent': &lt;MagicMock name='PaymentIntent' id='5325589856'&gt;, 'payment_method': &lt;MagicMock name='PaymentMethod' id='5325595472'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5325450800'&gt;}
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_handle_webhook_event0')
+
+    @pytest.fixture
+    def payment_processor(mock_stripe, tmp_path):
+        """Create a payment processor instance."""
+        config_path = tmp_path / "payment_config.json"
+&gt;       processor = PaymentProcessor(
+            stripe_api_key="test_key",
+            webhook_secret="test_secret",
+            config_path=str(config_path),
+        )
+E       TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'
+
+tests/test_payment_processor.py:60: TypeError</error></testcase><testcase classname="tests.test_payment_processor" name="test_get_tax_rate" time="0.007"><error message="failed on setup with &quot;TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'&quot;">mock_stripe = {'payment_intent': &lt;MagicMock name='PaymentIntent' id='5325181504'&gt;, 'payment_method': &lt;MagicMock name='PaymentMethod' id='5324176640'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5325230896'&gt;}
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_get_tax_rate0')
+
+    @pytest.fixture
+    def payment_processor(mock_stripe, tmp_path):
+        """Create a payment processor instance."""
+        config_path = tmp_path / "payment_config.json"
+&gt;       processor = PaymentProcessor(
+            stripe_api_key="test_key",
+            webhook_secret="test_secret",
+            config_path=str(config_path),
+        )
+E       TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'
+
+tests/test_payment_processor.py:60: TypeError</error></testcase><testcase classname="tests.test_payment_processor" name="test_calculate_tax" time="0.008"><error message="failed on setup with &quot;TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'&quot;">mock_stripe = {'payment_intent': &lt;MagicMock name='PaymentIntent' id='5325042064'&gt;, 'payment_method': &lt;MagicMock name='PaymentMethod' id='5325034768'&gt;, 'webhook': &lt;MagicMock name='Webhook' id='5326004208'&gt;}
+tmp_path = PosixPath('/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-20/test_calculate_tax0')
+
+    @pytest.fixture
+    def payment_processor(mock_stripe, tmp_path):
+        """Create a payment processor instance."""
+        config_path = tmp_path / "payment_config.json"
+&gt;       processor = PaymentProcessor(
+            stripe_api_key="test_key",
+            webhook_secret="test_secret",
+            config_path=str(config_path),
+        )
+E       TypeError: PaymentProcessor.__init__() got an unexpected keyword argument 'stripe_api_key'
+
+tests/test_payment_processor.py:60: TypeError</error></testcase><testcase classname="tests.test_plugins.TestWeatherPlugin" name="test_initialization" time="0.003" /><testcase classname="tests.test_plugins.TestWeatherPlugin" name="test_get_weather" time="0.006" /><testcase classname="tests.test_plugins.TestWeatherPlugin" name="test_get_forecast" time="0.011"><failure message="assert 0 == 3&#10; +  where 0 = len([])">self = &lt;tests.test_plugins.TestWeatherPlugin object at 0x13d390430&gt;
+mock_get = &lt;MagicMock name='get' id='5325673744'&gt;
+weather_plugin = &lt;plugins.weather_plugin.WeatherPlugin object at 0x13d6c3f10&gt;
+mock_forecast_data = {'list': [{'dt': 1749084596, 'main': {'humidity': 65, 'temp': 22.0}, 'weather': [{'description': 'clear sky'}]}, {'dt'...'clear sky'}]}, {'dt': 1749430196, 'main': {'humidity': 65, 'temp': 26.0}, 'weather': [{'description': 'clear sky'}]}]}
+
+    @patch("requests.get")
+    def test_get_forecast(self, mock_get, weather_plugin, mock_forecast_data):
+        """Test getting weather forecast."""
+        mock_get.return_value.json.return_value = mock_forecast_data
+        mock_get.return_value.raise_for_status = Mock()
+    
+        forecast = weather_plugin._get_forecast("Test City", days=3)
+    
+&gt;       assert len(forecast) == 3
+E       assert 0 == 3
+E        +  where 0 = len([])
+
+tests/test_plugins.py:87: AssertionError</failure></testcase><testcase classname="tests.test_plugins.TestWeatherPlugin" name="test_wind_direction" time="0.003" /><testcase classname="tests.test_plugins.TestWeatherPlugin" name="test_weather_command" time="0.003" /><testcase classname="tests.test_plugins.TestTaskPlugin" name="test_initialization" time="0.003" /><testcase classname="tests.test_plugins.TestTaskPlugin" name="test_add_task" time="0.003" /><testcase classname="tests.test_plugins.TestTaskPlugin" name="test_list_tasks" time="0.004" /><testcase classname="tests.test_plugins.TestTaskPlugin" name="test_complete_task" time="0.004" /><testcase classname="tests.test_plugins.TestTaskPlugin" name="test_delete_task" time="0.005" /><testcase classname="tests.test_plugins.TestTaskPlugin" name="test_update_task" time="0.003" /><testcase classname="tests.test_plugins.TestTaskPlugin" name="test_search_tasks" time="0.004"><failure message="assert 'Important Task' in &quot;No tasks found matching 'important'&quot;">self = &lt;tests.test_plugins.TestTaskPlugin object at 0x13d390f10&gt;
+task_plugin = &lt;plugins.task_plugin.TaskPlugin object at 0x13d5842b0&gt;
+
+    def test_search_tasks(self, task_plugin):
+        """Test searching tasks."""
+        # Add some test tasks
+        task_plugin._handle_add_task_command("Important Task", tags=["important"])
+        task_plugin._handle_add_task_command("Regular Task")
+    
+        response = task_plugin._handle_search_tasks_command("important")
+&gt;       assert "Important Task" in response
+E       assert 'Important Task' in "No tasks found matching 'important'"
+
+tests/test_plugins.py:211: AssertionError</failure></testcase><testcase classname="tests.test_security" name="test_encryption_key_creation" time="0.004" /><testcase classname="tests.test_security" name="test_api_key_encryption" time="0.007" /><testcase classname="tests.test_security" name="test_webhook_verification" time="0.005"><failure message="AssertionError: assert False&#10; +  where False = &lt;bound method SecurityManager.verify_webhook_signature of &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d585f90&gt;&gt;(payload='test_payload', signature='test_signature')&#10; +    where &lt;bound method SecurityManager.verify_webhook_signature of &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d585f90&gt;&gt; = &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d585f90&gt;.verify_webhook_signature">security_manager = &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d585f90&gt;
+
+    def test_webhook_verification(security_manager):
+        """Test webhook signature verification."""
+        with patch("stripe.Webhook.construct_event") as mock_construct:
+            mock_construct.return_value = Mock()
+&gt;           assert security_manager.verify_webhook_signature(
+                payload="test_payload", signature="test_signature"
+            )
+E           AssertionError: assert False
+E            +  where False = &lt;bound method SecurityManager.verify_webhook_signature of &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d585f90&gt;&gt;(payload='test_payload', signature='test_signature')
+E            +    where &lt;bound method SecurityManager.verify_webhook_signature of &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d585f90&gt;&gt; = &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d585f90&gt;.verify_webhook_signature
+
+tests/test_security.py:60: AssertionError</failure></testcase><testcase classname="tests.test_security" name="test_webhook_verification_failure" time="0.004" /><testcase classname="tests.test_security" name="test_failed_attempt_logging" time="0.007" /><testcase classname="tests.test_security" name="test_get_encrypted_config" time="0.004"><failure message="AssertionError: assert 'pk_test_123' != 'pk_test_123'">security_manager = &lt;src.secondbrain.monetization.security.SecurityManager object at 0x13d746da0&gt;
+
+    def test_get_encrypted_config(security_manager):
+        """Test getting encrypted configuration."""
+        config = security_manager.get_encrypted_config()
+    
+        assert "stripe_secret_key" in config
+        assert "stripe_publishable_key" in config
+        assert config["stripe_secret_key"] != "sk_test_123"
+&gt;       assert config["stripe_publishable_key"] != "pk_test_123"
+E       AssertionError: assert 'pk_test_123' != 'pk_test_123'
+
+tests/test_security.py:98: AssertionError</failure></testcase><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_initialization" time="0.002" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_get_info" time="0.001" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_get_commands" time="0.001" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_get_system_metrics" time="0.006"><failure message="AttributeError: &lt;module 'psutil' from '/Users/mac/.pyenv/versions/3.10.13/lib/python3.10/site-packages/psutil/__init__.py'&gt; does not have the attribute 'sensors_temperatures'">args = (&lt;tests.test_system_monitor.TestSystemMonitorPlugin object at 0x13d4943d0&gt;,)
+keywargs = {'mock_metrics': SystemMetrics(cpu_percent=50.0, memory_percent=75.0, disk_usage={'/': 60.0, '/home': 80.0}, network_i...e_left': 7200.0}, gpu_usage=30.0), 'plugin': &lt;plugins.system_monitor_plugin.SystemMonitorPlugin object at 0x13d747fa0&gt;}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+&gt;       with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+
+../../.pyenv/versions/3.10.13/lib/python3.10/unittest/mock.py:1376: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../.pyenv/versions/3.10.13/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+../../.pyenv/versions/3.10.13/lib/python3.10/unittest/mock.py:1358: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+../../.pyenv/versions/3.10.13/lib/python3.10/contextlib.py:492: in enter_context
+    result = _cm_type.__enter__(cm)
+../../.pyenv/versions/3.10.13/lib/python3.10/unittest/mock.py:1447: in __enter__
+    original, local = self.get_original()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;unittest.mock._patch object at 0x13d393e20&gt;
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+&gt;           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: &lt;module 'psutil' from '/Users/mac/.pyenv/versions/3.10.13/lib/python3.10/site-packages/psutil/__init__.py'&gt; does not have the attribute 'sensors_temperatures'
+
+../../.pyenv/versions/3.10.13/lib/python3.10/unittest/mock.py:1420: AttributeError</failure></testcase><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_system_command" time="0.004" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_processes_command" time="0.003" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_temperature_command" time="0.003" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_battery_command" time="0.002" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_gpu_command" time="0.003" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_cpu_command" time="0.003" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_memory_command" time="0.003" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_disk_command" time="0.003" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_network_command" time="0.002" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_uptime_command" time="0.002" /><testcase classname="tests.test_system_monitor.TestSystemMonitorPlugin" name="test_metrics_command" time="0.002" /><testcase classname="tests.test_voice_processor" name="test_initialization" time="0.049" /><testcase classname="tests.test_voice_processor" name="test_start_stop" time="0.003"><failure message="TypeError: object NoneType can't be used in 'await' expression">voice_processor = &lt;src.secondbrain.voice_processor.VoiceProcessor object at 0x13d6bc6a0&gt;
+
+    @pytest.mark.asyncio
+    async def test_start_stop(voice_processor):
+        """Test starting and stopping the voice processor."""
+        with patch("speech_recognition.Microphone"):
+            await voice_processor.initialize()
+&gt;           await voice_processor.start()
+E           TypeError: object NoneType can't be used in 'await' expression
+
+tests/test_voice_processor.py:27: TypeError</failure></testcase><testcase classname="tests.test_voice_processor" name="test_audio_processing" time="0.003"><failure message="AttributeError: None does not have the attribute 'recognize_google'">voice_processor = &lt;src.secondbrain.voice_processor.VoiceProcessor object at 0x13d6fbb50&gt;
+
+    @pytest.mark.asyncio
+    async def test_audio_processing(voice_processor):
+        """Test audio processing pipeline."""
+        mock_audio = Mock()
+        mock_text = "Hello, SecondBrain"
+    
+&gt;       with (
+            patch("speech_recognition.Microphone"),
+            patch.object(
+                voice_processor._recognizer, "recognize_google", return_value=mock_text
+            ),
+        ):
+
+tests/test_voice_processor.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../.pyenv/versions/3.10.13/lib/python3.10/unittest/mock.py:1447: in __enter__
+    original, local = self.get_original()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;unittest.mock._patch object at 0x13d6f3010&gt;
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+&gt;           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: None does not have the attribute 'recognize_google'
+
+../../.pyenv/versions/3.10.13/lib/python3.10/unittest/mock.py:1420: AttributeError</failure></testcase><testcase classname="tests.test_voice_processor" name="test_error_recovery" time="0.104" /><testcase classname="tests.test_voice_processor" name="test_settings_loading" time="0.004"><failure message="assert 300 == 5000&#10; +  where 300 = &lt;speech_recognition.Recognizer object at 0x13d728250&gt;.energy_threshold&#10; +    where &lt;speech_recognition.Recognizer object at 0x13d728250&gt; = &lt;src.secondbrain.voice_processor.VoiceProcessor object at 0x13d72b6d0&gt;._recognizer">voice_processor = &lt;src.secondbrain.voice_processor.VoiceProcessor object at 0x13d72b6d0&gt;
+
+    @pytest.mark.asyncio
+    async def test_settings_loading(voice_processor):
+        """Test settings loading and application."""
+        with (
+            patch("pathlib.Path.exists", return_value=True),
+            patch("pathlib.Path.read_text", return_value='{"energy_threshold": 5000}'),
+            patch("speech_recognition.Microphone"),
+        ):
+    
+            voice_processor.load_settings()
+            assert voice_processor.settings["energy_threshold"] == 5000
+    
+            await voice_processor.initialize()
+&gt;           assert voice_processor._recognizer.energy_threshold == 5000
+E           assert 300 == 5000
+E            +  where 300 = &lt;speech_recognition.Recognizer object at 0x13d728250&gt;.energy_threshold
+E            +    where &lt;speech_recognition.Recognizer object at 0x13d728250&gt; = &lt;src.secondbrain.voice_processor.VoiceProcessor object at 0x13d72b6d0&gt;._recognizer
+
+tests/test_voice_processor.py:111: AssertionError</failure></testcase><testcase classname="tests.test_voice_processor" name="test_consecutive_errors" time="0.002"><failure message="AttributeError: None does not have the attribute 'listen'">voice_processor = &lt;src.secondbrain.voice_processor.VoiceProcessor object at 0x13d7df010&gt;
+
+    @pytest.mark.asyncio
+    async def test_consecutive_errors(voice_processor):
+        """Test handling of consecutive errors."""
+&gt;       with (
+            patch("speech_recognition.Microphone"),
+            patch.object(
+                voice_processor._recognizer, "listen", side_effect=Exception("Mock error")
+            ),
+        ):
+
+tests/test_voice_processor.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../../.pyenv/versions/3.10.13/lib/python3.10/unittest/mock.py:1447: in __enter__
+    original, local = self.get_original()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;unittest.mock._patch object at 0x13d7dd510&gt;
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+&gt;           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: None does not have the attribute 'listen'
+
+../../.pyenv/versions/3.10.13/lib/python3.10/unittest/mock.py:1420: AttributeError</failure></testcase><testcase classname="tests.test_webhook_handler" name="test_checkout_completed_event" time="2.458"><failure message="assert 500 == 200&#10; +  where 500 = &lt;WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]&gt;.status_code">client = &lt;FlaskClient &lt;Flask 'src.secondbrain.monetization.webhook_handler'&gt;&gt;
+mock_stripe = &lt;MagicMock name='construct_event' id='5324977392'&gt;
+
+    def test_checkout_completed_event(client, mock_stripe):
+        """Test handling of checkout completed event."""
+        # Mock event data
+        event_data = {
+            "type": "checkout.session.completed",
+            "data": {
+                "object": {
+                    "customer_email": "test@example.com",
+                    "subscription": "sub_123",
+                    "amount_total": 999,
+                    "currency": "usd",
+                }
+            },
+        }
+        mock_stripe.return_value = event_data
+    
+        # Send request
+        response = client.post(
+            "/webhook",
+            data=json.dumps(event_data),
+            headers={"Stripe-Signature": "test_sig"},
+        )
+    
+        # Verify response
+&gt;       assert response.status_code == 200
+E       assert 500 == 200
+E        +  where 500 = &lt;WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]&gt;.status_code
+
+tests/test_webhook_handler.py:51: AssertionError</failure></testcase><testcase classname="tests.test_webhook_handler" name="test_subscription_deleted_event" time="0.005"><failure message="assert 500 == 200&#10; +  where 500 = &lt;WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]&gt;.status_code">client = &lt;FlaskClient &lt;Flask 'src.secondbrain.monetization.webhook_handler'&gt;&gt;
+mock_stripe = &lt;MagicMock name='construct_event' id='5325668464'&gt;
+
+    def test_subscription_deleted_event(client, mock_stripe):
+        """Test handling of subscription deleted event."""
+        # Mock event data
+        event_data = {
+            "type": "customer.subscription.deleted",
+            "data": {
+                "object": {
+                    "id": "sub_123",
+                    "customer": "cus_123",
+                    "status": "canceled",
+                    "canceled_at": int(datetime.now().timestamp()),
+                }
+            },
+        }
+        mock_stripe.return_value = event_data
+    
+        # Send request
+        response = client.post(
+            "/webhook",
+            data=json.dumps(event_data),
+            headers={"Stripe-Signature": "test_sig"},
+        )
+    
+        # Verify response
+&gt;       assert response.status_code == 200
+E       assert 500 == 200
+E        +  where 500 = &lt;WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]&gt;.status_code
+
+tests/test_webhook_handler.py:79: AssertionError</failure></testcase><testcase classname="tests.test_webhook_handler" name="test_payment_failed_event" time="0.006"><failure message="assert 500 == 200&#10; +  where 500 = &lt;WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]&gt;.status_code">client = &lt;FlaskClient &lt;Flask 'src.secondbrain.monetization.webhook_handler'&gt;&gt;
+mock_stripe = &lt;MagicMock name='construct_event' id='5325652320'&gt;
+
+    def test_payment_failed_event(client, mock_stripe):
+        """Test handling of payment failed event."""
+        # Mock event data
+        event_data = {
+            "type": "invoice.payment_failed",
+            "data": {
+                "object": {
+                    "id": "in_456",
+                    "customer": "cus_123",
+                    "customer_email": "test@example.com",
+                    "amount_due": 999,
+                    "attempt_count": 1,
+                }
+            },
+        }
+        mock_stripe.return_value = event_data
+    
+        # Send request
+        response = client.post(
+            "/webhook",
+            data=json.dumps(event_data),
+            headers={"Stripe-Signature": "test_sig"},
+        )
+    
+        # Verify response
+&gt;       assert response.status_code == 200
+E       assert 500 == 200
+E        +  where 500 = &lt;WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]&gt;.status_code
+
+tests/test_webhook_handler.py:108: AssertionError</failure></testcase><testcase classname="tests.test_webhook_handler" name="test_subscription_updated_event" time="0.005"><failure message="assert 500 == 200&#10; +  where 500 = &lt;WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]&gt;.status_code">client = &lt;FlaskClient &lt;Flask 'src.secondbrain.monetization.webhook_handler'&gt;&gt;
+mock_stripe = &lt;MagicMock name='construct_event' id='5326122160'&gt;
+
+    def test_subscription_updated_event(client, mock_stripe):
+        """Test handling of subscription updated event."""
+        # Mock event data
+        event_data = {
+            "type": "customer.subscription.updated",
+            "data": {
+                "object": {
+                    "id": "sub_123",
+                    "customer": "cus_123",
+                    "status": "active",
+                    "current_period_end": int(datetime.now().timestamp()),
+                }
+            },
+        }
+        mock_stripe.return_value = event_data
+    
+        # Send request
+        response = client.post(
+            "/webhook",
+            data=json.dumps(event_data),
+            headers={"Stripe-Signature": "test_sig"},
+        )
+    
+        # Verify response
+&gt;       assert response.status_code == 200
+E       assert 500 == 200
+E        +  where 500 = &lt;WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]&gt;.status_code
+
+tests/test_webhook_handler.py:136: AssertionError</failure></testcase><testcase classname="tests.test_webhook_handler" name="test_invalid_signature" time="0.004" /><testcase classname="tests.test_webhook_handler" name="test_missing_signature" time="0.006" /><testcase classname="tests.test_webhook_handler" name="test_invalid_payload" time="0.004" /><testcase classname="tests.test_webhook_handler" name="test_unknown_event_type" time="0.011" /></testsuite></testsuites>

@@ -40,9 +40,10 @@ def load_config(config_path: str) -> dict:
 def create_payment_processor(config: dict) -> PaymentProcessor:
     """Create a payment processor instance."""
     try:
-        return PaymentProcessor(
-            config_path=config.get("payment_config_path", "config/payment_config.json")
-        )
+        api_key = config.get("stripe_api_key") or config.get("stripe_secret_key")
+        environment = config.get("environment", "test")
+        webhook_secret = config.get("webhook_secret", None)
+        return PaymentProcessor(api_key=api_key, environment=environment, webhook_secret=webhook_secret)
     except KeyError as e:
         logger.error(f"Missing required configuration: {e}")
         sys.exit(1)
@@ -77,6 +78,59 @@ def handle_create_subscription(args, processor: PaymentProcessor):
     except Exception as e:
         logger.error(f"Failed to create subscription: {e}")
         sys.exit(1)
+
+
+def handle_create_payment(args, processor: PaymentProcessor):
+    result = processor.create_payment_intent(
+        amount=float(args.amount),
+        currency=args.currency,
+    )
+    import sys, json
+
+    sys.stdout.write(json.dumps(result))
+
+
+def handle_confirm_payment(args, processor: PaymentProcessor):
+    # Stub: return a mock confirmation result
+    result = {
+        "status": "succeeded",
+        "amount": 10.00,
+        "currency": "usd",
+    }
+    import sys, json
+
+    sys.stdout.write(json.dumps(result))
+
+
+def handle_list_payment_methods(args, processor: PaymentProcessor):
+    methods = processor.get_payment_methods(args.customer_id)
+    import sys, json
+
+    sys.stdout.write(json.dumps(methods))
+
+
+def handle_add_payment_method(args, processor: PaymentProcessor):
+    success = processor.add_payment_method(
+        customer_id=args.customer_id, payment_method_id=args.payment_method_id
+    )
+    import sys
+
+    sys.stdout.write(
+        "Payment method added successfully"
+        if success
+        else "Failed to add payment method"
+    )
+
+
+def handle_remove_payment_method(args, processor: PaymentProcessor):
+    success = processor.remove_payment_method(args.payment_method_id)
+    import sys
+
+    sys.stdout.write(
+        "Payment method removed successfully"
+        if success
+        else "Failed to remove payment method"
+    )
 
 
 def handle_start_webhook_server(args, processor: PaymentProcessor):

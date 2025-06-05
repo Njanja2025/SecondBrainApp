@@ -5,7 +5,7 @@ Payment processor for handling Stripe payments and subscriptions.
 import json
 import logging
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 from .security import SecurityManager
 
 logger = logging.getLogger(__name__)
@@ -14,10 +14,11 @@ logger = logging.getLogger(__name__)
 class PaymentProcessor:
     """Handles payment processing and subscription management."""
 
-    def __init__(self, api_key=None, environment=None):
+    def __init__(self, api_key: str, environment: str, webhook_secret: Optional[str] = None):
         """Initialize the payment processor."""
         self.api_key = api_key
         self.environment = environment
+        self.webhook_secret = webhook_secret
         # Set up config_path for test compatibility
         self.config_path = f"/tmp/payment_config_{environment or 'test'}.json"
         # Try to load config if file exists, else set a default
@@ -40,11 +41,9 @@ class PaymentProcessor:
         try:
             import stripe as stripe_module
             self.stripe = stripe_module
-            self.stripe_error = stripe_module.error
         except ImportError:
-            self.stripe = None
-            class DummyStripeError(Exception): pass
-            self.stripe_error = type('error', (), {'StripeError': DummyStripeError})
+            self.stripe = None  # For test environments without stripe
+
         from .security import SecurityManager
         self.security = SecurityManager()
 
@@ -95,7 +94,7 @@ class PaymentProcessor:
             self.security.log_failed_attempt("subscription_creation", str(e))
             raise
 
-    def handle_webhook_event(self, payload: str, signature: str) -> Dict:
+    def handle_webhook_event(self, payload: str, signature: str) -> Dict[str, Any]:
         """Handle webhook event."""
         try:
             # Verify webhook signature
@@ -107,20 +106,25 @@ class PaymentProcessor:
                 return {"status": "error", "message": "Invalid signature"}
 
             # Construct and verify event
-            event = self.stripe.Webhook.construct_event(
-                payload=payload,
-                sig_header=signature,
-                secret=self.config["webhook_secret"],
-            )
-
-            # Handle specific event types
-            if event.type == "checkout.session.completed":
+            secret = self.webhook_secret or getattr(self, 'config', {}).get('webhook_secret', None)
+            if not self.stripe:
+                return {"status": "error", "message": "Stripe module not available"}
+            try:
+                event = self.stripe.Webhook.construct_event(
+                    payload=payload,
+                    sig_header=signature,
+                    secret=secret,
+                )
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+            # Patch event handling for dict compatibility
+            event_type = getattr(event, 'type', None) or event.get('type')
+            if event_type == "checkout.session.completed":
                 return self._handle_checkout_completed(event)
-            elif event.type == "customer.subscription.updated":
+            elif event_type == "customer.subscription.updated":
                 return self._handle_subscription_updated(event)
-            elif event.type == "customer.subscription.deleted":
+            elif event_type == "customer.subscription.deleted":
                 return self._handle_subscription_deleted(event)
-
             return {"status": "success", "message": "Event processed"}
 
         except Exception as e:

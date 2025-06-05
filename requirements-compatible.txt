@@ -1,0 +1,70 @@
+# Compatible requirements for SecondBrainApp (auto-generated)
+# Core and direct dependencies
+boto3==1.28.64
+dropbox==12.0.2
+pyicloud  # (version not pinned, as not found in current reqs)
+schedule==1.2.2
+python-dotenv==1.1.0
+
+# Web framework and related
+fastapi==0.103.2  # latest compatible with Starlette 0.27.0
+starlette==0.27.0
+uvicorn==0.34.3
+httpx==0.28.1
+websockets==15.0.1
+
+# Typing and validation
+pydantic==1.10.12
+typing-extensions>=4.8.0
+
+# Monitoring and logging
+psutil==7.0.0
+prometheus-client==0.17.1
+loguru==0.7.2
+
+# Audio and speech
+pyaudio==0.2.14
+SpeechRecognition==3.14.3
+pyttsx3==2.98
+speechrecognition
+
+# Misc utilities
+python-dateutil==2.8.2
+requests==2.32.3
+tqdm==4.66.1
+rich==13.7.0
+aiofiles==23.2.1
+cryptography==41.0.7
+pyOpenSSL==23.3.0
+pycryptodome==3.19.0
+eth_typing==2.3.0
+numpy<2.0.0
+
+# AI/ML
+transformers==4.35.2
+torch==2.2.2
+torchaudio==2.2.2
+torchvision==0.17.2
+huggingface-hub==0.31.2
+
+# Development and testing
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+pytest-asyncio==0.23.2
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.0
+isort==5.12.0
+
+# Cloud/Google
+google-api-python-client==2.171.0
+google-auth==2.40.2
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.0.0
+
+# Blockchain and Cryptography
+web3<6.0.0  # Pinned for eth_typing==2.3.0 compatibility
+
+# Remove/relax any other strict pins as needed for your use case.
+# If you need more, add from current_requirements.txt as needed.

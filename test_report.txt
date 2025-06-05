@@ -1,0 +1,228 @@
+/Users/mac/.pyenv/versions/3.10.13/lib/python3.10/site-packages/web3/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+============================= test session starts ==============================
+platform darwin -- Python 3.10.13, pytest-7.4.4, pluggy-1.6.0 -- /Users/mac/.pyenv/versions/3.10.13/bin/python3.10
+cachedir: .pytest_cache
+rootdir: /Users/mac/Applications/SecondBrainApp
+configfile: pyproject.toml
+plugins: asyncio-0.23.8, cov-4.1.0, mock-3.12.0, anyio-3.7.1, web3-5.31.4, typeguard-4.4.2, dash-3.0.4
+asyncio: mode=strict
+collecting ... collected 53 items
+
+tests/test_cli.py::test_setup_logging PASSED                             [  1%]
+tests/test_cli.py::test_load_config PASSED                               [  3%]
+tests/test_cli.py::test_load_config_missing_file PASSED                  [  5%]
+tests/test_cli.py::test_load_config_invalid_json PASSED                  [  7%]
+tests/test_cli.py::test_create_payment_processor PASSED                  [  9%]
+tests/test_cli.py::test_create_payment_processor_missing_config PASSED   [ 11%]
+tests/test_cli.py::test_handle_create_payment PASSED                     [ 13%]
+tests/test_cli.py::test_handle_confirm_payment PASSED                    [ 15%]
+tests/test_cli.py::test_handle_list_payment_methods PASSED               [ 16%]
+tests/test_cli.py::test_handle_add_payment_method PASSED                 [ 18%]
+tests/test_cli.py::test_handle_remove_payment_method PASSED              [ 20%]
+tests/test_cli.py::test_handle_start_webhook_server PASSED               [ 22%]
+tests/test_companion_journaling_backup.py::test_create_backup PASSED     [ 24%]
+tests/test_companion_journaling_backup.py::test_backup_journal_entries PASSED [ 26%]
+tests/test_companion_journaling_backup.py::test_backup_emotional_logs PASSED [ 28%]
+tests/test_companion_journaling_backup.py::test_backup_memory_entries PASSED [ 30%]
+tests/test_companion_journaling_backup.py::test_backup_interaction_patterns PASSED [ 32%]
+tests/test_companion_journaling_backup.py::test_cleanup_old_backups PASSED [ 33%]
+tests/test_payment_integration.py::test_create_subscription PASSED       [ 35%]
+tests/test_payment_integration.py::test_webhook_handling PASSED          [ 37%]
+tests/test_payment_integration.py::test_security_features FAILED         [ 39%]
+tests/test_payment_integration.py::test_logging PASSED                   [ 41%]
+tests/test_payment_integration.py::test_companion_backup_trigger PASSED  [ 43%]
+tests/test_payment_processor.py::test_create_payment_intent PASSED       [ 45%]
+tests/test_payment_processor.py::test_confirm_payment PASSED             [ 47%]
+tests/test_payment_processor.py::test_handle_webhook_event PASSED        [ 49%]
+tests/test_payment_processor.py::test_calculate_tax PASSED               [ 50%]
+tests/test_plugins.py::test_get_weather PASSED                           [ 52%]
+tests/test_plugins.py::test_get_forecast PASSED                          [ 54%]
+tests/test_plugins.py::test_wind_direction PASSED                        [ 56%]
+tests/test_plugins.py::test_weather_command PASSED                       [ 58%]
+tests/test_security.py::test_encryption_key_creation PASSED              [ 60%]
+tests/test_security.py::test_api_key_encryption PASSED                   [ 62%]
+tests/test_security.py::test_webhook_verification PASSED                 [ 64%]
+tests/test_security.py::test_webhook_verification_failure PASSED         [ 66%]
+tests/test_security.py::test_failed_attempt_logging PASSED               [ 67%]
+tests/test_security.py::test_get_encrypted_config PASSED                 [ 69%]
+tests/test_system_monitor.py::TestSystemMonitorPlugin::test_initialization PASSED [ 71%]
+tests/test_system_monitor.py::TestSystemMonitorPlugin::test_disk_command PASSED [ 73%]
+tests/test_system_monitor.py::TestSystemMonitorPlugin::test_memory_command PASSED [ 75%]
+tests/test_system_monitor.py::TestSystemMonitorPlugin::test_network_command PASSED [ 77%]
+tests/test_system_monitor.py::TestSystemMonitorPlugin::test_uptime_command PASSED [ 79%]
+tests/test_system_monitor.py::TestSystemMonitorPlugin::test_metrics_command PASSED [ 81%]
+tests/test_system_monitor.py::TestSystemMonitorPlugin::test_get_system_metrics PASSED [ 83%]
+tests/test_voice_processor.py::test_start_stop PASSED                    [ 84%]
+tests/test_voice_processor.py::test_process_audio_empty_input PASSED     [ 86%]
+tests/test_voice_processor.py::test_process_audio_valid_input PASSED     [ 88%]
+tests/test_voice_processor.py::test_get_audio_data PASSED                [ 90%]
+tests/test_webhook_handler.py::test_webhook_success PASSED               [ 92%]
+tests/test_webhook_handler.py::test_webhook_no_data PASSED               [ 94%]
+tests/test_webhook_handler.py::test_webhook_ping PASSED                  [ 96%]
+tests/test_webhook_handler.py::test_webhook_test_error PASSED            [ 98%]
+tests/test_webhook_handler.py::test_health_check PASSED                  [100%]/Users/mac/.pyenv/versions/3.10.13/lib/python3.10/site-packages/coverage/report_core.py:110: CoverageWarning: Couldn't parse Python file '/Users/mac/Applications/SecondBrainApp/src/secondbrain/voice/voice_processor.py' (couldnt-parse)
+  coverage._warn(msg, slug="couldnt-parse")
+
+
+=================================== FAILURES ===================================
+____________________________ test_security_features ____________________________
+
+test_config = '/private/var/folders/jm/j96_ym4j1yndwb0_rvxnqxfm0000gp/T/pytest-of-mac/pytest-19/test_security_features0/test_payment_config.json'
+
+    def test_security_features(test_config):
+        """Test security features."""
+        security = SecurityManager(test_config)
+    
+        # Test API key encryption
+        original_key = "sk_test_123"
+        encrypted_key = security.encrypt_api_key(original_key)
+        decrypted_key = security.decrypt_api_key(encrypted_key)
+    
+        assert encrypted_key != original_key
+        assert decrypted_key == original_key
+    
+        # Test webhook verification
+>       assert security.verify_webhook_signature(
+            payload="test_payload", signature="test_signature"
+        )
+E       AssertionError: assert False
+E        +  where False = <bound method SecurityManager.verify_webhook_signature of <secondbrain.monetization.security.SecurityManager object at 0x13c2fc250>>(payload='test_payload', signature='test_signature')
+E        +    where <bound method SecurityManager.verify_webhook_signature of <secondbrain.monetization.security.SecurityManager object at 0x13c2fc250>> = <secondbrain.monetization.security.SecurityManager object at 0x13c2fc250>.verify_webhook_signature
+
+tests/test_payment_integration.py:126: AssertionError
+
+--------- coverage: platform darwin, python 3.10.13-final-0 ----------
+Name                                                      Stmts   Miss  Cover   Missing
+---------------------------------------------------------------------------------------
+src/__init__.py                                               0      0   100%
+src/main.py                                                 132    132     0%   5-255
+src/run_scheduler.py                                         32     32     0%   5-54
+src/secondbrain/__init__.py                                  20      0   100%
+src/secondbrain/__main__.py                                  42     42     0%   5-80
+src/secondbrain/ai_agent.py                                 179    179     0%   5-358
+src/secondbrain/ai_agent/__init__.py                          2      0   100%
+src/secondbrain/ai_agent/agent.py                            20     11    45%   17-18, 22-23, 27-28, 40-45
+src/secondbrain/ai_agent/baddy_agent.py                     246    246     0%   5-391
+src/secondbrain/api.py                                       31     31     0%   1-68
+src/secondbrain/assistant.py                                 73     73     0%   1-142
+src/secondbrain/backup/__init__.py                            2      0   100%
+src/secondbrain/backup/backup_cli.py                         65     65     0%   5-117
+src/secondbrain/backup/companion_journaling_backup.py       186     35    81%   101, 115-118, 161-163, 211-213, 262-264, 312-314, 404-423, 434-435, 440-447
+src/secondbrain/backup/monitor_backup_health.py             104    104     0%   6-239
+src/secondbrain/backup/test_backup_sync.py                   62     62     0%   5-104
+src/secondbrain/backup/test_backup_system.py                 46     46     0%   6-103
+src/secondbrain/backup/vault_verifier.py                     79     79     0%   5-130
+src/secondbrain/backup/verify_backup.py                      95     95     0%   6-154
+src/secondbrain/backup/verify_connection.py                  85     85     0%   6-134
+src/secondbrain/backup/verify_installation.py                66     66     0%   3-126
+src/secondbrain/blockchain/__init__.py                        5      5     0%   6-11
+src/secondbrain/blockchain/blockchain_agent.py              391    391     0%   5-895
+src/secondbrain/blockchain/contract_manager.py               88     88     0%   5-165
+src/secondbrain/blockchain/network_manager.py               101    101     0%   5-163
+src/secondbrain/blockchain/wallet_manager.py                 30     30     0%   5-55
+src/secondbrain/brain_controller.py                         128    102    20%   32-45, 49-71, 75-98, 109-117, 121-122, 139-159, 172-174, 178-207, 211-239, 243-275, 279-281, 285-308
+src/secondbrain/cloud/log_reporter.py                       126     98    22%   66-89, 93-129, 133-219, 223-281
+src/secondbrain/companion/__init__.py                         0      0   100%
+src/secondbrain/companion/backup.py                           3      0   100%
+src/secondbrain/context/__init__.py                           2      2     0%   5-7
+src/secondbrain/context/context_manager.py                  160    160     0%   5-265
+src/secondbrain/core/strategic_planner.py                   117     99    15%   24-29, 33-43, 69-93, 112-125, 141-156, 160-172, 188-214, 233-246, 256-280, 284-296, 311-349
+src/secondbrain/darkops/__init__.py                           5      5     0%   6-11
+src/secondbrain/darkops/darkops_agent.py                      7      7     0%   4-12
+src/secondbrain/darkops/data_encryption.py                   93     93     0%   5-178
+src/secondbrain/darkops/secure_comms.py                     100    100     0%   5-169
+src/secondbrain/darkops/stealth_research.py                  90     90     0%   5-157
+src/secondbrain/database.py                                   0      0   100%
+src/secondbrain/finance/__init__.py                           3      3     0%   5-8
+src/secondbrain/finance/document_generator.py               251    251     0%   5-462
+src/secondbrain/finance/report_generator.py                 238    238     0%   5-481
+src/secondbrain/finance/report_types.py                      28     28     0%   5-63
+src/secondbrain/gui.py                                       40     40     0%   5-67
+src/secondbrain/gui/__init__.py                               2      0   100%
+src/secondbrain/gui/gui.py                                   38     28    26%   18-19, 23-52, 56-59, 63-70
+src/secondbrain/gui/recovery_dialog.py                       73     73     0%   6-161
+src/secondbrain/gui/system_tray.py                          152    152     0%   5-257
+src/secondbrain/intel/global_web_scout.py                   163    142    13%   20-175, 181-191, 195-205, 214-254, 258-327, 331-350, 354-401, 405-417, 421-427, 431-437, 449
+src/secondbrain/intel/web_summarizer.py                      55     43    22%   18-22, 43-67, 72-82, 87-101, 114-132
+src/secondbrain/memory/__init__.py                            2      0   100%
+src/secondbrain/memory/agent_memory.py                      135    113    16%   13-16, 19, 28-30, 35-40, 50-72, 82-117, 123-159, 163-180, 184-213, 219-223, 227-235, 239-257, 263-280, 284
+src/secondbrain/memory/cloud_backup.py                       96     75    22%   28-31, 35-47, 63-82, 98-133, 158-179, 197-233, 237-242, 246-248
+src/secondbrain/memory/diagnostic_memory_core.py             22     12    45%   17-18, 34-49, 61, 73, 77-78
+src/secondbrain/memory/memory_engine.py                     132    132     0%   5-337
+src/secondbrain/memory/memory_integration.py                 72     72     0%   5-163
+src/secondbrain/memory/memory_store.py                       84     68    19%   18-25, 29-30, 36-48, 52-71, 89-108, 121-153, 157-166, 170-179
+src/secondbrain/memory/persona_memory.py                     94     78    17%   17-22, 26, 30-32, 36-49, 61-83, 97-106, 119-163, 167-186, 190-204
+src/secondbrain/memory/self_train.py                         98     98     0%   5-214
+src/secondbrain/monetization/__init__.py                      0      0   100%
+src/secondbrain/monetization/cli.py                         133     67    50%   65-67, 72-98, 106-108, 153, 162, 167-279, 297
+src/secondbrain/monetization/payment_processor.py            55     15    73%   18-19, 24, 41-42, 58-66, 82
+src/secondbrain/monetization/security.py                     64     13    80%   32-37, 46-49, 86-88, 93
+src/secondbrain/monetization/subscription_manager.py         97     97     0%   6-175
+src/secondbrain/monetization/webhook_handler.py              66     12    82%   15-18, 38-39, 55-57, 92, 97, 101
+src/secondbrain/monitoring.py                                85     85     0%   1-166
+src/secondbrain/notifications.py                             90     90     0%   1-154
+src/secondbrain/persona/adaptive_learning.py                117     95    19%   20-41, 59-89, 97-103, 111-112, 116-129, 138-161, 165-168, 177, 189, 198-209, 222, 242-257, 261-285, 294-312
+src/secondbrain/persona/emotion_adapter.py                  144    124    14%   22-44, 53-111, 125-146, 150-184, 188-209, 213-225, 229-243, 247-261, 265-300
+src/secondbrain/persona/mood_meter.py                        95     78    18%   21-49, 53-79, 92-128, 132-147, 151-186, 190-202, 206-221
+src/secondbrain/persona/samantha_voice_system.py            574    495    14%   26-322, 326-337, 344-350, 364-384, 394-428, 432-461, 465-492, 496-511, 515-522, 526-545, 549-565, 569-582, 586-594, 604, 624-632, 636-649, 653-675, 679-697, 701-712, 721-745, 749-783, 787-813, 817-821, 825-835, 839-847, 851-867, 871-882, 893-899, 908, 912, 929-947, 956-971, 975-991, 995-1005, 1013-1068, 1072-1079, 1083-1096, 1102-1111, 1120-1150, 1154, 1163-1171, 1175-1181, 1185-1191, 1200-1202, 1206-1209, 1213-1220, 1229-1230, 1239-1240, 1244, 1248, 1252, 1269-1326, 1339-1350, 1360-1406, 1418-1450, 1455-1463, 1467-1488, 1494-1500, 1507-1524, 1528-1541, 1545, 1573
+src/secondbrain/persona/sound_ambiance.py                    95     77    19%   21-48, 52-56, 60-69, 78-119, 123-129, 138-143, 152-158, 162-188
+src/secondbrain/persona/theme_manager.py                     84     67    20%   21-58, 62-69, 78-96, 105-131, 147-169, 173-174, 178-199
+src/secondbrain/plugins/__init__.py                           0      0   100%
+src/secondbrain/plugins/system_monitor_plugin.py             73     23    68%   6, 41, 49, 52-53, 65-66, 117, 123-126, 129-135, 138-141
+src/secondbrain/plugins/weather_plugin.py                    12      4    67%   6, 9, 12, 15
+src/secondbrain/resilience.py                               105    105     0%   1-202
+src/secondbrain/scaling.py                                  117    117     0%   1-204
+src/secondbrain/service_registry.py                         156    156     0%   1-247
+src/secondbrain/system_monitor_plugin.py                      8      3    62%   3, 6, 10
+src/secondbrain/tasks/__init__.py                             3      3     0%   6-9
+src/secondbrain/tasks/executor.py                            25     25     0%   5-48
+src/secondbrain/tasks/memory_planner.py                      23     23     0%   5-66
+src/secondbrain/tasks/planner.py                             12     12     0%   5-29
+src/secondbrain/timeline/timeline_engine.py                  24     16    33%   11-14, 23-31, 40-66, 75-76, 85
+src/secondbrain/timeline_engine.py                           11     11     0%   5-36
+src/secondbrain/utils/__init__.py                             6      6     0%   5-11
+src/secondbrain/utils/config.py                             119    119     0%   5-249
+src/secondbrain/utils/config_loader.py                        0      0   100%
+src/secondbrain/utils/data_io.py                            117    117     0%   6-266
+src/secondbrain/utils/email_analytics.py                    486    486     0%   5-1967
+src/secondbrain/utils/email_notifier.py                      59     59     0%   5-341
+src/secondbrain/utils/email_queue.py                         71     71     0%   5-203
+src/secondbrain/utils/encryption_utils.py                    50     50     0%   6-111
+src/secondbrain/utils/hotkey.py                             115    115     0%   5-232
+src/secondbrain/utils/logger.py                             103    103     0%   5-279
+src/secondbrain/utils/resilience.py                          15     15     0%   1-17
+src/secondbrain/utils/security.py                            63     63     0%   5-144
+src/secondbrain/utils/update_checker.py                      80     80     0%   6-165
+src/secondbrain/utils/validation.py                          83     83     0%   5-186
+src/secondbrain/voice/__init__.py                             2      2     0%   5-7
+src/secondbrain/voice/config.py                               2      2     0%   5-7
+src/secondbrain/voice/contract_speech.py                      2      2     0%   1-2
+src/secondbrain/voice/conversation_loop.py                  119    119     0%   5-209
+src/secondbrain/voice/emotion_voice_adapter.py               44     44     0%   5-113
+src/secondbrain/voice/examples/__init__.py                    0      0   100%
+src/secondbrain/voice/examples/enhanced_persona_demo.py     163    163     0%   5-515
+src/secondbrain/voice/examples/persona_demo.py               72     72     0%   5-206
+src/secondbrain/voice/main.py                               127    127     0%   5-275
+src/secondbrain/voice/respond_with_voice.py                   2      2     0%   6-14
+src/secondbrain/voice/samantha_memory_dashboard.py          123    123     0%   5-245
+src/secondbrain/voice/voice_enhancement.py                   64     64     0%   5-161
+src/secondbrain/voice/voice_modulator.py                     19     19     0%   1-32
+src/secondbrain/voice/voice_persona.py                      267    267     0%   6-618
+src/secondbrain/voice/wake_word_listener.py                  93     93     0%   5-196
+src/secondbrain/voice_processor.py                          141     82    42%   30-39, 43-51, 55-65, 69-75, 79-84, 87-94, 98, 102, 106-111, 115-117, 121-132, 136-137, 141-142, 146, 150-151, 160, 162-167, 197
+src/secondbrain/vpn_config.py                               174    174     0%   1-339
+src/secondbrain/vpn_connection.py                           148    148     0%   1-263
+src/secondbrain/vpn_dns.py                                  145    145     0%   1-323
+src/secondbrain/vpn_killswitch.py                            93     93     0%   1-203
+src/secondbrain/vpn_location.py                             116    116     0%   1-196
+src/secondbrain/vpn_manager.py                               47     47     0%   1-78
+src/secondbrain/web_scout/global_scanner.py                  82     56    32%   28-39, 43-52, 61-77, 81-92, 96, 106, 115, 125, 130, 135, 140, 149, 154, 159, 164, 168-179, 188-212, 221-245
+src/secondbrain/webhook_handler.py                           19     19     0%   1-27
+src/secondbrain/websocket.py                                 61     61     0%   1-118
+---------------------------------------------------------------------------------------
+TOTAL                                                     10551   9620     9%
+
+=========================== short test summary info ============================
+FAILED tests/test_payment_integration.py::test_security_features - AssertionE...
+========================= 1 failed, 52 passed in 8.88s =========================

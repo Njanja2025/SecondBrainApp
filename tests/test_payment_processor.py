@@ -54,11 +54,17 @@ def mock_stripe():
 
 
 @pytest.fixture
-def payment_processor(mock_stripe, tmp_path):
+def mock_stripe_key():
+    """Reusable mock Stripe secret key."""
+    return "test_key"
+
+
+@pytest.fixture
+def payment_processor(mock_stripe, tmp_path, mock_stripe_key):
     """Create a payment processor instance with a valid config file."""
     config_path = tmp_path / "payment_config.json"
     config = {
-        "stripe_secret_key": "test_key_encrypted",
+        "stripe_secret_key": mock_stripe_key,
         "webhook_secret": "test_secret",
         "supported_currencies": ["usd", "eur"],
         "payment_methods": ["card"],
@@ -68,21 +74,13 @@ def payment_processor(mock_stripe, tmp_path):
         },
         "subscription_plans": {},
         "urls": {"success": "http://localhost/success", "cancel": "http://localhost/cancel"},
+        "logging": {"file": str(tmp_path / "test_payments.log")},
     }
     with open(config_path, "w") as f:
         json.dump(config, f)
     # Patch SecurityManager.decrypt_api_key to return the test key
-    with patch("src.secondbrain.monetization.security.SecurityManager.decrypt_api_key", return_value="test_key"), \
-         patch("stripe.PaymentIntent.create") as mock_create:
-        mock_create.return_value = {
-            "id": "pi_test123",
-            "client_secret": "pi_test123_secret",
-            "status": "requires_payment_method"
-        }
-        processor = PaymentProcessor(
-            api_key="test_key",
-            environment="test",
-        )
+    with patch("src.secondbrain.monetization.security.SecurityManager.decrypt_api_key", return_value=mock_stripe_key):
+        processor = PaymentProcessor(api_key=mock_stripe_key, environment="test", webhook_secret="test_secret")
     return processor
 
 

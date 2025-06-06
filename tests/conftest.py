@@ -58,3 +58,28 @@ def mock_stripe():
             "payment_method": mock_payment_method,
             "webhook": mock_webhook,
         }
+
+@pytest.fixture
+def mock_processor(mock_stripe_key):
+    """Create a mock payment processor using the shared mock_stripe_key."""
+    processor = Mock()
+    processor.stripe = Mock()
+    processor.stripe.api_key = mock_stripe_key
+    processor.webhook_secret = "test_secret"
+    # Add all methods used in CLI tests
+    processor.create_payment_intent.return_value = {
+        "payment_intent_id": "pi_test123",
+        "client_secret": "pi_test123_secret",
+        "status": "requires_payment_method",
+    }
+    processor.confirm_payment.return_value = {
+        "status": "succeeded",
+        "amount": 10.00,
+        "currency": "usd",
+    }
+    processor.get_payment_methods.return_value = [
+        {"id": "pm_test123", "type": "card", "card": {"brand": "visa", "last4": "4242"}}
+    ]
+    processor.add_payment_method.return_value = True
+    processor.remove_payment_method.return_value = True
+    return processor

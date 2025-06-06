@@ -33,21 +33,6 @@ def mock_config(tmp_path):
     return str(config_path)
 
 
-@pytest.fixture
-def mock_stripe_key():
-    """Reusable mock Stripe secret key for CLI tests."""
-    return "test_key"
-
-
-@pytest.fixture
-def mock_processor(mock_stripe_key):
-    """Create a mock payment processor using the shared mock_stripe_key."""
-    processor = Mock()
-    processor.stripe.api_key = mock_stripe_key
-    processor.webhook_secret = "test_secret"
-    return processor
-
-
 def test_setup_logging():
     """Test logging setup."""
     with patch("logging.basicConfig") as mock_logging:

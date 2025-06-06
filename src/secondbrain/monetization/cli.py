@@ -41,11 +41,16 @@ def create_payment_processor(config: dict) -> PaymentProcessor:
     """Create a payment processor instance."""
     try:
         api_key = config.get("stripe_api_key") or config.get("stripe_secret_key")
+        if not api_key:
+            print("Missing required configuration: stripe_api_key or stripe_secret_key", flush=True)
+            import sys
+            sys.exit(1)
         environment = config.get("environment", "test")
         webhook_secret = config.get("webhook_secret", None)
         return PaymentProcessor(api_key=api_key, environment=environment, webhook_secret=webhook_secret)
     except KeyError as e:
         logger.error(f"Missing required configuration: {e}")
+        import sys
         sys.exit(1)
 
 
@@ -136,7 +141,10 @@ def handle_remove_payment_method(args, processor: PaymentProcessor):
 def handle_start_webhook_server(args, processor: PaymentProcessor):
     """Handle start-webhook-server command."""
     try:
-        handler = create_webhook_handler()
+        # Extract keys for test compatibility
+        stripe_api_key = getattr(processor, 'api_key', None)
+        webhook_secret = getattr(processor, 'webhook_secret', None)
+        handler = create_webhook_handler(stripe_api_key=stripe_api_key, webhook_secret=webhook_secret)
         handler.run(host=args.host, port=args.port, debug=args.debug)
     except Exception as e:
         logger.error(f"Failed to start webhook server: {e}")

@@ -6,6 +6,7 @@ import pytest
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch, MagicMock
 from plugins.system_monitor_plugin import SystemMonitorPlugin, SystemMetrics
+import psutil
 
 
 @pytest.fixture
@@ -38,6 +39,14 @@ def mock_metrics():
         },
         gpu_usage=30.0,
     )
+
+
+@pytest.fixture(autouse=True)
+def patch_psutil_sensors_temperatures():
+    import psutil
+
+    if not hasattr(psutil, "sensors_temperatures"):
+        setattr(psutil, "sensors_temperatures", lambda: {})
 
 
 class TestSystemMonitorPlugin:

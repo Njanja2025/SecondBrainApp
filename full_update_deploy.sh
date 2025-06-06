@@ -42,8 +42,9 @@ echo "Deploying application..."
 
 # Tag the release with a timestamp
 TAG="release-$(date +%Y%m%d%H%M%S)"
-git tag -a "$TAG" -m "Automated release on $(date)"
-git push origin "$TAG"
+git tag -a "$TAG" -m "Automated release on $(date)" || { echo "Tag creation failed. Aborting."; exit 1; }
+git push origin "$TAG" || { echo "Tag push failed. Aborting."; exit 1; }
 echo "Tagged release as $TAG"
 
 echo "Full update, test, deploy, and tag complete."
+exit 0

@@ -141,20 +141,8 @@ class SystemMonitorPlugin:
         return f"GPU Usage: {metrics.gpu_usage:.1f}%"
     
     def get_system_metrics(self):
-        # Return a dict for test compatibility
-        metrics = self._get_system_metrics()
-        return {
-            "cpu_usage": metrics.cpu_percent,
-            "memory_usage": metrics.memory_percent,
-            "disk_usage": metrics.disk_usage,
-            "network_io": metrics.network_io,
-            "boot_time": metrics.boot_time,
-            "uptime": metrics.uptime,
-            "process_count": metrics.process_count,
-            "temperature": metrics.temperature,
-            "battery": metrics.battery,
-            "gpu_usage": metrics.gpu_usage,
-        }
+        """Public method for tests to get system metrics."""
+        return self._get_system_metrics()
 
     def _get_system_metrics(self):
         # Return mock data for tests

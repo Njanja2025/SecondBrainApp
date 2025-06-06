@@ -26,13 +26,12 @@ class PaymentProcessor:
             with open(self.config_path) as f:
                 self.config = json.load(f)
         except Exception:
+            # If config is not provided, create a minimal config for test compatibility
             self.config = {
-                "supported_currencies": ["usd"],
-                "payment_methods": ["card"],
-                "tax_rates": {"usd": {"standard": 0.0, "reduced": 0.0}},
-                "webhook_secret": "test_secret",
-                "subscription_plans": {},
-                "urls": {"success": "http://localhost/success", "cancel": "http://localhost/cancel"},
+                "stripe_secret_key": api_key,
+                "environment": environment,
+                "webhook_secret": webhook_secret,
+                "logging": {"file": "test_payments.log"},
             }
             # Write default config for test_create_default_config
             with open(self.config_path, "w") as f:

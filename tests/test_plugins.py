@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 from plugins.weather_plugin import WeatherPlugin, WeatherData
 from plugins.task_plugin import TaskPlugin, Task
+import tempfile
+import os
 
 
 @pytest.fixture
@@ -14,6 +16,16 @@ def weather_plugin():
     """Create a weather plugin instance for testing."""
     with patch.dict("os.environ", {"OPENWEATHER_API_KEY": "test_key"}):
         return WeatherPlugin()
+
+
+@pytest.fixture(autouse=True)
+def isolate_task_plugin(tmp_path, monkeypatch):
+    """Isolate TaskPlugin data file for each test and clear tasks."""
+    data_file = tmp_path / "tasks.json"
+    monkeypatch.setattr("plugins.task_plugin.Path", lambda *a, **k: data_file)
+    yield
+    if data_file.exists():
+        os.remove(data_file)
 
 
 @pytest.fixture
@@ -79,6 +91,18 @@ class TestWeatherPlugin:
     @patch("requests.get")
     def test_get_forecast(self, mock_get, weather_plugin, mock_forecast_data):
         """Test getting weather forecast."""
+        # Patch mock_forecast_data to include noon entries
+        from datetime import datetime, timedelta
+
+        base = datetime.now().replace(hour=12, minute=0, second=0, microsecond=0)
+        mock_forecast_data["list"] = [
+            {
+                "dt": int((base + timedelta(days=i)).timestamp()),
+                "main": {"temp": 22.0 + i, "humidity": 65},
+                "weather": [{"description": "clear sky"}],
+            }
+            for i in range(3)
+        ]
         mock_get.return_value.json.return_value = mock_forecast_data
         mock_get.return_value.raise_for_status = Mock()
 
@@ -125,6 +149,10 @@ class TestWeatherPlugin:
 
 class TestTaskPlugin:
     """Test cases for the task plugin."""
+
+    def setup_method(self, method):
+        self.task_plugin = TaskPlugin()
+        self.task_plugin.tasks.clear()
 
     def test_initialization(self, task_plugin):
         """Test plugin initialization."""

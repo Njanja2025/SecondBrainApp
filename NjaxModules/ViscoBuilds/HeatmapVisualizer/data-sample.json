@@ -1,0 +1,14 @@
+{
+  "trafficData": [
+    {"x": 10, "y": 10, "w": 100, "h": 100, "intensity": 0.8},
+    {"x": 120, "y": 10, "w": 100, "h": 100, "intensity": 0.3}
+  ],
+  "housingData": [
+    {"x": 10, "y": 120, "w": 100, "h": 100, "occupancy": 0.6},
+    {"x": 120, "y": 120, "w": 100, "h": 100, "occupancy": 0.9}
+  ],
+  "alerts": [
+    {"x": 60, "y": 60, "type": "flood"},
+    {"x": 170, "y": 170, "type": "outage"}
+  ]
+}

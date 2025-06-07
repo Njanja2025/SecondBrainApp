@@ -1,0 +1,5 @@
+[
+  {"id": "Node-1", "status": "online", "latency": 12},
+  {"id": "Node-2", "status": "offline", "latency": null},
+  {"id": "Node-3", "status": "online", "latency": 20}
+]

@@ -1,0 +1,7 @@
+tracker:
+  api_endpoint: https://api.njaxcity.com/live
+  features:
+    - intelligence_updates
+    - city_alerts
+    - wallet_balance
+    - smart_city_score

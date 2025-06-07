@@ -1,0 +1,10 @@
+heatmap_layers:
+  - name: traffic
+    color: red
+    data_source: NjaxAPI/traffic
+  - name: housing
+    color: blue
+    data_source: NjaxAPI/housing
+  - name: alerts
+    color: yellow
+    data_source: NjaxAPI/alerts

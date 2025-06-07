@@ -1,0 +1,5 @@
+{
+  "apiEndpoint": "https://api.njaxcity.com/housing",
+  "refreshInterval": 60,
+  "features": ["rent_status", "meter", "maintenance", "family_management"]
+}

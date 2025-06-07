@@ -1,0 +1,5 @@
+{
+  "meshApiUrl": "https://api.njaxcity.com/mesh",
+  "autoLogInterval": 10,
+  "adminFeatures": ["status", "ping", "restart", "logs"]
+}

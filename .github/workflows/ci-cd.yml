@@ -1,3 +1,5 @@
+name: CI/CD Pipeline
+
 on:
   push:
     branches:
@@ -30,7 +32,7 @@ jobs:
 
       - name: Dependency Vulnerability Check (Safety)
         run: |
-          echo -e "\033[1;31m[CYBER-DEFENSE] Vulnerable dependencies found!\033[0m"
+          echo -e "\033[1;31m[CYBER-DEFENSE] Vulnerable dependencies found\033[0m"
           safety check -r requirements.txt
         continue-on-error: true
 
@@ -73,7 +75,7 @@ jobs:
         run: |
           cd NjaxModules/ViscoBuilds/MeshDiagnosticsPanel
           npm run build
-          npm test -- --watchAll=false || (echo -e "\033[1;31m[PHANTOM-ALERT] MeshDiagnosticsPanel tests failed\033[0m" && exit 0)
+          npm test -- --watchAll=false || (echo "\033[1;31m[PHANTOM-ALERT] MeshDiagnosticsPanel tests failed\033[0m" && exit 0)
         continue-on-error: true
 
       - name: Set up Flutter
@@ -86,7 +88,7 @@ jobs:
         run: |
           cd NjaxModules/ViscoBuilds/SmartHousingUI
           flutter pub get
-          flutter build web || (echo -e "\033[1;31m[PHANTOM-ALERT] SmartHousingUI build failed\033[0m" && exit 0)
+          flutter build web || (echo "\033[1;31m[PHANTOM-ALERT] SmartHousingUI build failed\033[0m" && exit 0)
         continue-on-error: true
 
       - name: Build LiveTrackerMobile (Flutter)
@@ -94,7 +96,7 @@ jobs:
         run: |
           cd NjaxModules/ViscoBuilds/LiveTrackerMobile
           flutter pub get
-          flutter build web || (echo -e "\033[1;31m[PHANTOM-ALERT] LiveTrackerMobile build failed\033[0m" && exit 0)
+          flutter build web || (echo "\033[1;31m[PHANTOM-ALERT] LiveTrackerMobile build failed\033[0m" && exit 0)
         continue-on-error: true
 
       - name: Build HeatmapVisualizer (D3.js)

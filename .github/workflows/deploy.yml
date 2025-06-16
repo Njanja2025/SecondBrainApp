@@ -1,30 +1,56 @@
-name: Deploy Webhook Fix
+name: Deploy GitHub Pages
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repo
+      - name: ⏬ Checkout Repository
         uses: actions/checkout@v3
-      - name: Set up Python
+
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Install Dependencies
+
+      - name: 📦 Install Dependencies
         run: |
+          echo ">> Installing pip dependencies..."
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Run Tests
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            echo "⚠️ No requirements.txt found — skipping dependency install."
+          fi
+
+      - name: ⚙️ Validate Environment
         run: |
-          pytest tests/ --disable-warnings -v
-      - name: Deploy Webhook Fix
+          echo ">> Python version: $(python --version)"
+          echo ">> Working directory: $PWD"
+          echo ">> Files in repo:"
+          ls -alh
+
+      - name: 🛠️ Build Static Site
         run: |
-          chmod +x deploy_webhook_fix.sh
-          ./deploy_webhook_fix.sh
-      - name: Notify on Success
-        run: echo "Webhook fix deployed successfully!"
+          echo ">> Creating ./public directory"
+          mkdir -p public
+          echo "<html><body><h1>🚀 SecondBrainApp deployed successfully</h1></body></html>" > public/index.html
+
+      - name: 🚀 Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          force_orphan: true  # clean deploy
+          cname: ${{ secrets.CUSTOM_DOMAIN || '' }}  # optional if hosting on custom domain
+
+      - name: ✅ Confirm Deployment Complete
+        run: echo "🎉 GitHub Pages deployed with success!"

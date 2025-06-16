@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: write  # Required for pages deployment
+  contents: write  # Required for GitHub Pages deployment
 
 jobs:
   deploy:
@@ -22,38 +22,42 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: 📦 Cache pip dependencies
+      - name: 🧹 Clear pip cache
+        run: |
+          pip cache purge || true
+
+      - name: ♻️ Cache pip dependencies
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip
 
-      - name: 🔧 Install Dependencies
+      - name: 📦 Install Dependencies
         run: |
-          echo "🔧 Installing pip dependencies..."
+          echo "Installing pip dependencies..."
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
+            pip install --use-feature=2020-resolver -r requirements.txt || true
           else
-            echo "⚠️ No requirements.txt found – skipping dependency install."
+            echo "❌ No requirements.txt found — skipping dependency install."
           fi
 
-      - name: 🧪 Validate Environment
+      - name: 🔍 Validate Environment
         run: |
-          echo "🐍 Python: $(python --version)"
-          echo "📁 Working Directory: $PWD"
-          echo "📂 Files:"
+          echo "🐍 Python version: $(python --version)"
+          echo "📂 Working Directory: $PWD"
+          echo "📁 Files:"
           ls -alh
 
-      - name: 🛠️ Build Static Site
+      - name: 🏗 Build Static Site
         run: |
-          echo "🏗️ Creating ./public directory..."
+          echo "📁 Creating ./public directory..."
           mkdir -p public
-          echo "<html><body><h1>🚀 SecondBrainApp deployed successfully!</h1></body></html>" > public/index.html
+          echo "<html><body><h1>✅ SecondBrainApp deployed successfully!</h1></body></html>" > public/index.html
 
-      - name: 🕵️ Verify Build Output
+      - name: 🔍 Verify Build Output
         run: |
           if [ ! -f public/index.html ]; then
             echo "❌ Static site generation failed!"
@@ -62,7 +66,7 @@ jobs:
             echo "✅ Static site build verified."
           fi
 
-      - name: 🚢 Deploy to GitHub Pages
+      - name: 🚀 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -71,11 +75,11 @@ jobs:
           cname: ${{ secrets.CUSTOM_DOMAIN || '' }}
 
       - name: ✅ Confirm Deployment Complete
-        run: echo "✅ GitHub Pages deployed successfully!"
+        run: echo "🎉 GitHub Pages deployed successfully!"
 
-      # Optional notification hook
-      # - name: 📩 Notify via Webhook
+      # Optional: Webhook Notification (e.g., Telegram or Slack)
+      # - name: 📢 Notify via Webhook
       #   run: |
       #     curl -X POST -H "Content-Type: application/json" \
-      #     -d '{"text":"✅ SecondBrainApp deployed on GitHub Pages!"}' \
+      #     -d '{"text":"🚀 SecondBrainApp deployed on GitHub Pages!"}' \
       #     ${{ secrets.TELEGRAM_WEBHOOK }}

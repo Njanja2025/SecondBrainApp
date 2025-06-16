@@ -69,7 +69,7 @@ jobs:
       - name: 🚀 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_PAT }}
           publish_dir: ./public
           force_orphan: true
           cname: ${{ secrets.CUSTOM_DOMAIN || '' }}
@@ -77,9 +77,10 @@ jobs:
       - name: ✅ Confirm Deployment Complete
         run: echo "🎉 GitHub Pages deployed successfully!"
 
-      # Optional: Webhook Notification (e.g., Telegram or Slack)
-      # - name: 📢 Notify via Webhook
-      #   run: |
-      #     curl -X POST -H "Content-Type: application/json" \
-      #     -d '{"text":"🚀 SecondBrainApp deployed on GitHub Pages!"}' \
-      #     ${{ secrets.TELEGRAM_WEBHOOK }}
+# Optional: Telegram or Slack Notification
+# Uncomment if needed
+#      - name: 📢 Notify via Webhook
+#        run: |
+#          curl -X POST -H "Content-Type: application/json" \
+#          -d '{"text":"🚀 SecondBrainApp deployed on GitHub Pages!"}' \
+#          ${{ secrets.TELEGRAM_WEBHOOK }}

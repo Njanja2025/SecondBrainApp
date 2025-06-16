@@ -11,10 +11,10 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
     steps:
-      - name: ⏬ Checkout Repository
-        uses: actions/checkout@v3
+      - name: 🔁 Checkout Repository
+        uses: actions/checkout@v4
 
       - name: 🐍 Set up Python
         uses: actions/setup-python@v4
@@ -23,34 +23,41 @@ jobs:
 
       - name: 📦 Install Dependencies
         run: |
-          echo ">> Installing pip dependencies..."
+          echo "🔧 Installing pip dependencies..."
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
           else
-            echo "⚠️ No requirements.txt found — skipping dependency install."
+            echo "⚠️ No requirements.txt found – skipping dependency install."
           fi
 
-      - name: ⚙️ Validate Environment
+      - name: 🔍 Validate Environment
         run: |
-          echo ">> Python version: $(python --version)"
-          echo ">> Working directory: $PWD"
-          echo ">> Files in repo:"
+          echo "➡️ Python version: $(python --version)"
+          echo "➡️ Working directory: $PWD"
+          echo "➡️ Files in repo:"
           ls -alh
 
       - name: 🛠️ Build Static Site
         run: |
-          echo ">> Creating ./public directory"
+          echo "➡️ Creating ./public directory"
           mkdir -p public
           echo "<html><body><h1>🚀 SecondBrainApp deployed successfully</h1></body></html>" > public/index.html
 
+      - name: 🛡️ Verify Build Output
+        run: |
+          if [ ! -f public/index.html ]; then
+            echo "❌ Static site generation failed!"
+            exit 1
+          fi
+
       - name: 🚀 Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
-          force_orphan: true  # clean deploy
-          cname: ${{ secrets.CUSTOM_DOMAIN || '' }}  # optional if hosting on custom domain
+          force_orphan: true
+          cname: ${{ secrets.CUSTOM_DOMAIN || '' }}
 
       - name: ✅ Confirm Deployment Complete
-        run: echo "🎉 GitHub Pages deployed with success!"
+        run: echo "✅ GitHub Pages deployed with success!"

@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: 📥 Checkout Repository
+      - name: 🧾 Checkout Repository
         uses: actions/checkout@v4
 
       - name: 🐍 Set up Python
@@ -24,28 +24,28 @@ jobs:
 
       - name: 📦 Install Dependencies
         run: |
-          echo "🔧 Installing pip dependencies..."
+          echo "📦 Installing pip dependencies..."
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
           else
-            echo "⚠️ No requirements.txt found – skipping dependency install."
+            echo "⚠️ No requirements.txt found — skipping pip install."
           fi
 
       - name: 🧪 Validate Environment
         run: |
           echo "🐍 Python version: $(python --version)"
           echo "📁 Working directory: $PWD"
-          echo "📂 Files in repo:"
+          echo "📄 Files in repo:"
           ls -alh
 
-      - name: 🛠 Build Static Site
+      - name: 🏗️ Build Static Site
         run: |
-          echo "🏗 Creating ./public directory"
+          echo "🏗️ Creating ./public directory..."
           mkdir -p public
-          echo "<html><body><h1>✅ SecondBrainApp deployed successfully</h1></body></html>" > public/index.html
+          echo "<html><body><h1>🚀 SecondBrainApp deployed successfully!</h1></body></html>" > public/index.html
 
-      - name: 🕵️ Verify Build Output
+      - name: 🔍 Verify Build Output
         run: |
           if [ ! -f public/index.html ]; then
             echo "❌ Static site generation failed!"
@@ -54,7 +54,7 @@ jobs:
             echo "✅ Static site build verified."
           fi
 
-      - name: 🚀 Deploy to GitHub Pages
+      - name: 🚢 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -62,5 +62,5 @@ jobs:
           force_orphan: true
           cname: ${{ secrets.CUSTOM_DOMAIN || '' }}
 
-      - name: ✅ Confirm Deployment Complete
-        run: echo "🎉 GitHub Pages deployed with success!"
+      - name: 🎉 Confirm Deployment Complete
+        run: echo "✅ GitHub Pages deployed with success!"

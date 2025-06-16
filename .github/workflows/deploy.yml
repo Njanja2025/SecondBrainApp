@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: 📦 Checkout Repository
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
       - name: 🐍 Set up Python
@@ -22,9 +22,9 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: 📥 Install Dependencies
+      - name: 📦 Install Dependencies
         run: |
-          echo "📥 Installing pip dependencies..."
+          echo "🔧 Installing pip dependencies..."
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
@@ -36,16 +36,16 @@ jobs:
         run: |
           echo "🐍 Python version: $(python --version)"
           echo "📁 Working directory: $PWD"
-          echo "📄 Files in repo:"
+          echo "📂 Files in repo:"
           ls -alh
 
-      - name: 🏗️ Build Static Site
+      - name: 🛠 Build Static Site
         run: |
-          echo "📁 Creating ./public directory"
+          echo "🏗 Creating ./public directory"
           mkdir -p public
-          echo "<html><body><h1>🌐 SecondBrainApp deployed successfully!</h1></body></html>" > public/index.html
+          echo "<html><body><h1>✅ SecondBrainApp deployed successfully</h1></body></html>" > public/index.html
 
-      - name: 🔍 Verify Build Output
+      - name: 🕵️ Verify Build Output
         run: |
           if [ ! -f public/index.html ]; then
             echo "❌ Static site generation failed!"
@@ -63,4 +63,4 @@ jobs:
           cname: ${{ secrets.CUSTOM_DOMAIN || '' }}
 
       - name: ✅ Confirm Deployment Complete
-        run: echo "🎉 GitHub Pages deployed successfully!"
+        run: echo "🎉 GitHub Pages deployed with success!"

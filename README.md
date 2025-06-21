@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ![SecondBrain Logo](assets/secondbrain_logo.png)
 
 # Baddy-Agent
@@ -125,3 +126,6 @@ For support, please:
 1. Check the [Troubleshooting Guide](https://github.com/Njanja2025/SecondBrainApp/wiki/Troubleshooting)
 2. Open an [Issue](https://github.com/Njanja2025/SecondBrainApp/issues)
 3. Contact support@baddyagent.com 
+=======
+# SecondBrainApp
+>>>>>>> 46133858 (Initial auto-push with Visco: Docker, Compose, Makefile, README)

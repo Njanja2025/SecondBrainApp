@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+<<<<<<< HEAD
   traefik:
     image: traefik:v2.9
     command:
@@ -110,3 +111,39 @@ volumes:
   postgres_data:
   grafana_data:
   prometheus_data: 
+=======
+  secondbrainapp:
+    container_name: secondbrainapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    command: >
+      sh -c "pip install watchdog && \
+             streamlit run streamlit_app/main.py \
+             --server.port=8501 \
+             --server.address=0.0.0.0 \
+             --logger.level=debug"
+  # db:
+  #   image: postgres:14
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: brain
+  #     POSTGRES_PASSWORD: secret
+  #     POSTGRES_DB: secondbrain
+  #   volumes:
+  #     - db_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+volumes:
+  db_data:
+>>>>>>> 46133858 (Initial auto-push with Visco: Docker, Compose, Makefile, README)

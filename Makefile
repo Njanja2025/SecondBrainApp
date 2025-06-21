@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .PHONY: setup test lint format clean build run docker-build docker-run
 
 # Development setup
@@ -60,3 +61,33 @@ docs-build:
 
 docs-serve:
 	python -m http.server --directory docs/build 8000 
+=======
+# Makefile for SecondBrainApp Docker automation
+
+APP_NAME=secondbrainapp
+DOCKERFILE=Dockerfile
+TAG=$(APP_NAME):latest
+PORT=8501
+
+build:
+	docker build -t $(TAG) -f $(DOCKERFILE) .
+
+dev: build
+	docker run -it --rm -p $(PORT):$(PORT) $(TAG)
+
+shell:
+	docker run -it --rm $(TAG) /bin/bash
+
+logs:
+	docker logs -f $(APP_NAME)
+
+clean:
+	docker container stop $$(docker ps -aq --filter ancestor=$(TAG)) || true
+	docker container rm $$(docker ps -aq --filter ancestor=$(TAG)) || true
+	docker image rm $(TAG) || true
+
+gitpush:
+	git add README.md
+	git commit -m "Add project README with Docker and structure instructions" || echo "No changes to commit."
+	git push origin main
+>>>>>>> 46133858 (Initial auto-push with Visco: Docker, Compose, Makefile, README)
